@@ -1,4 +1,10 @@
-import { logtest } from "./test";
+import { createApp } from "vue";
 
-debugger;
-logtest("Hello World");
+import VueTest from "./test.vue";
+
+createApp({
+  components: {
+    "vue-test": VueTest,
+  },
+  template: "<vue-test />",
+}).mount("#app");
