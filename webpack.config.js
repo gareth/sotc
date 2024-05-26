@@ -14,6 +14,7 @@ module.exports = {
       directory: path.join(__dirname, "dist"),
     },
   },
+  devtool: "source-map",
 
   resolve: {
     extensions: [".ts", ".tsx", ".js"],
