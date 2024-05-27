@@ -1,22 +1,14 @@
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import { VueLoaderPlugin } from "vue-loader";
 
-import path from "path";
-
-const __dirname = import.meta.dirname;
-
 export default {
-  mode: "none",
+  mode: "development",
 
-  entry: "./src/index.ts",
-  // output: {
-  //   filename: "main.js",
-  //   path: path.resolve(__dirname, "dist"),
-  // },
-  devServer: {
-    static: {
-      directory: path.join(__dirname, "dist"),
-    },
+  entry: {
+    popup: "./src/popup.ts",
+    content: "./src/content.ts",
+    inject: "./src/inject.ts",
+    worker: "./src/worker.ts",
   },
   devtool: "source-map",
 
@@ -45,6 +37,7 @@ export default {
   plugins: [
     new HtmlWebpackPlugin({
       template: "src/popup.html",
+      chunks: ["popup"],
     }),
     new VueLoaderPlugin(),
   ],
