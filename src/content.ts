@@ -3,6 +3,7 @@ import { TaggedLogger } from "./util/TaggedLogger";
 import extractScript from "./scrapers/DomScraper";
 
 const logger = new TaggedLogger("Content");
+logger.info("initialized");
 
 const port = chrome.runtime.connect({ name: "gameTab" });
 
@@ -33,8 +34,9 @@ if (main) {
 
 function _injectScript() {
   const script = document.createElement("script");
-  const runtimeUrl = chrome.runtime.getURL("src/inject.ts");
+  const runtimeUrl = chrome.runtime.getURL("inject.js");
   script.src = runtimeUrl;
+  logger.debug("injecting", runtimeUrl);
   (document.head || document.documentElement).appendChild(script);
 
   // document.addEventListener("variableRetrieved", (e) => {

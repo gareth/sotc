@@ -5,6 +5,7 @@ import { RuntimeMessageType } from "./types/messages";
 import { TaggedLogger } from "./util/TaggedLogger";
 
 const logger = new TaggedLogger("Popup");
+logger.info("initialized");
 
 logger.debug("Loading game from worker");
 chrome.runtime

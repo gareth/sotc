@@ -5,13 +5,14 @@ import { RuntimeMessageType, isRuntimeMessage } from "./types/messages";
 
 const logger = new TaggedLogger("Worker");
 
+logger.info("initialized");
+
 type GamePort = chrome.runtime.Port & { name: "gameTab" };
 const isGamePort = (port: chrome.runtime.Port): port is GamePort =>
   port.name == "gameTab";
 
 chrome.runtime.onMessage.addListener(
   (message: any, sender: any, sendResponse: (...args: any[]) => void) => {
-    debugger;
     logger.debug("Received message", message, sender);
     if (!isRuntimeMessage(message)) {
       logger.warn("Unexpected runtime message", message, sender);
