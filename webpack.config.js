@@ -1,8 +1,11 @@
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-const { VueLoaderPlugin } = require("vue-loader");
+import HtmlWebpackPlugin from "html-webpack-plugin";
+import { VueLoaderPlugin } from "vue-loader";
 
-const path = require("path");
-module.exports = {
+import path from "path";
+
+const __dirname = import.meta.dirname;
+
+export default {
   mode: "none",
 
   entry: "./src/index.ts",
@@ -41,7 +44,7 @@ module.exports = {
 
   plugins: [
     new HtmlWebpackPlugin({
-      template: "src/index.html",
+      template: "src/popup.html",
     }),
     new VueLoaderPlugin(),
   ],
