@@ -1,5 +1,7 @@
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import { VueLoaderPlugin } from "vue-loader";
+import path from "path";
+import webpack from "webpack";
 
 export default {
   mode: "development",
@@ -9,9 +11,13 @@ export default {
     content: "./src/content.ts",
     inject: "./src/inject.ts",
     worker: "./src/worker.ts",
+    manifest: "./manifest.json",
   },
   devtool: "source-map",
 
+  resolveLoader: {
+    modules: [path.resolve(import.meta.dirname, "webpack"), "node_modules"],
+  },
   resolve: {
     extensions: [".ts", ".tsx", ".js"],
     alias: {
@@ -30,6 +36,11 @@ export default {
       {
         test: /\.vue$/,
         loader: "vue-loader",
+      },
+      {
+        // Generate a CRX manifest programatically
+        test: /manifest.json$/,
+        use: ["manifest-loader"],
       },
     ],
   },

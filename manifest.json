@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "Stream on the Clocktower",
+  "description": "Blood on the Clocktower streaming companion",
+  "action": {
+    "default_popup": "index.html"
+  },
+  "background": {
+    "service_worker": "worker.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://botc.app/*"
+      ],
+      "js": [
+        "content.js"
+      ]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "inject.js"
+      ],
+      "matches": [
+        "*://botc.app/*"
+      ]
+    }
+  ]
+}
