@@ -1,21 +1,26 @@
 import { TaggedLogger } from "./util/TaggedLogger";
+import extractScript from "./scrapers/VueScraper";
 
 type HTMLVueElement = HTMLElement & { __vue_app__: any };
 
-const logger = new TaggedLogger("Injected");
+const logger = new TaggedLogger("Inject");
 logger.info("initialized");
 
-const main = document.getElementById("main") as HTMLVueElement;
-logger.info("Vue", main.__vue_app__);
-
-document.addEventListener("detectVueInstance", () => {
+document.addEventListener("detectScript", () => {
+  logger.info("Script requested");
+  const main = document.getElementById("main") as HTMLVueElement;
   if (!main) return;
-  if (main.__vue_app__) {
-    console.log("Detected Vue app", main.__vue_app__);
+
+  const script = extractScript(main);
+
+  if (script) {
+    logger.info("Detected script", script);
     document.dispatchEvent(
-      new CustomEvent("vueInstance", {
-        detail: main.__vue_app__,
+      new CustomEvent("detectedScript", {
+        detail: script,
       })
     );
   }
 });
+
+document.dispatchEvent(new CustomEvent("detectScript", {}));
