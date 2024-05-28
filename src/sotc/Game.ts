@@ -1,11 +1,11 @@
-enum CharacterType {
+export enum CharacterType {
   TOWNSFOLK,
   OUTSIDER,
   MINION,
   DEMON,
 }
 
-enum CharacterAlignment {
+export enum CharacterAlignment {
   GOOD,
   EVIL,
 }

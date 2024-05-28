@@ -23,4 +23,6 @@ document.addEventListener("detectScript", () => {
   }
 });
 
-document.dispatchEvent(new CustomEvent("detectScript", {}));
+setTimeout(() => {
+  document.dispatchEvent(new CustomEvent("detectScript", {}));
+}, 3000);
