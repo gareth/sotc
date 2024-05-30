@@ -1,13 +1,13 @@
 export enum CharacterType {
-  TOWNSFOLK,
-  OUTSIDER,
-  MINION,
-  DEMON,
+  TOWNSFOLK = "t",
+  OUTSIDER = "o",
+  MINION = "m",
+  DEMON = "d",
 }
 
 export enum CharacterAlignment {
-  GOOD,
-  EVIL,
+  GOOD = "good",
+  EVIL = "evil",
 }
 
 export type Character = {

@@ -1,5 +1,5 @@
 export enum RuntimeMessageType {
-  GET_GAME_STATE,
+  GET_GAME_STATE = "get_game_state",
 }
 
 export type RuntimeMessage = { type: RuntimeMessageType.GET_GAME_STATE };
