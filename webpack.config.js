@@ -11,6 +11,7 @@ export default {
     content: "./src/content.ts",
     inject: "./src/inject.ts",
     worker: "./src/worker.ts",
+    options: "./src/options.ts",
     manifest: "./manifest.json",
   },
   devtool: "source-map",
@@ -54,6 +55,10 @@ export default {
     new HtmlWebpackPlugin({
       template: "src/popup.html",
       chunks: ["popup"],
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ["options"],
+      filename: "options.html",
     }),
     new VueLoaderPlugin(),
   ],

@@ -2,12 +2,19 @@
   "manifest_version": 3,
   "name": "Stream on the Clocktower",
   "description": "Blood on the Clocktower streaming companion",
+  "permissions": [
+    "storage"
+  ],
   "action": {
     "default_popup": "index.html"
   },
   "background": {
     "service_worker": "worker.js",
     "type": "module"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
   },
   "content_scripts": [
     {
