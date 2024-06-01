@@ -1,5 +1,19 @@
-import { Game } from "./sotc/Game";
+import { CharacterAlignment, CharacterType, Game } from "./sotc/Game";
 import { TaggedLogger } from "./util/TaggedLogger";
+
+const ALIGNMENTS = new Map([
+  ["townsfolk", CharacterAlignment.GOOD],
+  ["outsider", CharacterAlignment.GOOD],
+  ["minion", CharacterAlignment.EVIL],
+  ["demon", CharacterAlignment.EVIL],
+]);
+
+const TYPES = new Map([
+  ["townsfolk", CharacterType.TOWNSFOLK],
+  ["outsider", CharacterType.OUTSIDER],
+  ["minion", CharacterType.MINION],
+  ["demon", CharacterType.DEMON],
+]);
 
 const logger = new TaggedLogger("Content");
 logger.info("initialized");
@@ -26,6 +40,27 @@ function injectScript() {
 
   document.addEventListener("sotc/script", (e: CustomEvent) => {
     logger.info("Detected script change", e.detail);
+    const { edition, roles } = e.detail;
+
+    const mapRole = (r) => {
+      const { id, name, team, ability } = r;
+      const alignment = ALIGNMENTS.get(team);
+      const type = TYPES.get(team);
+      return { id, name, ability, alignment, type };
+    };
+
+    const script = {
+      name: edition.name,
+      author: edition.author,
+      characters: roles.map(mapRole),
+    };
+
+    const game = new Game(script);
+
+    port.postMessage({
+      type: "gameState",
+      payload: game,
+    });
   });
 
   document.addEventListener("sotc/gameState", (e: CustomEvent) => {

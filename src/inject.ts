@@ -33,8 +33,10 @@ function inject(container: HTMLVueElement) {
   const unwatchScript = globals.$store.watch(
     (state) => [state.edition, state.roles],
     ([edition, roles]) => {
-      logger.info("Detected VueX script change", { edition, roles });
-      const detail = JSON.parse(JSON.stringify({ edition, roles }));
+      const detail = JSON.parse(
+        JSON.stringify({ edition, roles: [...roles.values()] })
+      );
+      logger.info("Detected VueX script change", detail);
 
       document.dispatchEvent(
         new CustomEvent<ScriptEvent>("sotc/script", { detail })
