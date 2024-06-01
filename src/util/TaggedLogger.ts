@@ -1,7 +1,16 @@
+export enum LogLevel {
+  DEBUG,
+  INFO,
+  WARN,
+  ERROR,
+}
+
 export class TaggedLogger {
   tag: string;
+  level: LogLevel;
 
-  constructor(tag: string) {
+  constructor(tag: string, level?: LogLevel) {
+    this.level = level || LogLevel.DEBUG;
     this.tag = `[${tag}]`;
   }
 
@@ -10,19 +19,19 @@ export class TaggedLogger {
   }
 
   debug(...args: any[]) {
-    console.debug(this.tag, ...args);
-  }
-
-  error(...args: any[]) {
-    console.error(this.tag, ...args);
+    this.level <= LogLevel.DEBUG && console.debug(this.tag, ...args);
   }
 
   info(...args: any[]) {
-    console.info(this.tag, ...args);
+    this.level <= LogLevel.INFO && console.info(this.tag, ...args);
   }
 
   warn(...args: any[]) {
-    console.warn(this.tag, ...args);
+    this.level <= LogLevel.WARN && console.warn(this.tag, ...args);
+  }
+
+  error(...args: any[]) {
+    this.level <= LogLevel.ERROR && console.error(this.tag, ...args);
   }
 
   table(...args: any[]) {

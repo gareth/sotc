@@ -1,8 +1,8 @@
-import { TaggedLogger } from "./util/TaggedLogger";
+import { TaggedLogger, LogLevel } from "./util/TaggedLogger";
 
 type HTMLVueElement = HTMLElement & { __vue_app__: any };
 
-const logger = new TaggedLogger("Inject");
+const logger = new TaggedLogger("Inject", LogLevel.WARN);
 logger.info("initialized");
 
 const IGNORED_MUTATIONS = [
