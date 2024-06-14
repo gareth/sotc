@@ -11,10 +11,11 @@ const logger = new TaggedLogger("App");
 
 onMounted(async () => {
   logger.debug("Loading game from worker");
-  activeGame.value = await chrome.runtime.sendMessage({
+  const response = await chrome.runtime.sendMessage({
     type: RuntimeMessageType.GET_GAME_STATE,
   });
-  logger.debug("Loaded game from worker", activeGame.value);
+  logger.debug("Loaded game from worker", response);
+  activeGame.value = response;
 });
 
 const activeGame: Ref<Game | undefined> = ref(
@@ -25,7 +26,10 @@ const gameState = computed(() => JSON.stringify(activeGame.value));
 </script>
 
 <template>
-  <div v-text="gameState"></div>
+  <div>
+    <h1 v-if="activeGame">{{ activeGame.script.name }}</h1>
+    <h1 v-else>No game</h1>
+  </div>
 </template>
 
 <style scoped></style>

@@ -13,7 +13,8 @@ const isGamePort = (port: chrome.runtime.Port): port is GamePort =>
 
 chrome.runtime.onMessage.addListener(
   (message: any, sender: any, sendResponse: (...args: any[]) => void) => {
-    logger.debug("Received message", message, sender);
+    logger.debug("Received runtime message", message, sender);
+
     if (!isRuntimeMessage(message)) {
       logger.warn("Unexpected runtime message", message, sender);
       return;
@@ -21,7 +22,25 @@ chrome.runtime.onMessage.addListener(
 
     switch (message.type) {
       case RuntimeMessageType.GET_GAME_STATE:
+        logger.info(
+          "Retrieving game state with instance",
+          GameManager.instance
+        );
+        /**/
+        const response =
+          GameManager.instance.page == "Grimoire"
+            ? GameManager.instance.game
+            : null;
+        logger.info(
+          "Sending game state",
+          GameManager.instance,
+          response,
+          JSON.parse(JSON.stringify(response))
+        );
+        sendResponse(response);
+      /*/
         sendResponse(GameManager.instance.game);
+        /**/
     }
   }
 );

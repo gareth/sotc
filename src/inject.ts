@@ -2,7 +2,7 @@ import { TaggedLogger, LogLevel } from "./util/TaggedLogger";
 
 type HTMLVueElement = HTMLElement & { __vue_app__: any };
 
-const logger = new TaggedLogger("Inject", LogLevel.WARN);
+const logger = new TaggedLogger("Inject");
 logger.info("initialized");
 
 const IGNORED_MUTATIONS = [
@@ -10,6 +10,9 @@ const IGNORED_MUTATIONS = [
   "session/setPing",
   "toggleModal",
 ];
+
+// "deep clones" an object by stringifying and parsing it through JSON
+const clone: <T>(o: T) => T = (o) => JSON.parse(JSON.stringify(o));
 
 type ScriptEvent = {
   edition: unknown;
@@ -23,6 +26,10 @@ type GameStateEvent = {
   isNight: unknown;
 };
 
+type NavigateEvent = {
+  page: string;
+};
+
 function inject(container: HTMLVueElement) {
   const vueApp = container.__vue_app__;
   const globals = vueApp._context.config.globalProperties;
@@ -33,13 +40,11 @@ function inject(container: HTMLVueElement) {
   const unwatchScript = globals.$store.watch(
     (state) => [state.edition, state.roles],
     ([edition, roles]) => {
-      const detail = JSON.parse(
-        JSON.stringify({ edition, roles: [...roles.values()] })
-      );
+      const detail = { edition, roles: [...roles.values()] };
       logger.info("Detected VueX script change", detail);
 
       document.dispatchEvent(
-        new CustomEvent<ScriptEvent>("sotc/script", { detail })
+        new CustomEvent("sotc-script", { detail: clone(detail) })
       );
     }
   );
@@ -65,9 +70,7 @@ function inject(container: HTMLVueElement) {
           isNight,
         })
       );
-      document.dispatchEvent(
-        new CustomEvent<GameStateEvent>("sotc/gameState", { detail })
-      );
+      document.dispatchEvent(new CustomEvent("sotc-gameState", { detail }));
     }
   );
 
@@ -78,10 +81,17 @@ function inject(container: HTMLVueElement) {
     // logger.debug("VueX mutation", mutation, state);
   });
 
-  logger.info("Adding route watcher");
-  globals.$router.afterEach((to, from) => {
-    logger.debug("Routing to", to, "from", from);
+  logger.info("Adding route watcher to", globals.$router);
+  globals.$router.afterEach((to) => {
+    logger.debug("Routing to", to);
+    const detail = { page: to.name };
+    logger.debug("Dispatching navigated route", detail);
+    document.dispatchEvent(new CustomEvent("sotc-navigate", { detail }));
   });
+
+  const detail = { page: globals.$route.name };
+  logger.debug("Dispatching initial route", detail);
+  document.dispatchEvent(new CustomEvent("sotc-navigate", { detail }));
 }
 
 const main = document.getElementById("main") as HTMLVueElement;

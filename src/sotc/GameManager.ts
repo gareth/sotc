@@ -28,6 +28,7 @@ export class GameManager {
   #_connection: Connection = DISCONNECTED;
 
   #_game?: Game;
+  page?: string;
 
   connect(port: chrome.runtime.Port) {
     this.port?.disconnect();
@@ -48,9 +49,12 @@ export class GameManager {
     });
 
     port.onMessage.addListener((message: GameMessage) => {
+      logger.debug("Received port message", message.type, message.payload);
       switch (message.type) {
         case "gameState":
           this.#game = message.payload;
+        case "sotc-navigate":
+          this.page = message.payload.page;
       }
     });
   }

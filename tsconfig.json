@@ -3,5 +3,6 @@
     "target": "es6",
     "moduleResolution": "bundler",
     "sourceMap": true
+    // "strict": true
   }
 }
