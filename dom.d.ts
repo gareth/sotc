@@ -10,5 +10,3 @@ declare global {
     "sotc-navigate": CustomEvent<NavigateEvent>;
   }
 }
-
-export {}; // Tell Typescript to treat this as a module
