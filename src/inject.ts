@@ -14,22 +14,6 @@ const IGNORED_MUTATIONS = [
 // "deep clones" an object by stringifying and parsing it through JSON
 const clone: <T>(o: T) => T = (o) => JSON.parse(JSON.stringify(o));
 
-type ScriptEvent = {
-  edition: unknown;
-  roles: unknown[];
-};
-
-type GameStateEvent = {
-  history: unknown;
-  phase: unknown;
-  isRunning: unknown;
-  isNight: unknown;
-};
-
-type NavigateEvent = {
-  page: string;
-};
-
 function inject(container: HTMLVueElement) {
   const vueApp = container.__vue_app__;
   const globals = vueApp._context.config.globalProperties;
