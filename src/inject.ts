@@ -1,6 +1,10 @@
-import { TaggedLogger, LogLevel } from "./util/TaggedLogger";
+import { TaggedLogger } from "./util/TaggedLogger";
+import type { BOTCVueApp } from "botc";
 
-type HTMLVueElement = HTMLElement & { __vue_app__: any };
+type HTMLVueAppElement = HTMLElement & { __vue_app__: BOTCVueApp };
+function isHTMLVueAppElement(el: HTMLElement | null): el is HTMLVueAppElement {
+  return !!(el && "__vue_app__" in el);
+}
 
 const logger = new TaggedLogger("Inject");
 logger.info("initialized");
@@ -11,10 +15,11 @@ const IGNORED_MUTATIONS = [
   "toggleModal",
 ];
 
-// "deep clones" an object by stringifying and parsing it through JSON
+// "Deep clones" an object by stringifying and parsing it through JSON.
+// Good for removing "proxy" references
 const clone: <T>(o: T) => T = (o) => JSON.parse(JSON.stringify(o));
 
-function inject(container: HTMLVueElement) {
+function inject(container: HTMLVueAppElement) {
   const vueApp = container.__vue_app__;
   const globals = vueApp._context.config.globalProperties;
 
@@ -22,8 +27,8 @@ function inject(container: HTMLVueElement) {
 
   logger.info("Adding script watcher");
   const unwatchScript = globals.$store.watch(
-    (state) => [state.edition, state.roles],
-    ([edition, roles]) => {
+    (state) => ({ edition: state.edition, roles: state.roles }),
+    ({ edition, roles }) => {
       const detail = { edition, roles: [...roles.values()] };
       logger.info("Detected VueX script change", detail);
 
@@ -35,14 +40,13 @@ function inject(container: HTMLVueElement) {
 
   logger.info("Adding game watcher");
   const unwatchGame = globals.$store.watch(
-    (state, getters) => [
-      state.game.history,
-      state.game.phase,
-      state.game.isRunning,
-      getters["game/isNight"],
-    ],
-    ([history, phase, isRunning, isNight]) => {
-      // const changes = oldValue.map((e, i) => [e, newValue[i]]);
+    (state, getters) => ({
+      history: state.game.history,
+      phase: state.game.phase,
+      isRunning: state.game.isRunning,
+      isNight: getters["game/isNight"],
+    }),
+    ({ history, phase, isRunning, isNight }) => {
       const newState = { history, phase, isRunning, isNight };
       logger.info("Detected VueX game change", newState);
 
@@ -78,7 +82,7 @@ function inject(container: HTMLVueElement) {
   document.dispatchEvent(new CustomEvent("sotc-navigate", { detail }));
 }
 
-const main = document.getElementById("main") as HTMLVueElement;
-if (main.__vue_app__) {
+const main = document.getElementById("main");
+if (isHTMLVueAppElement(main)) {
   inject(main);
 }
