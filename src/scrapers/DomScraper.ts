@@ -1,4 +1,4 @@
-import { Script } from "../sotc/Game";
+import { Script } from "../types/sotc";
 
 export default function (container: HTMLElement): Script | undefined {
   if (container.querySelector("#grimoire")) {

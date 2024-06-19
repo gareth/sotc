@@ -28,8 +28,14 @@
  * they will be distributed to any other port listeners.
  */
 
-import { CharacterAlignment, CharacterType, Game, Script } from "./sotc/Game";
+import { Game } from "./sotc/Game";
 import { sotcEvent } from "./types/event";
+import {
+  Character,
+  CharacterAlignment,
+  CharacterType,
+  Script,
+} from "./types/sotc";
 import { TaggedLogger } from "./util/TaggedLogger";
 
 const ALIGNMENTS = new Map([
