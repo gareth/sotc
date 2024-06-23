@@ -16,6 +16,11 @@ const DISCONNECTED: Connection = { state: "disconnected" };
 const WAITING_TIMEOUT = 5000;
 
 type GameMessage = { type: string; payload: any };
+function isGameMessage(message: any): message is GameMessage {
+  return (
+    "type" in message && typeof message.type == "string" && "payload" in message
+  );
+}
 
 export class GameManager {
   static #instance: GameManager = new GameManager();
@@ -48,13 +53,17 @@ export class GameManager {
       this.#connection = { state: "waiting", port, timeout };
     });
 
-    port.onMessage.addListener((message: GameMessage) => {
+    port.onMessage.addListener((message: unknown) => {
+      if (!isGameMessage(message)) return;
+
       logger.debug("Received port message", message.type, message.payload);
       switch (message.type) {
         case "gameState":
           this.#game = message.payload;
+          break;
         case "sotc-navigate":
           this.page = message.payload.page;
+          break;
       }
     });
   }
