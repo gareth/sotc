@@ -63,8 +63,10 @@ export class GameManager {
           break;
         case "sotc-navigate":
           this.page = message.payload.page;
+          logger.debug("Page is now", this.page);
           break;
       }
+      logger.debug("State is now", { ...this });
     });
   }
 

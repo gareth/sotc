@@ -18,23 +18,33 @@ export class TaggedLogger {
     console.log(this.tag, ...args);
   }
 
-  debug(...args: any[]) {
-    this.level <= LogLevel.DEBUG && console.debug(this.tag, ...args);
+  noop() {}
+
+  get debug() {
+    return this.level <= LogLevel.DEBUG
+      ? console.debug.bind(console.debug, this.tag)
+      : this.noop;
   }
 
-  info(...args: any[]) {
-    this.level <= LogLevel.INFO && console.info(this.tag, ...args);
+  get info() {
+    return this.level <= LogLevel.INFO
+      ? console.info.bind(console.info, this.tag)
+      : this.noop;
   }
 
-  warn(...args: any[]) {
-    this.level <= LogLevel.WARN && console.warn(this.tag, ...args);
+  get warn() {
+    return this.level <= LogLevel.WARN
+      ? console.warn.bind(console.warn, this.tag)
+      : this.noop;
   }
 
-  error(...args: any[]) {
-    this.level <= LogLevel.ERROR && console.error(this.tag, ...args);
+  get error() {
+    return this.level <= LogLevel.ERROR
+      ? console.error.bind(console.debug, this.tag)
+      : this.noop;
   }
 
-  table(...args: any[]) {
-    console.table(this.tag, ...args);
+  get table() {
+    return console.table.bind(console.table, this.tag);
   }
 }
