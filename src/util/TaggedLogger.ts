@@ -5,6 +5,11 @@ export enum LogLevel {
   ERROR,
 }
 
+// A subset of the Console methods that we want to expose using the #log
+// wrapper. For type compatibility, we can only pick methods of the form (x:
+// any[]) => void i.e. must allow zero arguments to be passed.
+type Loggables = Pick<Console, "log" | "debug" | "info" | "warn" | "error">;
+
 export class TaggedLogger {
   tag: string;
   level: LogLevel;
@@ -14,34 +19,33 @@ export class TaggedLogger {
     this.tag = `[${tag}]`;
   }
 
-  log(...args: any[]) {
-    console.log(this.tag, ...args);
+  #log(level: LogLevel, methodName: keyof Loggables) {
+    const method = console[methodName];
+    return this.level <= level ? method.bind(method, this.tag) : this.#noop;
   }
 
-  noop() {}
+  // A method that allows us to return a type-safe logger method (takes any
+  // arguments, returns void) when logging is disabled
+  #noop() {}
+
+  get log() {
+    return console.log.bind(console.log, this.tag);
+  }
 
   get debug() {
-    return this.level <= LogLevel.DEBUG
-      ? console.debug.bind(console.debug, this.tag)
-      : this.noop;
+    return this.#log(LogLevel.DEBUG, "debug");
   }
 
   get info() {
-    return this.level <= LogLevel.INFO
-      ? console.info.bind(console.info, this.tag)
-      : this.noop;
+    return this.#log(LogLevel.INFO, "info");
   }
 
   get warn() {
-    return this.level <= LogLevel.WARN
-      ? console.warn.bind(console.warn, this.tag)
-      : this.noop;
+    return this.#log(LogLevel.WARN, "warn");
   }
 
   get error() {
-    return this.level <= LogLevel.ERROR
-      ? console.error.bind(console.debug, this.tag)
-      : this.noop;
+    return this.#log(LogLevel.ERROR, "error");
   }
 
   get table() {
