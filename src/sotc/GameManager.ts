@@ -66,7 +66,6 @@ export class GameManager {
           logger.debug("Page is now", this.page);
           break;
       }
-      logger.debug("State is now", { ...this });
     });
   }
 

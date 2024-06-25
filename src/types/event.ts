@@ -1,24 +1,4 @@
-export type ScriptEvent = {
-  edition: any;
-  roles: botc.Role[];
-};
-
-export type GameStateEvent = {
-  history: unknown;
-  phase: unknown;
-  isRunning: unknown;
-  isNight: unknown;
-};
-
-export type NavigateEvent = {
-  page: string;
-};
-
-interface SOTCEvent {
-  "sotc-script": ScriptEvent;
-  "sotc-gameState": GameStateEvent;
-  "sotc-navigate": NavigateEvent;
-}
+interface SOTCEvent {}
 
 // Generate a CustomEvent object with type checking
 //

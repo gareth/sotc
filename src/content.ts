@@ -29,7 +29,6 @@
  */
 
 import { Game } from "./sotc/Game";
-import { sotcEvent } from "./types/event";
 import {
   Character,
   CharacterAlignment,
@@ -90,49 +89,6 @@ function injectScript() {
   const runtimeUrl = chrome.runtime.getURL("inject.js");
   logger.debug("Injecting Vue monitor script", runtimeUrl);
   script.src = runtimeUrl;
-
-  document.addEventListener("detectedScript", (e) => {
-    if (e instanceof CustomEvent) {
-      logger.info("Script detected", e.detail);
-
-      const game = new Game(e.detail);
-
-      port.postMessage({
-        type: "gameState",
-        payload: game,
-      });
-    }
-  });
-
-  document.addEventListener("sotc-script", (e) => {
-    logger.info("Detected script change", e.detail);
-    const { edition, roles } = e.detail;
-
-    const mapRole: (r: botc.Role) => Character = (r) => {
-      const { id, name, team, ability } = r;
-      const type = TYPES.get(team);
-      if (!type) throw new Error(`No type for team ${team}`);
-      const alignment = ALIGNMENTS.get(type);
-      if (!alignment) throw new Error(`No alignment for team ${team}`);
-      return { id, name, ability, alignment, type };
-    };
-
-    const script: Script = {
-      name: edition.name,
-      author: edition.author,
-      characters: roles.map(mapRole),
-    };
-
-    const game = new Game(script);
-
-    port.postMessage({
-      type: "gameState",
-      payload: game,
-    });
-  });
-
-  relay("sotc-gameState");
-  relay("sotc-navigate");
 
   (document.head || document.documentElement).appendChild(script);
 }
