@@ -20,11 +20,11 @@ export default tseslint.config(
     },
   },
   {
-    extends: eslint.configs.recommended,
-    excludedFiles: ["webpack/manifest-loader.js"],
+    extends: [eslint.configs.recommended],
+    ignores: ["webpack/manifest-loader.js"],
   },
   {
-    files: ["*.ts"],
+    files: ["**/*.ts"],
     extends: [
       ...tseslint.configs.recommendedTypeChecked,
       ...tseslint.configs.stylisticTypeChecked,
