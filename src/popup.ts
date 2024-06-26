@@ -16,4 +16,7 @@ chrome.runtime
     logger.debug("Loaded game from worker", game);
 
     createApp(PopupApp, { game }).mount("#app");
+  })
+  .catch((e) => {
+    logger.error("Error sending message to worker", e);
   });

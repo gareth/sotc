@@ -9,16 +9,23 @@ function isHTMLVueAppElement(el: HTMLElement | null): el is HTMLVueAppElement {
 const logger = new TaggedLogger("Inject");
 logger.info("initialized");
 
-// const IGNORED_MUTATIONS = [
-//   "chat/updateServer",
-//   "session/setPing",
-//   "toggleModal",
-// ];
+const IGNORED_MUTATIONS = [
+  "chat/updateServer",
+  "session/setPing",
+  "toggleModal",
+];
 
-function inject(_container: HTMLVueAppElement) {
-  // const vueApp = container.__vue_app__;
-  // const globals = vueApp._context.config.globalProperties;
-  // logger.info("Adding Vue hooks");
+function inject(container: HTMLVueAppElement) {
+  const vueApp = container.__vue_app__;
+  const globals = vueApp._context.config.globalProperties;
+  logger.info("Adding Vue hooks");
+
+  logger.info("Adding mutation watcher");
+  globals.$store.subscribe((mutation, state) => {
+    if (IGNORED_MUTATIONS.includes(mutation.type)) return;
+
+    logger.debug("VueX mutation", mutation, state);
+  });
 }
 
 const main = document.getElementById("main");

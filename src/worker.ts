@@ -1,4 +1,4 @@
-import { Game } from "./sotc/Game";
+// import { Game } from "./sotc/Game";
 import { GameManager } from "./sotc/GameManager";
 import { TaggedLogger } from "./util/TaggedLogger";
 import { RuntimeMessageType, isRuntimeMessage } from "./types/messages";
@@ -13,7 +13,7 @@ const isGamePort = (port: chrome.runtime.Port): port is GamePort =>
 
 chrome.runtime.onMessage.addListener(
   (
-    message: unknown,
+    message: object,
     sender: unknown,
     sendResponse: (...args: unknown[]) => void
   ) => {
@@ -68,14 +68,20 @@ chrome.runtime.onConnect.addListener((port) => {
 //   chrome.action.setBadgeText({ text: game ? " " : "" });
 // });
 
-GameManager.instance.on("port:connected", () => {
-  chrome.action.setBadgeBackgroundColor({ color: "green" });
-});
+GameManager.instance.on("port:connected", () =>
+  updateBadge({ color: "green" })
+);
+GameManager.instance.on("port:waiting", () => updateBadge({ color: "yellow" }));
+GameManager.instance.on("port:disconnected", () =>
+  updateBadge({ color: "red" })
+);
 
-GameManager.instance.on("port:waiting", () => {
-  chrome.action.setBadgeBackgroundColor({ color: "yellow" });
-});
+interface Badge {
+  color: string;
+}
 
-GameManager.instance.on("port:disconnected", () => {
-  chrome.action.setBadgeBackgroundColor({ color: "red" });
-});
+function updateBadge({ color }: Badge) {
+  chrome.action
+    .setBadgeBackgroundColor({ color })
+    .catch((e) => logger.error("Error setting badge color", e));
+}
