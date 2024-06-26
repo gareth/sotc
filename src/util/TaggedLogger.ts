@@ -15,7 +15,7 @@ export class TaggedLogger {
   level: LogLevel;
 
   constructor(tag: string, level?: LogLevel) {
-    this.level = level || LogLevel.DEBUG;
+    this.level = level ?? LogLevel.DEBUG;
     this.tag = `[${tag}]`;
   }
 
@@ -26,7 +26,7 @@ export class TaggedLogger {
 
   // A method that allows us to return a type-safe logger method (takes any
   // arguments, returns void) when logging is disabled
-  #noop() {} // eslint-disable-line @typescript-eslint/no-empty-function
+  #noop = () => {}; // eslint-disable-line @typescript-eslint/no-empty-function
 
   get log() {
     return console.log.bind(console.log, this.tag);

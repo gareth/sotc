@@ -1,29 +1,43 @@
 import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
-import globals from "globals";
+
+const noUnusedVarsConfig = {
+  argsIgnorePattern: "^_",
+  varsIgnorePattern: "^_",
+  caughtErrorsIgnorePattern: "^_",
+};
 
 export default tseslint.config(
-  eslint.configs.recommended,
-  ...tseslint.configs.strict,
-  ...tseslint.configs.stylistic,
   {
     ignores: ["dist/*"],
   },
   {
-    rules: {
-      "@typescript-eslint/no-unused-vars": [
-        "error",
-        {
-          argsIgnorePattern: "^_",
-          varsIgnorePattern: "^_",
-          caughtErrorsIgnorePattern: "^_",
-        },
-      ],
-    },
     languageOptions: {
-      globals: {
-        ...globals.browser,
+      parserOptions: {
+        project: true,
+        tsconfigDirName: import.meta.dirname,
       },
+    },
+  },
+  {
+    extends: eslint.configs.recommended,
+    excludedFiles: ["webpack/manifest-loader.js"],
+  },
+  {
+    files: ["*.ts"],
+    extends: [
+      ...tseslint.configs.recommendedTypeChecked,
+      ...tseslint.configs.stylisticTypeChecked,
+    ],
+    rules: {
+      "@typescript-eslint/no-unused-vars": ["error", noUnusedVarsConfig],
+    },
+  },
+  {
+    files: ["*.js"],
+    extends: [...tseslint.configs.recommended, ...tseslint.configs.stylistic],
+    rules: {
+      "no-unused-vars": ["error", noUnusedVarsConfig],
     },
   }
 );

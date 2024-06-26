@@ -1,6 +1,7 @@
 import EventEmitter from "../util/EventEmitter";
 import { Game } from "./Game";
 import { TaggedLogger } from "../util/TaggedLogger";
+import { SOTCEvent } from "../types/event";
 
 const logger = new TaggedLogger("GameManager");
 
@@ -15,11 +16,14 @@ const DISCONNECTED: Connection = { state: "disconnected" };
 
 const WAITING_TIMEOUT = 5000;
 
-interface GameMessage {
-  type: string;
-  payload: unknown;
+interface GameMessage<T extends keyof SOTCEvent> {
+  type: T;
+  payload: SOTCEvent[T];
 }
-function isGameMessage(message: unknown): message is GameMessage {
+
+function isGameMessage<T extends keyof SOTCEvent>(
+  message: object
+): message is GameMessage<T> {
   return (
     "type" in message && typeof message.type == "string" && "payload" in message
   );
@@ -56,20 +60,25 @@ export class GameManager {
       this.#connection = { state: "waiting", port, timeout };
     });
 
-    port.onMessage.addListener((message: unknown) => {
-      if (!isGameMessage(message)) return;
+    port.onMessage.addListener(
+      <T extends keyof SOTCEvent>(message: GameMessage<T>) => {
+        if (!isGameMessage(message)) {
+          logger.warn("Received malformed port message", message);
+          return;
+        }
 
-      logger.debug("Received port message", message.type, message.payload);
-      switch (message.type) {
-        case "gameState":
-          this.#game = message.payload;
-          break;
-        case "sotc-navigate":
-          this.page = message.payload.page;
-          logger.debug("Page is now", this.page);
-          break;
+        logger.debug("Received port message", message.type, message.payload);
+        // switch (message.type) {
+        //   // case "sotc-noop2":
+        //   //   message.payload;
+        //   //   break;
+        //   // case "sotc-navigate":
+        //   //   this.page = message.payload.page;
+        //   //   logger.debug("Page is now", this.page);
+        //   //   break;
+        // }
       }
-    });
+    );
   }
 
   get #connection() {

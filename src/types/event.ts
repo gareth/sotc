@@ -1,5 +1,5 @@
-interface SOTCEvent {
-  "sotc-sampleEvent": unknown;
+export interface SOTCEvent {
+  "sotc-noop": object;
 }
 
 // Generate a CustomEvent object with type checking

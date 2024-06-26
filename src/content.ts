@@ -35,6 +35,7 @@
 //   CharacterType,
 //   Script,
 // } from "./types/sotc";
+import { SOTCEvent } from "./types/event";
 import { TaggedLogger } from "./util/TaggedLogger";
 
 // Maps the default alignment for a character
@@ -63,18 +64,15 @@ const port = chrome.runtime.connect({ name: "gameTab" });
 // script) and relay it to the extension worker script as a JSON message. The
 // CustomEvent's `detail` property is passed as the `payload` value of the JSON
 // message, passed through the `callback` function if present.
-export function relay<T>(
-  eventName: keyof GlobalEventHandlersEventMap,
-  callback: (a: T) => T = (e) => e
-) {
+export function relay<T extends keyof SOTCEvent>(eventName: T) {
   document.addEventListener(eventName, (e) => {
     if (e instanceof CustomEvent) {
-      const data = callback(e.detail) || e.detail;
-      logger.info("Relaying event", eventName, data, port);
+      const detail = e.detail;
+      logger.info("Relaying event", eventName, detail, port);
 
       port.postMessage({
         type: eventName,
-        payload: data,
+        payload: detail,
       });
     }
   });

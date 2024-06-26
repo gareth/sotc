@@ -63,10 +63,10 @@ chrome.runtime.onConnect.addListener((port) => {
   }
 });
 
-GameManager.instance.on("game:updated", (game: Game | undefined) => {
-  logger.debug("Game updated", game);
-  chrome.action.setBadgeText({ text: game ? " " : "" });
-});
+// GameManager.instance.on("game:updated", (game: Game | undefined) => {
+//   logger.debug("Game updated", game);
+//   chrome.action.setBadgeText({ text: game ? " " : "" });
+// });
 
 GameManager.instance.on("port:connected", () => {
   chrome.action.setBadgeBackgroundColor({ color: "green" });
