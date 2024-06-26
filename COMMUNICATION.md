@@ -33,8 +33,28 @@ port.postMessage({
   type: "eventName",
   ...detail
 })
-```$$
+```
 
-## worker <-> popup <-> options
+## worker -> Twitch
 
-Maybe https://github.com/xanf/vuex-shared-mutations
+```javascript
+{
+  script: {
+    name: string,
+    author: string,
+    characters: Character[],
+  },
+  game: {
+    storytellers: Player[],
+    players: Player[],
+    phase: number | "start",
+  },
+  streamer: {
+    role: "storyteller" | "player",
+    name: string,
+  },
+  app: {
+    town_square: [x: number, y: number, w: number, h: number, r: number] // good luck!
+  }
+}
+```
