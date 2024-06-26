@@ -1,4 +1,4 @@
-type CallbackFn = (...args: any[]) => any;
+type CallbackFn = (...args: unknown[]) => unknown;
 
 interface Callback {
   name: string;
@@ -8,7 +8,7 @@ interface Callback {
 export default class EventEmitter {
   listeners: Callback[] = [];
 
-  emit(eventName: string, ...data: any[]) {
+  emit(eventName: string, ...data: unknown[]) {
     this.listeners
       .filter(({ name }: { name: string }) => name === eventName)
       .forEach(({ callback }: { callback: CallbackFn }) => {

@@ -12,7 +12,11 @@ const isGamePort = (port: chrome.runtime.Port): port is GamePort =>
   port.name == "gameTab";
 
 chrome.runtime.onMessage.addListener(
-  (message: any, sender: any, sendResponse: (...args: any[]) => void) => {
+  (
+    message: unknown,
+    sender: unknown,
+    sendResponse: (...args: unknown[]) => void
+  ) => {
     logger.debug("Received runtime message", message, sender);
 
     if (!isRuntimeMessage(message)) {
@@ -21,7 +25,7 @@ chrome.runtime.onMessage.addListener(
     }
 
     switch (message.type) {
-      case RuntimeMessageType.GET_GAME_STATE:
+      case RuntimeMessageType.GET_GAME_STATE: {
         logger.info(
           "Retrieving game state with instance",
           GameManager.instance
@@ -38,6 +42,7 @@ chrome.runtime.onMessage.addListener(
           JSON.parse(JSON.stringify(response))
         );
         sendResponse(response);
+      }
       /*/
         sendResponse(GameManager.instance.game);
         /**/

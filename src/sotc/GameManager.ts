@@ -15,8 +15,11 @@ const DISCONNECTED: Connection = { state: "disconnected" };
 
 const WAITING_TIMEOUT = 5000;
 
-interface GameMessage { type: string; payload: any }
-function isGameMessage(message: any): message is GameMessage {
+interface GameMessage {
+  type: string;
+  payload: unknown;
+}
+function isGameMessage(message: unknown): message is GameMessage {
   return (
     "type" in message && typeof message.type == "string" && "payload" in message
   );
@@ -44,7 +47,7 @@ export class GameManager {
 
     this.#connection = { state: "connected", port };
 
-    port.onDisconnect.addListener((_port) => {
+    port.onDisconnect.addListener((port) => {
       const timeout = setTimeout(() => {
         this.#game = undefined;
         this.#connection = DISCONNECTED;
@@ -69,6 +72,10 @@ export class GameManager {
     });
   }
 
+  get #connection() {
+    return this.#_connection;
+  }
+
   set #connection(connection: Connection) {
     logger.debug("Connection state change", connection);
     this.#_connection = connection;
@@ -85,10 +92,6 @@ export class GameManager {
     return this.#_game;
   }
 
-  get #connection() {
-    return this.#_connection;
-  }
-
   get port() {
     switch (this.#connection.state) {
       case "connected":
@@ -99,9 +102,10 @@ export class GameManager {
     }
   }
 
-  on = (event: string, callback: (..._data: any[]) => void) =>
+  on = (event: string, callback: (..._data: unknown[]) => void) =>
     this.#events.on(event, callback);
-  off = (event: string, callback: (..._data: any[]) => void) =>
+  off = (event: string, callback: (..._data: unknown[]) => void) =>
     this.#events.off(event, callback);
-  #emit = (event: string, ...data: any[]) => this.#events.emit(event, ...data);
+  #emit = (event: string, ...data: unknown[]) =>
+    this.#events.emit(event, ...data);
 }

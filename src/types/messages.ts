@@ -5,8 +5,11 @@ export enum RuntimeMessageType {
   NAVIGATE = "navigate",
 }
 
-export interface RuntimeMessage { type: RuntimeMessageType; payload?: any }
-export const isRuntimeMessage = (message: any): message is RuntimeMessage =>
+export interface RuntimeMessage {
+  type: RuntimeMessageType;
+  payload?: unknown;
+}
+export const isRuntimeMessage = (message: unknown): message is RuntimeMessage =>
   "type" in message;
 
 export type SOTCMessage =

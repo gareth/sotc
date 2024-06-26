@@ -26,7 +26,7 @@ export class TaggedLogger {
 
   // A method that allows us to return a type-safe logger method (takes any
   // arguments, returns void) when logging is disabled
-  #noop() {}
+  #noop() {} // eslint-disable-line @typescript-eslint/no-empty-function
 
   get log() {
     return console.log.bind(console.log, this.tag);
