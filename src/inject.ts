@@ -15,10 +15,6 @@ const IGNORED_MUTATIONS = [
   "toggleModal",
 ];
 
-// "Deep clones" an object by stringifying and parsing it through JSON.
-// Good for removing "proxy" references
-const clone: <T>(o: T) => T = (o) => JSON.parse(JSON.stringify(o));
-
 function inject(container: HTMLVueAppElement) {
   const vueApp = container.__vue_app__;
   const globals = vueApp._context.config.globalProperties;
