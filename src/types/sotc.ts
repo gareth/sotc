@@ -12,17 +12,17 @@ export enum CharacterAlignment {
   UNKNOWN = "unknown", // e.g. a traveller without an alignment
 }
 
-export type Character = {
+export interface Character {
   id: string;
   name: string;
   ability: string;
   wiki_url?: string;
   type: CharacterType;
   alignment: CharacterAlignment;
-};
+}
 
-export type Script = {
+export interface Script {
   name: string;
   author: string;
   characters: Character[];
-};
+}

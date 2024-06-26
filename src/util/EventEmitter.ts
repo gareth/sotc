@@ -1,9 +1,9 @@
 type CallbackFn = (...args: any[]) => any;
 
-type Callback = {
+interface Callback {
   name: string;
   callback: CallbackFn;
-};
+}
 
 export default class EventEmitter {
   listeners: Callback[] = [];

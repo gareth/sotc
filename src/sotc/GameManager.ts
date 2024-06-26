@@ -15,7 +15,7 @@ const DISCONNECTED: Connection = { state: "disconnected" };
 
 const WAITING_TIMEOUT = 5000;
 
-type GameMessage = { type: string; payload: any };
+interface GameMessage { type: string; payload: any }
 function isGameMessage(message: any): message is GameMessage {
   return (
     "type" in message && typeof message.type == "string" && "payload" in message

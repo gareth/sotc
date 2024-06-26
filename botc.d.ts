@@ -7,7 +7,7 @@
 // intended to be typed correctly. The Vue $store actually uses the Vue `Store`
 // interface to ensure correct typing as far as possible.
 declare namespace botc {
-  export type Role = {
+  export interface Role {
     ability: string;
     edition?: string;
     firstNight?: number;
@@ -19,9 +19,9 @@ declare namespace botc {
     reminders?: string[];
     setup?: boolean;
     team: string;
-  };
+  }
 
-  export type Store = {
+  export interface Store {
     edition: {
       name: string;
       author?: string;
@@ -33,7 +33,7 @@ declare namespace botc {
       phase: never;
       isRunning: never;
     };
-  };
+  }
 }
 
 declare module "botc" {
