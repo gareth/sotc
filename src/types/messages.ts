@@ -9,8 +9,7 @@ export interface RuntimeMessage {
   type: RuntimeMessageType;
   payload?: unknown;
 }
-export const isRuntimeMessage = (message: object): message is RuntimeMessage =>
-  "type" in message;
+export const isRuntimeMessage = (message: object): message is RuntimeMessage => "type" in message;
 
 export type SOTCMessage =
   | {

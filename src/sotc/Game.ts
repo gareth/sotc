@@ -1,7 +1,12 @@
 import { Script } from "../types/sotc";
 
-interface InactiveGame { type: "pregame" | "postgame" }
-interface ActiveGame { type: "day" | "night"; count: number }
+interface InactiveGame {
+  type: "pregame" | "postgame";
+}
+interface ActiveGame {
+  type: "day" | "night";
+  count: number;
+}
 
 type GamePhase = InactiveGame | ActiveGame;
 

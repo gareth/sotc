@@ -8,47 +8,29 @@ const logger = new TaggedLogger("Worker");
 logger.info("initialized");
 
 type GamePort = chrome.runtime.Port & { name: "gameTab" };
-const isGamePort = (port: chrome.runtime.Port): port is GamePort =>
-  port.name == "gameTab";
+const isGamePort = (port: chrome.runtime.Port): port is GamePort => port.name == "gameTab";
 
-chrome.runtime.onMessage.addListener(
-  (
-    message: object,
-    sender: unknown,
-    sendResponse: (...args: unknown[]) => void
-  ) => {
-    logger.debug("Received runtime message", message, sender);
+chrome.runtime.onMessage.addListener((message: object, sender: unknown, sendResponse: (...args: unknown[]) => void) => {
+  logger.debug("Received runtime message", message, sender);
 
-    if (!isRuntimeMessage(message)) {
-      logger.warn("Unexpected runtime message", message, sender);
-      return;
+  if (!isRuntimeMessage(message)) {
+    logger.warn("Unexpected runtime message", message, sender);
+    return;
+  }
+
+  switch (message.type) {
+    case RuntimeMessageType.GET_GAME_STATE: {
+      logger.info("Retrieving game state with instance", GameManager.instance);
+      /**/
+      const response = GameManager.instance.page == "Grimoire" ? GameManager.instance.game : null;
+      logger.info("Sending game state", GameManager.instance, response, JSON.parse(JSON.stringify(response)));
+      sendResponse(response);
     }
-
-    switch (message.type) {
-      case RuntimeMessageType.GET_GAME_STATE: {
-        logger.info(
-          "Retrieving game state with instance",
-          GameManager.instance
-        );
-        /**/
-        const response =
-          GameManager.instance.page == "Grimoire"
-            ? GameManager.instance.game
-            : null;
-        logger.info(
-          "Sending game state",
-          GameManager.instance,
-          response,
-          JSON.parse(JSON.stringify(response))
-        );
-        sendResponse(response);
-      }
-      /*/
+    /*/
         sendResponse(GameManager.instance.game);
         /**/
-    }
   }
-);
+});
 
 chrome.runtime.onConnect.addListener((port) => {
   if (isGamePort(port)) {
@@ -68,20 +50,14 @@ chrome.runtime.onConnect.addListener((port) => {
 //   chrome.action.setBadgeText({ text: game ? " " : "" });
 // });
 
-GameManager.instance.on("port:connected", () =>
-  updateBadge({ color: "green" })
-);
+GameManager.instance.on("port:connected", () => updateBadge({ color: "green" }));
 GameManager.instance.on("port:waiting", () => updateBadge({ color: "yellow" }));
-GameManager.instance.on("port:disconnected", () =>
-  updateBadge({ color: "red" })
-);
+GameManager.instance.on("port:disconnected", () => updateBadge({ color: "red" }));
 
 interface Badge {
   color: string;
 }
 
 function updateBadge({ color }: Badge) {
-  chrome.action
-    .setBadgeBackgroundColor({ color })
-    .catch((e) => logger.error("Error setting badge color", e));
+  chrome.action.setBadgeBackgroundColor({ color }).catch((e) => logger.error("Error setting badge color", e));
 }

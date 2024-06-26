@@ -21,12 +21,8 @@ interface GameMessage<T extends keyof SOTCEvent> {
   payload: SOTCEvent[T];
 }
 
-function isGameMessage<T extends keyof SOTCEvent>(
-  message: object
-): message is GameMessage<T> {
-  return (
-    "type" in message && typeof message.type == "string" && "payload" in message
-  );
+function isGameMessage<T extends keyof SOTCEvent>(message: object): message is GameMessage<T> {
+  return "type" in message && typeof message.type == "string" && "payload" in message;
 }
 
 export class GameManager {
@@ -60,25 +56,23 @@ export class GameManager {
       this.#connection = { state: "waiting", port, timeout };
     });
 
-    port.onMessage.addListener(
-      <T extends keyof SOTCEvent>(message: GameMessage<T>) => {
-        if (!isGameMessage(message)) {
-          logger.warn("Received malformed port message", message);
-          return;
-        }
-
-        logger.debug("Received port message", message.type, message.payload);
-        // switch (message.type) {
-        //   // case "sotc-noop2":
-        //   //   message.payload;
-        //   //   break;
-        //   // case "sotc-navigate":
-        //   //   this.page = message.payload.page;
-        //   //   logger.debug("Page is now", this.page);
-        //   //   break;
-        // }
+    port.onMessage.addListener(<T extends keyof SOTCEvent>(message: GameMessage<T>) => {
+      if (!isGameMessage(message)) {
+        logger.warn("Received malformed port message", message);
+        return;
       }
-    );
+
+      logger.debug("Received port message", message.type, message.payload);
+      // switch (message.type) {
+      //   // case "sotc-noop2":
+      //   //   message.payload;
+      //   //   break;
+      //   // case "sotc-navigate":
+      //   //   this.page = message.payload.page;
+      //   //   logger.debug("Page is now", this.page);
+      //   //   break;
+      // }
+    });
   }
 
   get #connection() {
@@ -111,10 +105,7 @@ export class GameManager {
     }
   }
 
-  on = (event: string, callback: (..._data: unknown[]) => void) =>
-    this.#events.on(event, callback);
-  off = (event: string, callback: (..._data: unknown[]) => void) =>
-    this.#events.off(event, callback);
-  #emit = (event: string, ...data: unknown[]) =>
-    this.#events.emit(event, ...data);
+  on = (event: string, callback: (..._data: unknown[]) => void) => this.#events.on(event, callback);
+  off = (event: string, callback: (..._data: unknown[]) => void) => this.#events.off(event, callback);
+  #emit = (event: string, ...data: unknown[]) => this.#events.emit(event, ...data);
 }

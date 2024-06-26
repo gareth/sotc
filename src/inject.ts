@@ -9,11 +9,7 @@ function isHTMLVueAppElement(el: HTMLElement | null): el is HTMLVueAppElement {
 const logger = new TaggedLogger("Inject");
 logger.info("initialized");
 
-const IGNORED_MUTATIONS = [
-  "chat/updateServer",
-  "session/setPing",
-  "toggleModal",
-];
+const IGNORED_MUTATIONS = ["chat/updateServer", "session/setPing", "toggleModal"];
 
 function inject(container: HTMLVueAppElement) {
   const vueApp = container.__vue_app__;

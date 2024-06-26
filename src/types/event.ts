@@ -8,7 +8,5 @@ export interface SOTCEvent {
 // detail object into any named event. This wrapper ensures that a) the event
 // name matches one of the SOTC events we're expecting and b) the corresponding
 // detail type is correctly typed too.
-export const sotcEvent = <T extends keyof SOTCEvent>(
-  type: T,
-  detail: CustomEventInit<SOTCEvent[T]>
-) => new CustomEvent(type, detail);
+export const sotcEvent = <T extends keyof SOTCEvent>(type: T, detail: CustomEventInit<SOTCEvent[T]>) =>
+  new CustomEvent(type, detail);
