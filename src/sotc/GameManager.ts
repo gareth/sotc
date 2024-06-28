@@ -1,5 +1,4 @@
 import EventEmitter from "../util/EventEmitter";
-import { Game } from "./Game";
 import { TaggedLogger } from "../util/TaggedLogger";
 import { SOTCEvent } from "../types/event";
 
@@ -35,10 +34,10 @@ export class GameManager {
   #events: EventEmitter = new EventEmitter();
   #_connection: Connection = DISCONNECTED;
 
-  #_game?: Game;
   page?: string;
 
   connect(port: chrome.runtime.Port) {
+    logger.debug("Received connection from port", port);
     this.port?.disconnect();
 
     if (this.#connection.state == "waiting") {
@@ -49,7 +48,6 @@ export class GameManager {
 
     port.onDisconnect.addListener((port) => {
       const timeout = setTimeout(() => {
-        this.#game = undefined;
         this.#connection = DISCONNECTED;
       }, WAITING_TIMEOUT);
 
@@ -63,15 +61,12 @@ export class GameManager {
       }
 
       logger.debug("Received port message", message.type, message.payload);
-      // switch (message.type) {
-      //   // case "sotc-noop2":
-      //   //   message.payload;
-      //   //   break;
-      //   // case "sotc-navigate":
-      //   //   this.page = message.payload.page;
-      //   //   logger.debug("Page is now", this.page);
-      //   //   break;
-      // }
+      switch (message.type) {
+        case "sotc-navigate":
+          this.page = message.payload.page;
+          logger.debug("Page is now", this.page);
+          break;
+      }
     });
   }
 
@@ -83,16 +78,6 @@ export class GameManager {
     logger.debug("Connection state change", connection);
     this.#_connection = connection;
     this.#emit(`port:${connection.state}`, connection);
-  }
-
-  set #game(game: Game | undefined) {
-    logger.debug("Game state change", game);
-    this.#_game = game;
-    this.#emit("game:updated", this.#_game);
-  }
-
-  get game() {
-    return this.#_game;
   }
 
   get port() {

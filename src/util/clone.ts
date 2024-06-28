@@ -5,4 +5,7 @@
  */
 // Typescript can't infer that we're returning an object with the same structure
 // as its input, so we tell it that it's safe to return this `any` type
-export const clone: <T extends object>(o: T) => T = (o) => JSON.parse(JSON.stringify(o)); // eslint-disable-line @typescript-eslint/no-unsafe-return
+export const clone: <T extends object | undefined>(o: T) => T = (o) => {
+  if (!o) return o;
+  return JSON.parse(JSON.stringify(o)); // eslint-disable-line @typescript-eslint/no-unsafe-return
+};

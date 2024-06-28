@@ -22,6 +22,15 @@ export default tseslint.config(
   {
     extends: [eslint.configs.recommended],
     ignores: ["webpack/manifest-loader.js"],
+    rules: {
+      "no-restricted-syntax": [
+        "warn",
+        {
+          selector: "NewExpression > Identifier[name='CustomEvent']",
+          message: "Prefer using `sotcEvent` for creating CustomEvent objects",
+        },
+      ],
+    },
   },
   {
     files: ["**/*.ts"],

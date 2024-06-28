@@ -30,8 +30,8 @@ new CustomEvent("sotc-eventName", detail: {})
 
 ```javascript
 port.postMessage({
-  type: "eventName",
-  ...detail
+  type: "sotc-eventName",
+  payload: detail
 })
 ```
 
@@ -39,6 +39,10 @@ port.postMessage({
 
 ```javascript
 {
+  user: {
+    role: "storyteller" | "player" | "spectator",
+    name: string,
+  },
   script: {
     name: string,
     author: string,
@@ -48,10 +52,6 @@ port.postMessage({
     storytellers: Player[],
     players: Player[],
     phase: number | "start",
-  },
-  streamer: {
-    role: "storyteller" | "player",
-    name: string,
   },
   app: {
     town_square: [x: number, y: number, w: number, h: number, r: number] // good luck!

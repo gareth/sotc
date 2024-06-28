@@ -88,6 +88,8 @@ function injectScript() {
   logger.debug("Injecting Vue monitor script", runtimeUrl);
   script.src = runtimeUrl;
 
+  relay("sotc-navigate");
+
   (document.head || document.documentElement).appendChild(script);
 }
 
