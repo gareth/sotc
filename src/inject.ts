@@ -1,6 +1,8 @@
 import { sotcEvent } from "./types/event";
 import { TaggedLogger } from "./util/TaggedLogger";
 import type { BOTCVueApp } from "botc";
+import { clone } from "./util/clone";
+import { Character, CharacterAlignments, Script, characterType } from "./types/sotc";
 
 type HTMLVueAppElement = HTMLElement & { __vue_app__: BOTCVueApp };
 function isHTMLVueAppElement(el: HTMLElement | null): el is HTMLVueAppElement {
@@ -12,19 +14,54 @@ logger.info("initialized");
 
 const IGNORED_MUTATIONS = ["chat/updateServer", "chat/toggleMuted", "session/setPing", "toggleModal"];
 
+function roleToCharacter(role: botc.Role): Character[] {
+  const { id, name, ability } = role;
+
+  const type = characterType(role.team);
+  if (!type) {
+    logger.error("Unexpected team", role.team, "for role", role);
+    return [];
+  }
+
+  const alignment = CharacterAlignments.get(type);
+  if (!alignment) {
+    logger.error("No known alignment for type", type);
+    return [];
+  }
+
+  return [{ id, name, ability, type, alignment }];
+}
+
+function editionToScript(data: Pick<botc.Store, "edition" | "roles">): Script {
+  const name = data.edition.name;
+
+  let author = data.edition.author;
+  if (!author && data.edition.isOfficial) author = "The Pandemonium Institute";
+  if (!author) {
+    logger.warn("Unofficial script detected with no author:", data);
+    author = "Unknown";
+  }
+
+  const characters = [...data.roles.values()].flatMap(roleToCharacter);
+
+  return { name, author, characters };
+}
+
 function inject(container: HTMLVueAppElement) {
   const vueApp = container.__vue_app__;
   const globals = vueApp._context.config.globalProperties;
   logger.info("Adding Vue hooks to", globals);
 
   logger.info("Adding script watcher");
-  const unwatchScript = globals.$store.watch(
+  globals.$store.watch(
     (state) => ({ edition: state.edition, roles: state.roles }),
     ({ edition, roles }) => {
-      const detail = { edition, roles: [...roles.values()] };
-      logger.info("Detected VueX script change", detail);
+      const script = editionToScript({ edition, roles });
 
-      document.dispatchEvent(new CustomEvent("sotc-script", { detail: clone(detail) }));
+      logger.info("Detected VueX script change", script);
+      if (!script) return;
+
+      document.dispatchEvent(sotcEvent("sotc-scriptChanged", { detail: clone(script) }));
     }
   );
 

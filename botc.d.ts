@@ -21,12 +21,14 @@ declare namespace botc {
     team: string;
   }
 
+  export interface Edition {
+    name: string;
+    author?: string;
+    isOfficial: boolean;
+  }
+
   export interface Store {
-    edition: {
-      name: string;
-      author?: string;
-      isOfficial: boolean;
-    };
+    edition: Edition;
     roles: Map<string, Role>;
     game: {
       history: never[];

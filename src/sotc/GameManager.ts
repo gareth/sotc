@@ -1,6 +1,7 @@
 import EventEmitter from "../util/EventEmitter";
 import { TaggedLogger } from "../util/TaggedLogger";
-import { SOTCEvent } from "../types/event";
+import { NavigateEventDetail, isSOTCEventMessage } from "../types/event";
+import { ExtensionState, Script } from "../types/sotc";
 
 const logger = new TaggedLogger("GameManager");
 
@@ -15,15 +16,6 @@ const DISCONNECTED: Connection = { state: "disconnected" };
 
 const WAITING_TIMEOUT = 5000;
 
-interface GameMessage<T extends keyof SOTCEvent> {
-  type: T;
-  payload: SOTCEvent[T];
-}
-
-function isGameMessage<T extends keyof SOTCEvent>(message: object): message is GameMessage<T> {
-  return "type" in message && typeof message.type == "string" && "payload" in message;
-}
-
 export class GameManager {
   static #instance: GameManager = new GameManager();
 
@@ -34,7 +26,7 @@ export class GameManager {
   #events: EventEmitter = new EventEmitter();
   #_connection: Connection = DISCONNECTED;
 
-  page?: string;
+  state: Partial<ExtensionState> = {};
 
   connect(port: chrome.runtime.Port) {
     logger.debug("Received connection from port", port);
@@ -54,19 +46,25 @@ export class GameManager {
       this.#connection = { state: "waiting", port, timeout };
     });
 
-    port.onMessage.addListener(<T extends keyof SOTCEvent>(message: GameMessage<T>) => {
-      if (!isGameMessage(message)) {
+    port.onMessage.addListener((message: object) => {
+      if (!isSOTCEventMessage(message)) {
         logger.warn("Received malformed port message", message);
         return;
       }
 
-      logger.debug("Received port message", message.type, message.payload);
+      logger.debug("Received port message", message);
+
       switch (message.type) {
         case "sotc-navigate":
-          this.page = message.payload.page;
-          logger.debug("Page is now", this.page);
+          this.state.page = (message.payload as NavigateEventDetail).page;
+          logger.debug("Page is now", this.state.page);
+          break;
+        case "sotc-scriptChanged":
+          this.state.script = message.payload as Script;
+          logger.debug("Script is now", this.state.script);
           break;
       }
+      logger.info("State is now", this.state);
     });
   }
 

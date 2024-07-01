@@ -28,32 +28,8 @@
  * they will be distributed to any other port listeners.
  */
 
-// import { Game } from "./sotc/Game";
-// import {
-//   Character,
-//   CharacterAlignment,
-//   CharacterType,
-//   Script,
-// } from "./types/sotc";
 import { SOTCEvent } from "./types/event";
 import { TaggedLogger } from "./util/TaggedLogger";
-
-// Maps the default alignment for a character
-// const ALIGNMENTS = new Map<CharacterType, CharacterAlignment>([
-//   [CharacterType.TOWNSFOLK, CharacterAlignment.GOOD],
-//   [CharacterType.OUTSIDER, CharacterAlignment.GOOD],
-//   [CharacterType.MINION, CharacterAlignment.EVIL],
-//   [CharacterType.DEMON, CharacterAlignment.EVIL],
-//   [CharacterType.TRAVELER, CharacterAlignment.UNKNOWN],
-// ]);
-
-// const TYPES = new Map([
-//   ["townsfolk", CharacterType.TOWNSFOLK],
-//   ["outsider", CharacterType.OUTSIDER],
-//   ["minion", CharacterType.MINION],
-//   ["demon", CharacterType.DEMON],
-//   ["traveler", CharacterType.TRAVELER],
-// ]);
 
 const logger = new TaggedLogger("Content");
 logger.info("initialized");
@@ -89,6 +65,7 @@ function injectScript() {
   script.src = runtimeUrl;
 
   relay("sotc-navigate");
+  relay("sotc-scriptChanged");
 
   (document.head || document.documentElement).appendChild(script);
 }

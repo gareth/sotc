@@ -1,7 +1,7 @@
 // import { Game } from "./sotc/Game";
 import { GameManager } from "./sotc/GameManager";
 import { TaggedLogger } from "./util/TaggedLogger";
-import { RuntimeMessageType, isRuntimeMessage } from "./types/messages";
+import { clone } from "./util/clone";
 
 const logger = new TaggedLogger("Worker");
 
@@ -25,25 +25,22 @@ chrome.runtime.onConnect.addListener((port) => {
 });
 
 // Handle connection from the extension popup window
-chrome.runtime.onMessage.addListener((message: object, sender: unknown, sendResponse: (response: unknown) => void) => {
+chrome.runtime.onMessage.addListener((message: string, sender: unknown, sendResponse: (response: unknown) => void) => {
   logger.debug("Received runtime message", message, sender);
 
-  if (!isRuntimeMessage(message)) {
-    logger.warn("Unexpected runtime message", message, sender);
-    return;
-  }
+  switch (message) {
+    case "getState":
+      {
+        logger.info("Retrieving game state with instance", GameManager.instance);
 
-  switch (message.type) {
-    case RuntimeMessageType.GET_GAME_STATE: {
-      logger.info("Retrieving game state with instance", GameManager.instance);
-      /**/
-      const response = null;
-      logger.info("Sending game state", GameManager.instance, response, JSON.parse(JSON.stringify(response)));
-      sendResponse(response);
+        const response = clone(GameManager.instance.state);
+        logger.info("Sending game state", response);
+        sendResponse(response);
+      }
+      break;
+    default: {
+      logger.error("Expected runtime message, got", message);
     }
-    /*/
-        sendResponse(GameManager.instance.game);
-        /**/
   }
 });
 

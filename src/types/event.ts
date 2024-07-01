@@ -1,9 +1,25 @@
-export interface NavigateEvent {
+import { Script } from "./sotc";
+
+export interface NavigateEventDetail {
   page?: string;
 }
 
 export interface SOTCEvent {
-  "sotc-navigate": NavigateEvent;
+  "sotc-navigate": NavigateEventDetail;
+  "sotc-scriptChanged": Script;
+}
+
+export type SOTCEventMap = {
+  [K in keyof SOTCEvent]: CustomEvent<{ detail: SOTCEvent[K] }>;
+};
+
+export interface SOTCEventMessage<T extends keyof SOTCEvent> {
+  type: T;
+  payload: SOTCEvent[T];
+}
+
+export function isSOTCEventMessage<T extends keyof SOTCEvent>(message: object): message is SOTCEventMessage<T> {
+  return "type" in message && typeof message.type == "string" && "payload" in message;
 }
 
 // Generate a CustomEvent object with type checking
@@ -13,4 +29,6 @@ export interface SOTCEvent {
 // name matches one of the SOTC events we're expecting and b) the corresponding
 // detail type is correctly typed too.
 export const sotcEvent = <T extends keyof SOTCEvent>(type: T, detail: CustomEventInit<SOTCEvent[T]>) =>
+  // We use `no-restricted-syntax` to guard against `new CustomEvent` in *other*
+  // places, specifically because we want to use this version
   new CustomEvent(type, detail); // eslint-disable-line no-restricted-syntax

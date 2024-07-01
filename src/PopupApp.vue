@@ -1,34 +1,30 @@
 <script async setup lang="ts">
-import { computed, onMounted, ref } from "vue";
-import type { Ref } from "vue";
-import { Game } from "./sotc/Game";
+import { computed } from "vue";
 import { TaggedLogger } from "./util/TaggedLogger";
-import { RuntimeMessageType } from "./types/messages";
+import { ExtensionState } from "./types/sotc";
 
-const props = defineProps<{ game: Game | undefined }>();
+const props = defineProps<{ state: Partial<ExtensionState> }>();
 
 const logger = new TaggedLogger("App");
 
-onMounted(async () => {
-  logger.debug("Loading game from worker");
-  const response = await chrome.runtime.sendMessage({
-    type: RuntimeMessageType.GET_GAME_STATE,
-  });
-  logger.debug("Loaded game from worker", response);
-  activeGame.value = response;
-});
-
-const activeGame: Ref<Game | undefined> = ref(
-  props.game || new Game({ name: "Hello", author: "Author", characters: [] })
+const activeScript = computed(() =>
+  props.state.page == "Grimoire" ? props.state.script : undefined
 );
-
-const gameState = computed(() => JSON.stringify(activeGame.value));
 </script>
 
 <template>
-  <div>
-    <h1 v-if="activeGame">{{ activeGame.script.name }}</h1>
-    <h1 v-else>No game</h1>
+  <div class="popup">
+    <h1>Stream on the Clocktower</h1>
+    <details v-if="activeScript">
+      <summary>{{ activeScript.name }}</summary>
+      <span>by {{ activeScript.author }}</span>
+      <ul>
+        <li v-for="character in activeScript?.characters">
+          {{ character.name }}
+        </li>
+      </ul>
+    </details>
+    <div v-else>Grimoire not visible on {{ state.page }} page</div>
   </div>
 </template>
 

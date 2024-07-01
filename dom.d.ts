@@ -1,8 +1,4 @@
-import { SOTCEvent } from "./src/types/event";
-
-type SOTCEventMap = {
-  [K in keyof SOTCEvent]: CustomEvent<SOTCEvent[K]>;
-};
+import { SOTCEventMap } from "./src/types/event";
 
 // Declare the event types for our custom events. This allows for compile-time
 // checking of our own event handling code, otherwise event data would be
