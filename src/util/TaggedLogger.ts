@@ -15,13 +15,13 @@ export class TaggedLogger {
   level: LogLevel;
 
   constructor(tag: string, level?: LogLevel) {
+    this.tag = tag;
     this.level = level ?? LogLevel.DEBUG;
-    this.tag = `[${tag}]`;
   }
 
   #log(level: LogLevel, methodName: keyof Loggables) {
     const method = console[methodName];
-    return this.level <= level ? method.bind(method, this.tag) : this.#noop;
+    return this.level <= level ? method.bind(method, `[SOTC ${this.tag}]`) : this.#noop;
   }
 
   // A method that allows us to return a type-safe logger method (takes any
