@@ -26,12 +26,15 @@ const activeScript = computed(() =>
     </details>
     <div v-else>Grimoire not visible on {{ state.page }} page</div>
 
-    <details v-if="props.state.seats">
+    <details open v-if="props.state.seats">
       <summary>Seats ({{ state.seats?.length }})</summary>
       <ul>
         <li v-for="player in props.state.seats">
-          {{ player.role?.name }}
-          <span v-if="player.user">({{ player.user }})</span>
+          <div v-if="player.role">
+            <span>{{ player.role?.name }}</span>
+            <span v-if="player.user"> ({{ player.user }})</span>
+          </div>
+          <div v-else class="empty">[empty]</div>
         </li>
       </ul>
     </details>
