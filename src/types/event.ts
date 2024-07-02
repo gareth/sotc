@@ -25,7 +25,7 @@ export interface SOTCEventMessage<T extends keyof SOTCEvent> {
 }
 
 export function isSOTCEventMessage<T extends keyof SOTCEvent>(message: object): message is SOTCEventMessage<T> {
-  return "type" in message && typeof message.type == "string" && "payload" in message;
+  return typeof message == "object" && "type" in message && typeof message.type == "string" && "payload" in message;
 }
 
 // Generate a CustomEvent object with type checking
