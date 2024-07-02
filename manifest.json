@@ -3,7 +3,8 @@
   "name": "Stream on the Clocktower",
   "description": "Blood on the Clocktower streaming companion",
   "permissions": [
-    "storage"
+    "storage",
+    "identity"
   ],
   "action": {
     "default_popup": "index.html"

@@ -45,8 +45,7 @@ const connectPort = () => {
   }, 25000);
 
   // Reconnect on fail
-  port.onDisconnect.addListener((e) => {
-    logger.warn("Port disconnected, attempting to reconnect", e);
+  port.onDisconnect.addListener(() => {
     connectPort();
   });
 };

@@ -46,7 +46,9 @@ export class GameManager {
       this.#connection = { state: "waiting", port, timeout };
     });
 
-    port.onMessage.addListener((message: object) => {
+    port.onMessage.addListener((message: object | "ping") => {
+      if (message == "ping") return;
+
       if (!isSOTCEventMessage(message)) {
         logger.warn("Received malformed port message", message);
         return;

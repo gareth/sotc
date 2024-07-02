@@ -61,6 +61,7 @@ export default {
       chunks: ["popup"],
     }),
     new HtmlWebpackPlugin({
+      template: "src/options.html",
       chunks: ["options"],
       filename: "options.html",
     }),
