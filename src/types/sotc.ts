@@ -1,3 +1,4 @@
+import { Seat } from "./event";
 import { lookup } from "./lookup";
 
 export const CharacterType = ["townsfolk", "outsider", "minion", "demon", "traveler"] as const;
@@ -34,4 +35,5 @@ export interface Script {
 export interface ExtensionState {
   script: Script;
   page: string;
+  seats: Seat[];
 }

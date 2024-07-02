@@ -27,6 +27,15 @@ declare namespace botc {
     isOfficial: boolean;
   }
 
+  export interface Player {
+    id: string;
+    role: Role | Record<string, never>; // {} used for blank tokens
+  }
+
+  export interface User {
+    username: string;
+  }
+
   export interface Store {
     edition: Edition;
     roles: Map<string, Role>;
@@ -34,6 +43,12 @@ declare namespace botc {
       history: never[];
       phase: never;
       isRunning: never;
+    };
+    players: {
+      players: Player[];
+    };
+    session: {
+      users: Map<string, User>;
     };
   }
 }

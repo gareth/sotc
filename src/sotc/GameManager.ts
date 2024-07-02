@@ -1,6 +1,6 @@
 import EventEmitter from "../util/EventEmitter";
 import { TaggedLogger } from "../util/TaggedLogger";
-import { NavigateEventDetail, isSOTCEventMessage } from "../types/event";
+import { NavigateEventDetail, Seat, isSOTCEventMessage } from "../types/event";
 import { ExtensionState, Script } from "../types/sotc";
 
 const logger = new TaggedLogger("GameManager");
@@ -61,6 +61,10 @@ export class GameManager {
           break;
         case "sotc-scriptChanged":
           this.state.script = message.payload as Script;
+          logger.debug("Script is now", this.state.script);
+          break;
+        case "sotc-playersChanged":
+          this.state.seats = message.payload as Seat[];
           logger.debug("Script is now", this.state.script);
           break;
       }

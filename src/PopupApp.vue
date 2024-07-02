@@ -25,6 +25,16 @@ const activeScript = computed(() =>
       </ul>
     </details>
     <div v-else>Grimoire not visible on {{ state.page }} page</div>
+
+    <details v-if="props.state.seats">
+      <summary>Seats ({{ state.seats?.length }})</summary>
+      <ul>
+        <li v-for="player in props.state.seats">
+          {{ player.role?.name }}
+          <span v-if="player.user">({{ player.user }})</span>
+        </li>
+      </ul>
+    </details>
   </div>
 </template>
 

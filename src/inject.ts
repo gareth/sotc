@@ -1,4 +1,4 @@
-import { sotcEvent } from "./types/event";
+import { Seat, sotcEvent } from "./types/event";
 import { TaggedLogger } from "./util/TaggedLogger";
 import type { BOTCVueApp } from "botc";
 import { clone } from "./util/clone";
@@ -13,6 +13,10 @@ const logger = new TaggedLogger("Inject");
 logger.info("initialized");
 
 const IGNORED_MUTATIONS = ["chat/updateServer", "chat/toggleMuted", "session/setPing", "toggleModal"];
+
+function isEmptyObject(o: object): o is Record<string, never> {
+  return !Object.keys(o).length;
+}
 
 function roleToCharacter(role: botc.Role): Character[] {
   const { id, name, ability } = role;
@@ -63,6 +67,23 @@ function inject(container: HTMLVueAppElement) {
 
       document.dispatchEvent(sotcEvent("sotc-scriptChanged", { detail: clone(script) }));
     }
+  );
+
+  logger.info("Adding players watcher");
+  globals.$store.watch(
+    (state) => ({ players: state.players.players, users: state.session.users }),
+    ({ players, users }) => {
+      const activePlayers = players.map((player): Seat => {
+        const user = users.get(player.id);
+        const role = isEmptyObject(player.role) ? undefined : { ...player.role };
+        return { user: user?.username, role };
+      });
+
+      logger.info("Players changed", [...activePlayers]);
+
+      document.dispatchEvent(sotcEvent("sotc-playersChanged", { detail: clone(activePlayers) }));
+    },
+    { deep: true }
   );
 
   // logger.info("Adding game watcher");

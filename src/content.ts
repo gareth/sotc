@@ -66,6 +66,7 @@ function injectScript() {
 
   relay("sotc-navigate");
   relay("sotc-scriptChanged");
+  relay("sotc-playersChanged");
 
   (document.head || document.documentElement).appendChild(script);
 }

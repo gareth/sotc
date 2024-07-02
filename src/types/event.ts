@@ -4,9 +4,15 @@ export interface NavigateEventDetail {
   page?: string;
 }
 
+export type Seat = Partial<{
+  user?: string;
+  role?: botc.Role;
+}>;
+
 export interface SOTCEvent {
   "sotc-navigate": NavigateEventDetail;
   "sotc-scriptChanged": Script;
+  "sotc-playersChanged": Seat[];
 }
 
 export type SOTCEventMap = {
