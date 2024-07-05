@@ -1,4 +1,4 @@
-import { Auth } from "../store";
+import { Auth } from "../stores/local";
 import { TaggedLogger } from "../util/TaggedLogger";
 import client_id from "../../config/client_id";
 

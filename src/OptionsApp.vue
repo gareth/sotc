@@ -1,6 +1,6 @@
 <script async setup lang="ts">
 import { TaggedLogger } from "./util/TaggedLogger";
-import { useStore } from "./store";
+import { useStore } from "./stores/local";
 import { twitchAuth } from "./twitch/auth";
 import { twitchApi } from "./twitch/api";
 import { computed, toRefs } from "vue";

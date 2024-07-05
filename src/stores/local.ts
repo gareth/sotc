@@ -13,4 +13,9 @@ export const useStore = defineStore("sotc", {
   state: () => ({
     auth: useStorage<Partial<Auth>>("auth", {}),
   }),
+  getters: {
+    accessToken(state) {
+      return state.auth.access_token;
+    },
+  },
 });
