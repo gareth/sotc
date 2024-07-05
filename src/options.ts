@@ -8,7 +8,15 @@ import OptionsApp from "./OptionsApp.vue";
 const logger = new TaggedLogger("Options");
 logger.info("initialized");
 
+const ownerId = "59942572";
+import clientId from "../config/client_id";
+import secret from "../config/secret";
+
 const pinia = createPinia();
-const app = createApp(OptionsApp, {});
+const app = createApp(OptionsApp, {
+  ownerId,
+  clientId,
+  secret,
+});
 app.use(pinia);
 app.mount("#app");

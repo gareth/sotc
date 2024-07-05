@@ -1,5 +1,6 @@
 import { Auth } from "../store";
 import { TaggedLogger } from "../util/TaggedLogger";
+import client_id from "../../config/client_id";
 
 const logger = new TaggedLogger("Auth");
 
@@ -11,7 +12,7 @@ export const twitchAuth = async (force_verify = false) => {
 
   const url = new URL("https://id.twitch.tv/oauth2/authorize");
   Object.entries({
-    client_id: "uxheujux1fgxziwxggp54dl3t31u7d", // cspell:disable-line
+    client_id, // cspell:disable-line
     state,
     nonce,
     response_type: "token id_token",
