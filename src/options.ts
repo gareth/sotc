@@ -15,6 +15,7 @@ import secret from "../config/secret";
 const pinia = createPinia();
 const app = createApp(OptionsApp, {
   ownerId,
+  broadcasterId: ownerId,
   clientId,
   secret,
 });
