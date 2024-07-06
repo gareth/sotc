@@ -1,6 +1,9 @@
-import { Auth } from "../stores/local";
+import { Auth, OIDCIdentity } from "../stores/local";
 import { TaggedLogger } from "../util/TaggedLogger";
 import client_id from "../../config/client_id";
+
+import * as jose from "jose";
+import { clone } from "../util/clone";
 
 const logger = new TaggedLogger("Auth");
 
@@ -39,7 +42,16 @@ export const twitchAuth = async (force_verify = false) => {
       );
     }
 
-    logger.info("Got params", auth);
-    return auth;
+    const id = clone(jose.decodeJwt<OIDCIdentity>(auth.id_token));
+    if (id.nonce != nonce) {
+      throw new Error(
+        `Twitch authorization failed: returned nonce ${id.nonce as string} doesn't match requested nonce ${state}`
+      );
+    }
+
+    // TODO: Validate the OIDC token: https://dev.twitch.tv/docs/authentication/getting-tokens-oidc/#validating-an-id-token
+
+    logger.debug("Got params", auth, id);
+    return { auth, id };
   }
 };

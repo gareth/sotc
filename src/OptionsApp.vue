@@ -3,7 +3,7 @@ import { TaggedLogger } from "./util/TaggedLogger";
 import useLocalStore from "./stores/local";
 import { twitchAuth } from "./twitch/auth";
 import { twitchApi } from "./twitch/api";
-import { computed, toRefs } from "vue";
+import { computed } from "vue";
 
 import {
   setExtensionBroadcasterConfiguration,
@@ -36,10 +36,21 @@ const logger = new TaggedLogger("Options");
 const doAuth = async (verify = false) => {
   const data = await twitchAuth(verify).catch((e) => {
     logger.error("Authentication failed:", e);
+    return undefined;
   });
 
+  // debugger;
   if (data) {
-    store.auth = data;
+    const { auth, id } = data;
+
+    // // TODO: Maybe use remote call the verify connection
+    // const token_info = await getTokenInfo(auth.access_token);
+    // console.log("Got token info", token_info);
+
+    if (auth) {
+      store.auth = auth;
+      store.id = { data: id };
+    }
   }
 };
 
@@ -79,7 +90,7 @@ const getInfo = async (api: ReturnType<typeof twitchApi> | undefined) => {
   <div>
     <h1>Stream on the Clocktower</h1>
     <h2>Options</h2>
-    <div v-text="store.auth.id_token"></div>
+    <div v-text="store.id"></div>
     <div v-text="api"></div>
     <button @click="doAuth(false)">Connect with Twitch</button>
     <button v-if="api" @click="getInfo(api)">Get info</button>
