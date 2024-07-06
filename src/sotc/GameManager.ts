@@ -9,7 +9,7 @@ import { createPinia } from "pinia";
 import { clone } from "../util/clone";
 const extensionStore = useExtensionStore(pinia);
 
-const logger = new TaggedLogger("GameManager", LogLevel.WARN);
+const logger = new TaggedLogger("GameManager", LogLevel.INFO);
 
 type Port = chrome.runtime.Port;
 

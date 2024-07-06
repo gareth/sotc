@@ -11,6 +11,7 @@
     "@eslint/js": "^9.5.0",
     "@types/chrome": "^0.0.268",
     "@types/eslint__js": "^8.42.3",
+    "@types/underscore": "^1.11.15",
     "css-loader": "^7.1.2",
     "eslint": "^9.5.0",
     "html-webpack-plugin": "^5.6.0",
@@ -32,6 +33,7 @@
     "@vueuse/core": "^10.11.0",
     "jose": "^5.6.3",
     "pinia": "^2.1.7",
+    "underscore": "^1.13.6",
     "vue": "^3.4.27",
     "vue-router": "^4.3.2",
     "vuex": "^4.1.0"

@@ -6,6 +6,8 @@ import { clone } from "../util/clone";
 import useLocalStore from "../stores/local";
 // import { synchronizeExtensionState } from "../twitch/sync";
 
+import { throttle } from "underscore";
+
 const pinia = createPinia();
 const localStore = useLocalStore(pinia);
 
@@ -17,6 +19,8 @@ const synchroniseState = async (newState: object) => {
     logger.info("Synchronising extension state");
     return Promise.resolve();
     // await synchronizeExtensionState(localStore.broadcasterId, newState);
+  } else {
+    logger.info("Not synchronising - no authenticated user");
   }
 };
 
@@ -24,7 +28,7 @@ export default defineStore("extension", () => {
   const state = ref<Partial<ExtensionState>>({});
 
   logger.debug("Watching", state);
-  watch(state, synchroniseState, { deep: true });
+  watch(state, throttle(synchroniseState, 1000), { deep: true });
 
   return { state };
 });
