@@ -1,6 +1,6 @@
 <script async setup lang="ts">
 import { TaggedLogger } from "./util/TaggedLogger";
-import { useStore } from "./stores/local";
+import useLocalStore from "./stores/local";
 import { twitchAuth } from "./twitch/auth";
 import { twitchApi } from "./twitch/api";
 import { computed, toRefs } from "vue";
@@ -10,7 +10,7 @@ import {
   getExtensionBroadcasterConfiguration,
 } from "@twurple/ebs-helper";
 
-const store = useStore();
+const store = useLocalStore();
 
 const props = defineProps({
   ownerId: {

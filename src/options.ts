@@ -8,7 +8,7 @@ import OptionsApp from "./OptionsApp.vue";
 const logger = new TaggedLogger("Options");
 logger.info("initialized");
 
-const ownerId = "59942572";
+import ownerId from "../config/owner_id";
 import clientId from "../config/client_id";
 import secret from "../config/secret";
 

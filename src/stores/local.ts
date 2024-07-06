@@ -9,7 +9,7 @@ export interface Auth {
   token_type: string;
 }
 
-export const useStore = defineStore("sotc", {
+export default defineStore("sotc", {
   state: () => ({
     auth: useStorage<Partial<Auth>>("auth", {}),
   }),
