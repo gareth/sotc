@@ -1,6 +1,6 @@
-import ownerId from "../../config/owner_id";
-import clientId from "../../config/client_id";
-import secret from "../../config/secret";
+import ownerId from ".././config/owner_id";
+import clientId from ".././config/client_id";
+import secret from ".././config/secret";
 import { setExtensionBroadcasterConfiguration } from "@twurple/ebs-helper";
 import { EbsCallConfig } from "@twurple/ebs-helper";
 

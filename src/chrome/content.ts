@@ -58,7 +58,7 @@ connectPort();
 export function relay<T extends keyof SOTCEvent>(eventName: T) {
   document.addEventListener(eventName, (e) => {
     if (e instanceof CustomEvent) {
-      const detail = e.detail;
+      const detail = e.detail as unknown;
       logger.info("Relaying event", eventName, detail, port);
 
       port.postMessage({

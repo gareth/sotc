@@ -1,6 +1,6 @@
 import { Auth, OIDCIdentity } from "../stores/local";
 import { TaggedLogger } from "../util/TaggedLogger";
-import client_id from "../../config/client_id";
+import client_id from ".././config/client_id";
 
 import * as jose from "jose";
 import { clone } from "../util/clone";

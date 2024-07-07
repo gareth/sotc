@@ -7,12 +7,16 @@ export default {
   mode: "development",
 
   entry: {
-    popup: "./src/popup.ts",
-    content: "./src/content.ts",
-    inject: "./src/inject.ts",
-    worker: "./src/worker.ts",
-    options: "./src/options.ts",
+    popup: "./src/chrome/popup.ts",
+    content: "./src/chrome/content.ts",
+    inject: "./src/chrome/inject.ts",
+    worker: "./src/chrome/worker.ts",
+    options: "./src/chrome/options.ts",
     manifest: "./manifest.json",
+  },
+  output: {
+    clean: true,
+    path: path.resolve(import.meta.dirname, "dist", "chrome"),
   },
   devtool: "source-map",
 
@@ -57,11 +61,11 @@ export default {
       __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: "false",
     }),
     new HtmlWebpackPlugin({
-      template: "src/popup.html",
+      template: "src/chrome/popup.html",
       chunks: ["popup"],
     }),
     new HtmlWebpackPlugin({
-      template: "src/options.html",
+      template: "src/chrome/options.html",
       chunks: ["options"],
       filename: "options.html",
     }),
