@@ -12,6 +12,7 @@
     "@eslint/js": "^9.5.0",
     "@types/chrome": "^0.0.268",
     "@types/eslint__js": "^8.42.3",
+    "@types/twitch-ext": "^1.24.9",
     "@types/underscore": "^1.11.15",
     "css-loader": "^7.1.2",
     "eslint": "^9.5.0",

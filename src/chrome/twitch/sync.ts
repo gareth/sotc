@@ -1,7 +1,7 @@
 import ownerId from ".././config/owner_id";
 import clientId from ".././config/client_id";
 import secret from ".././config/secret";
-import { setExtensionBroadcasterConfiguration } from "@twurple/ebs-helper";
+import { getExtensionBroadcasterConfiguration, setExtensionBroadcasterConfiguration } from "@twurple/ebs-helper";
 import { EbsCallConfig } from "@twurple/ebs-helper";
 
 const ebsCallConfig: EbsCallConfig = {
@@ -15,4 +15,10 @@ export const synchronizeExtensionState = async (broadcasterId: string, data: obj
   // extension context. Patch this method to use native `fetch`
   // See: https://discord.com/channels/325552783787032576/1259059116484329472
   await setExtensionBroadcasterConfiguration(ebsCallConfig, broadcasterId, JSON.stringify(data));
+
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      void getExtensionBroadcasterConfiguration(ebsCallConfig, broadcasterId).then((e) => resolve(e));
+    }, 800);
+  });
 };

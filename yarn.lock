@@ -563,6 +563,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/twitch-ext@^1.24.9":
+  version "1.24.9"
+  resolved "https://registry.yarnpkg.com/@types/twitch-ext/-/twitch-ext-1.24.9.tgz#79f9cdf7aee821cf8fe119ef2ba552387af68318"
+  integrity sha512-YUArlcgu3Hfln0odpkhZXtQIhKquR9usEjWmkpgz+uiUsAFmBDtA27uxLTaOWZHSfWcz8va2mQaNm1g+JRoh0w==
+
 "@types/underscore@^1.11.15":
   version "1.11.15"
   resolved "https://registry.yarnpkg.com/@types/underscore/-/underscore-1.11.15.tgz#29c776daecf6f1935da9adda17509686bf979947"
