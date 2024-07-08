@@ -1,6 +1,7 @@
 <script async setup lang="ts">
 import { ref } from "vue";
 import { TaggedLogger } from "../chrome/util/TaggedLogger";
+import { decode } from "../chrome/twitch/sync";
 
 const logger = new TaggedLogger("OverlayApp");
 
@@ -15,7 +16,9 @@ window.Twitch.ext.onContext((ctx) => {
 window.Twitch.ext.configuration.onChanged(() => {
   logger.info("Change detected");
   if (Twitch.ext.configuration.broadcaster) {
-    config.value = JSON.parse(Twitch.ext.configuration.broadcaster.content);
+    const content = Twitch.ext.configuration.broadcaster.content;
+    const decompressed = decode(content);
+    config.value = decompressed;
   }
 });
 
@@ -34,4 +37,4 @@ logger.info("Got initial config", config);
   </div>
 </template>
 
-<style scoped></style>
+<style lang="scss" scoped></style>

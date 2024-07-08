@@ -1,8 +1,12 @@
 import ownerId from ".././config/owner_id";
 import clientId from ".././config/client_id";
 import secret from ".././config/secret";
-import { getExtensionBroadcasterConfiguration, setExtensionBroadcasterConfiguration } from "@twurple/ebs-helper";
+import { setExtensionBroadcasterConfiguration } from "@twurple/ebs-helper";
 import { EbsCallConfig } from "@twurple/ebs-helper";
+import { compress, decompress } from "lzutf8";
+import { TaggedLogger } from "../util/TaggedLogger";
+
+const logger = new TaggedLogger("Sync");
 
 const ebsCallConfig: EbsCallConfig = {
   ownerId,
@@ -10,15 +14,29 @@ const ebsCallConfig: EbsCallConfig = {
   secret,
 };
 
-export const synchronizeExtensionState = async (broadcasterId: string, data: object) => {
-  // FIXME: This ends up calling XMLHttpRequest which is unavailable in an
-  // extension context. Patch this method to use native `fetch`
-  // See: https://discord.com/channels/325552783787032576/1259059116484329472
-  await setExtensionBroadcasterConfiguration(ebsCallConfig, broadcasterId, JSON.stringify(data));
+export function encode<T extends object>(data: T): string {
+  const target = JSON.stringify(data);
+  logger.debug("Compressing", target, `(${target.length})`);
+  const compressed = compress(target, { outputEncoding: "BinaryString" }) as string;
+  logger.debug("Compressed to", compressed, `(${compressed.length})`);
+  return compressed;
+}
 
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      void getExtensionBroadcasterConfiguration(ebsCallConfig, broadcasterId).then((e) => resolve(e));
-    }, 800);
+export function decode(data: string) {
+  logger.debug("Retrieving", data);
+  if (data) {
+    return JSON.parse(decompress(data, { inputEncoding: "BinaryString" }) as string) as object;
+  } else {
+    throw new Error("No data to decode");
+  }
+}
+
+export const synchronizeExtensionState = async (broadcasterId: string, data: object) => {
+  logger.debug("Synchronising object", data);
+  const encoded = encode(data);
+
+  await setExtensionBroadcasterConfiguration(ebsCallConfig, broadcasterId, encoded).catch((e) => {
+    logger.error("Error setting config", e);
+    throw e;
   });
 };

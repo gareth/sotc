@@ -1,5 +1,5 @@
 import { createApp } from "vue";
-// import "@/style.css";
+import "./overlay.scss";
 import OverlayApp from "./OverlayApp.vue";
 import { TaggedLogger } from "../chrome/util/TaggedLogger";
 

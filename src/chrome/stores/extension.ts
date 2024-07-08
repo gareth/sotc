@@ -18,8 +18,12 @@ const synchroniseState = async (newState: object) => {
   if (localStore.broadcasterId) {
     logger.info("Synchronising extension state");
     // return Promise.resolve();
-    const returnData = (await synchronizeExtensionState(localStore.broadcasterId, newState)) as { content: string };
-    logger.info("Confirmed data", JSON.parse(returnData.content));
+    const returnData = (await synchronizeExtensionState(localStore.broadcasterId, newState)) as string | undefined;
+    if (returnData) {
+      logger.info("Confirmed data", returnData);
+    } else {
+      logger.warn("Confirmed data was not returned");
+    }
   } else {
     logger.info("Not synchronising - no authenticated user");
   }
