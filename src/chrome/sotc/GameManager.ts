@@ -6,7 +6,7 @@ import { ExtensionState, Script } from "../types/sotc";
 const pinia = createPinia();
 import useExtensionStore from "../stores/extension";
 import { createPinia } from "pinia";
-import { clone } from "../util/clone";
+// import { clone } from "../util/clone";
 const extensionStore = useExtensionStore(pinia);
 
 const logger = new TaggedLogger("GameManager", LogLevel.INFO);
@@ -65,18 +65,21 @@ export class GameManager {
       switch (message.type) {
         case "sotc-navigate":
           this.state.page = (message.payload as NavigateEventDetail).page;
+          extensionStore.page = this.state.page;
           logger.debug("Page is now", this.state.page);
           break;
         case "sotc-scriptChanged":
           this.state.script = message.payload as Script;
+          extensionStore.script = this.state.script;
           logger.debug("Script is now", this.state.script);
           break;
         case "sotc-playersChanged":
           this.state.seats = message.payload as Seat[];
+          extensionStore.seats = this.state.seats;
           logger.debug("Seats are now", this.state.seats);
           break;
       }
-      extensionStore.state = clone(this.state);
+      // extensionStore.state = clone(this.state);
       logger.info("State is now", this.state);
     });
   }
