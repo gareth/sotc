@@ -18,7 +18,8 @@ export function encode<T extends object>(data: T): string {
   const target = JSON.stringify(data);
   logger.debug("Compressing", target, `(${target.length})`);
   const compressed = compress(target, { outputEncoding: "BinaryString" }) as string;
-  logger.debug("Compressed to", compressed, `(${compressed.length})`);
+  const reduction = (100 * (target.length - compressed.length)) / target.length;
+  logger.debug("Compressed to", compressed, `(${compressed.length}, -${Math.round(reduction)}%)`);
   return compressed;
 }
 
