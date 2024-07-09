@@ -5,6 +5,7 @@ import { decode } from "../chrome/twitch/sync";
 import { ExtensionState, Script } from "../chrome/types/sotc";
 import { Seat } from "../chrome/types/event";
 import ScriptPanel from "./ScriptPanel.vue";
+import GrimoirePanel from "./GrimoirePanel.vue";
 
 // import * as jose from "jose";
 
@@ -95,7 +96,8 @@ onMounted(() => {
 
 <template>
   <main>
-    <ScriptPanel class="script" :script="script"></ScriptPanel>
+    <GrimoirePanel class="panel-grimoire" :seats="seats"></GrimoirePanel>
+    <ScriptPanel class="panel-script" :script="script"></ScriptPanel>
     <!-- <Game class="script" v-if="config && config.page == `Grimoire`" v-bind="config"></Game> -->
   </main>
 </template>
@@ -105,14 +107,14 @@ main {
   height: 100%;
 
   display: grid;
-  grid-template-columns: auto 23%;
+  grid-template-columns: 23% auto 23%;
   grid-template-rows: 1fr;
-  grid-template-areas: ". script";
+  grid-template-areas: ". grimoire script";
   grid-column-gap: 0px;
   grid-row-gap: 0px;
 }
 
-.script {
+.panel-script {
   grid-area: script;
   background-color: rgba(242, 230, 243, 0.95);
   border: 2px solid rgb(76, 10, 71);
@@ -120,5 +122,11 @@ main {
   margin: 19% 0;
 
   overflow: scroll;
+}
+
+.panel-grimoire {
+  grid-area: grimoire;
+  background-color: rgba(242, 230, 243, 0.95);
+  border: 2px solid rgb(76, 10, 71);
 }
 </style>
