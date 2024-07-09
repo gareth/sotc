@@ -4,7 +4,7 @@ import { computed, ref, watch } from "vue";
 import { TaggedLogger } from "../util/TaggedLogger";
 import { clone } from "../util/clone";
 import useLocalStore from "../stores/local";
-import { synchronizeExtensionState } from "../twitch/sync";
+import { broadcastStateChange, synchronizeExtensionState } from "../twitch/sync";
 
 import { throttle } from "underscore";
 import { Seat } from "../types/event";
@@ -22,6 +22,17 @@ const synchroniseState = async (newState: object) => {
   } else {
     logger.info("Not synchronising - no authenticated user");
   }
+};
+
+const broadcastState = <T extends object>(key: string) => {
+  return async (newState: T) => {
+    if (localStore.broadcasterId) {
+      logger.info("Broadcasting extension state for", key);
+      await broadcastStateChange(localStore.broadcasterId, key, newState);
+    } else {
+      logger.info("Not broadcasting - no authenticated user");
+    }
+  };
 };
 
 export default defineStore("extension", () => {
@@ -43,6 +54,10 @@ export default defineStore("extension", () => {
 
   logger.debug("Watching", state);
   watch(state, throttle(synchroniseState, 1000), { deep: true });
+
+  watch(script, throttle(broadcastState("script"), 1000), { deep: true });
+  watch(seats, throttle(broadcastState("seats"), 1000), { deep: true });
+  watch(page, throttle(broadcastState("page"), 1000), { deep: true });
 
   return { script, page, seats, state, setState };
 });

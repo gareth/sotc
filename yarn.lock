@@ -38,6 +38,19 @@
     "@d-fischer/shared-utils" "^3.6.3"
     tslib "^2.6.2"
 
+"@d-fischer/connection@^9.0.0":
+  version "9.0.0"
+  resolved "https://registry.yarnpkg.com/@d-fischer/connection/-/connection-9.0.0.tgz#8e684bdbc08330380de98d9cc3a61329b603d932"
+  integrity sha512-Mljp/EbaE+eYWfsFXUOk+RfpbHgrWGL/60JkAvjYixw6KREfi5r17XdUiXe54ByAQox6jwgdN2vebdmW1BT+nQ==
+  dependencies:
+    "@d-fischer/isomorphic-ws" "^7.0.0"
+    "@d-fischer/logger" "^4.2.1"
+    "@d-fischer/shared-utils" "^3.5.0"
+    "@d-fischer/typed-event-emitter" "^3.3.0"
+    "@types/ws" "^8.5.4"
+    tslib "^2.4.1"
+    ws "^8.11.0"
+
 "@d-fischer/cross-fetch@^5.0.1":
   version "5.0.5"
   resolved "https://registry.yarnpkg.com/@d-fischer/cross-fetch/-/cross-fetch-5.0.5.tgz#5905ac512e8e14110de8d4b92c0c4e7da0e6b5d9"
@@ -49,6 +62,11 @@
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/@d-fischer/detect-node/-/detect-node-3.0.1.tgz#7b051a86611b0396ba205aabae805b18cc642a78"
   integrity sha512-0Rf3XwTzuTh8+oPZW9SfxTIiL+26RRJ0BRPwj5oVjZFyFKmsj9RGfN2zuTRjOuA3FCK/jYm06HOhwNK+8Pfv8w==
+
+"@d-fischer/isomorphic-ws@^7.0.0":
+  version "7.0.2"
+  resolved "https://registry.yarnpkg.com/@d-fischer/isomorphic-ws/-/isomorphic-ws-7.0.2.tgz#444eeb82c2f79566ec5e055fab1e2e43b578330c"
+  integrity sha512-xK+qIJUF0ne3dsjq5Y3BviQ4M+gx9dzkN+dPP7abBMje4YRfow+X9jBgeEoTe5e+Q6+8hI9R0b37Okkk8Vf0hQ==
 
 "@d-fischer/logger@^4.2.1", "@d-fischer/logger@^4.2.3":
   version "4.2.3"
@@ -73,14 +91,14 @@
     "@d-fischer/shared-utils" "^3.6.3"
     tslib "^2.6.2"
 
-"@d-fischer/shared-utils@^3.2.0", "@d-fischer/shared-utils@^3.6.1", "@d-fischer/shared-utils@^3.6.3":
+"@d-fischer/shared-utils@^3.2.0", "@d-fischer/shared-utils@^3.5.0", "@d-fischer/shared-utils@^3.6.1", "@d-fischer/shared-utils@^3.6.3":
   version "3.6.3"
   resolved "https://registry.yarnpkg.com/@d-fischer/shared-utils/-/shared-utils-3.6.3.tgz#1178633bf5fe715cf6222a51f2b3169132496ba8"
   integrity sha512-Lz+Qk1WJLVoeREOHPZcIDTHOoxecxMSG2sq+x1xWYCH1exqiMKMMx06pXdy15UzHG7ohvQRNXk2oHqZ9EOl9jQ==
   dependencies:
     tslib "^2.4.1"
 
-"@d-fischer/typed-event-emitter@^3.3.1":
+"@d-fischer/typed-event-emitter@^3.3.0", "@d-fischer/typed-event-emitter@^3.3.1":
   version "3.3.3"
   resolved "https://registry.yarnpkg.com/@d-fischer/typed-event-emitter/-/typed-event-emitter-3.3.3.tgz#d65fcf7756f3503bd56ed41bc916dc181d30597a"
   integrity sha512-OvSEOa8icfdWDqcRtjSEZtgJTFOFNgTjje7zaL0+nAtu2/kZtRCSK5wUMrI/aXtCH8o0Qz2vA8UqkhWUTARFQQ==
@@ -331,6 +349,13 @@
     retry "^0.13.1"
     tslib "^2.0.3"
 
+"@twurple/auth-ext@^7.1.0":
+  version "7.1.0"
+  resolved "https://registry.yarnpkg.com/@twurple/auth-ext/-/auth-ext-7.1.0.tgz#c36a433b1a00a530cf8ec16016e89addc9744634"
+  integrity sha512-UQa1xQi917CJW4PhqTsFnMBX2WKcVUN32WHoxalqlc4RN05225oYQR3iHZC1+7k8eDCIbHjiOjClHuOSHbWjlQ==
+  dependencies:
+    tslib "^2.0.3"
+
 "@twurple/auth@^7.1.0":
   version "7.1.0"
   resolved "https://registry.yarnpkg.com/@twurple/auth/-/auth-7.1.0.tgz#f9287be00cb8675af812a3120692f8408065116e"
@@ -361,6 +386,18 @@
     "@twurple/api-call" "7.1.0"
     "@twurple/common" "7.1.0"
     jose "^4.14.4"
+    tslib "^2.0.3"
+
+"@twurple/pubsub@^7.1.0":
+  version "7.1.0"
+  resolved "https://registry.yarnpkg.com/@twurple/pubsub/-/pubsub-7.1.0.tgz#a54ac2e784de69b0841371325f474c105ac1971d"
+  integrity sha512-2YMiktQbHPiPqCNzdlQ2OOMLVHNiy5tjRImkVBHNjw0tqCsbrCUhmFwgKjiIiDQUTTzOcNdFhDNhlcgy5Mz65A==
+  dependencies:
+    "@d-fischer/connection" "^9.0.0"
+    "@d-fischer/logger" "^4.2.1"
+    "@d-fischer/shared-utils" "^3.6.1"
+    "@d-fischer/typed-event-emitter" "^3.3.0"
+    "@twurple/common" "7.1.0"
     tslib "^2.0.3"
 
 "@types/body-parser@*":
@@ -578,7 +615,7 @@
   resolved "https://registry.yarnpkg.com/@types/web-bluetooth/-/web-bluetooth-0.0.20.tgz#f066abfcd1cbe66267cdbbf0de010d8a41b41597"
   integrity sha512-g9gZnnXVq7gM7v3tJCWV/qw7w+KeOlSHAhgF9RytFyifW6AF61hdT2ucrYhPq9hLs5JIryeupHV3qGk95dH9ow==
 
-"@types/ws@^8.5.10":
+"@types/ws@^8.5.10", "@types/ws@^8.5.4":
   version "8.5.10"
   resolved "https://registry.yarnpkg.com/@types/ws/-/ws-8.5.10.tgz#4acfb517970853fa6574a3a6886791d04a396787"
   integrity sha512-vmQSUcfalpIq0R9q7uTo2lXs6eGIpt9wtnLdMv9LVpIjCA/+ufZRozlVoVelIYixx1ugCBKDhn89vnsEGOCx9A==
@@ -4995,6 +5032,11 @@ wrappy@1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/wrappy/-/wrappy-1.0.2.tgz#b5243d8f3ec1aa35f1364605bc0d1036e30ab69f"
   integrity sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==
+
+ws@^8.11.0:
+  version "8.18.0"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-8.18.0.tgz#0d7505a6eafe2b0e712d232b42279f53bc289bbc"
+  integrity sha512-8VbfWfHLbbwu3+N6OKsOMpBdT4kXPDDB9cJk2bJ6mh9ucxdlnNvH1e+roYkKmN9Nxw2yjz7VzeO9oOz2zJ04Pw==
 
 ws@^8.16.0:
   version "8.17.0"

@@ -1,7 +1,7 @@
 import ownerId from ".././config/owner_id";
 import clientId from ".././config/client_id";
 import secret from ".././config/secret";
-import { setExtensionBroadcasterConfiguration } from "@twurple/ebs-helper";
+import { sendExtensionPubSubBroadcastMessage, setExtensionBroadcasterConfiguration } from "@twurple/ebs-helper";
 import { EbsCallConfig } from "@twurple/ebs-helper";
 import { compress, decompress } from "lzutf8";
 import { TaggedLogger } from "../util/TaggedLogger";
@@ -40,4 +40,9 @@ export const synchronizeExtensionState = async (broadcasterId: string, data: obj
     logger.error("Error setting config", e);
     throw e;
   });
+};
+
+export const broadcastStateChange = async (broadcasterId: string, key: string, data: object) => {
+  const message = { type: "updateState", key, payload: data };
+  await sendExtensionPubSubBroadcastMessage(ebsCallConfig, broadcasterId, encode(message));
 };

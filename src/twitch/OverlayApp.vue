@@ -6,7 +6,57 @@ import { ExtensionState, Script } from "../chrome/types/sotc";
 import { Seat } from "../chrome/types/event";
 import Game from "./Game.vue";
 
+// import * as jose from "jose";
+
+interface SOTCPubSubMessage {
+  type: string;
+  key: string;
+}
+
+interface SOTCPubSubUpdateStateMessage<T extends keyof ExtensionState> {
+  type: "updateState";
+  key: T;
+  payload: ExtensionState[T];
+}
+
 const logger = new TaggedLogger("OverlayApp");
+
+window.Twitch.ext.onAuthorized((auth) => {
+  // const helix = jose.decodeJwt(auth.helixToken);
+  // const id = jose.decodeJwt(auth.token);
+  // logger.debug({ auth, helix, id });
+
+  window.Twitch.ext.listen("broadcast", (target, contentType, rawMessage) => {
+    logger.debug("Received broadcast message", target, contentType, rawMessage);
+    const message = decode(rawMessage) as SOTCPubSubMessage;
+    logger.debug("Decoded, this is", message);
+
+    if (message.type == "updateState") {
+      switch (message.key) {
+        case "script":
+          script.value = (
+            message as SOTCPubSubUpdateStateMessage<"script">
+          ).payload;
+          break;
+
+        case "seats":
+          seats.value = (
+            message as SOTCPubSubUpdateStateMessage<"seats">
+          ).payload;
+          break;
+
+        case "page":
+          page.value = (
+            message as SOTCPubSubUpdateStateMessage<"page">
+          ).payload;
+          break;
+
+        default:
+          break;
+      }
+    }
+  });
+});
 
 const context = ref<object>({});
 
@@ -45,7 +95,7 @@ onMounted(() => {
 
 <template>
   <div class="overlay">
-    <Game v-if="config" v-bind="config">1</Game>
+    <Game v-if="config && config.page == `Grimoire`" v-bind="config"></Game>
   </div>
 </template>
 

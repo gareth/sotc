@@ -33,7 +33,9 @@
   "dependencies": {
     "@twurple/api": "^7.1.0",
     "@twurple/auth": "^7.1.0",
+    "@twurple/auth-ext": "^7.1.0",
     "@twurple/ebs-helper": "^7.1.0",
+    "@twurple/pubsub": "^7.1.0",
     "@vueuse/core": "^10.11.0",
     "jose": "^5.6.3",
     "lzutf8": "^0.6.3",
