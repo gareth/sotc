@@ -4,7 +4,7 @@ import { TaggedLogger } from "../chrome/util/TaggedLogger";
 import { decode } from "../chrome/twitch/sync";
 import { ExtensionState, Script } from "../chrome/types/sotc";
 import { Seat } from "../chrome/types/event";
-import Game from "./Game.vue";
+import ScriptPanel from "./ScriptPanel.vue";
 
 // import * as jose from "jose";
 
@@ -94,9 +94,31 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="overlay">
-    <Game v-if="config && config.page == `Grimoire`" v-bind="config"></Game>
-  </div>
+  <main>
+    <ScriptPanel class="script" :script="script"></ScriptPanel>
+    <!-- <Game class="script" v-if="config && config.page == `Grimoire`" v-bind="config"></Game> -->
+  </main>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+main {
+  height: 100%;
+
+  display: grid;
+  grid-template-columns: auto 23%;
+  grid-template-rows: 1fr;
+  grid-template-areas: ". script";
+  grid-column-gap: 0px;
+  grid-row-gap: 0px;
+}
+
+.script {
+  grid-area: script;
+  background-color: rgba(242, 230, 243, 0.95);
+  border: 2px solid rgb(76, 10, 71);
+  padding: 0rem 1rem;
+  margin: 19% 0;
+
+  overflow: scroll;
+}
+</style>

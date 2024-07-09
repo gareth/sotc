@@ -1,9 +1,13 @@
-body {
-  background-color: wheat;
-
-  font-family: sans-serif;
+html {
+  display: grid;
+  min-height: calc(100% - 31px);
 }
 
-summary {
-  cursor: pointer;
+body {
+  font-family: sans-serif;
+  height: 100%;
+}
+
+#app {
+  height: 100%;
 }
