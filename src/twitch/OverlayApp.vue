@@ -1,5 +1,5 @@
 <script async setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { onMounted, ref } from "vue";
 import { TaggedLogger } from "../chrome/util/TaggedLogger";
 import { decode } from "../chrome/twitch/sync";
 import { ExtensionState, Script } from "../chrome/types/sotc";
@@ -72,18 +72,6 @@ const script = ref<Script | undefined>(undefined);
 const page = ref<string | undefined>(undefined);
 const seats = ref<Seat[] | undefined>(undefined);
 
-const config = computed(() => {
-  if (script.value && page.value && seats.value) {
-    return {
-      script: script.value,
-      page: page.value,
-      seats: seats.value,
-    };
-  } else {
-    return;
-  }
-});
-
 window.Twitch.ext.onContext((ctx) => {
   context.value = ctx;
 });
@@ -107,7 +95,6 @@ onMounted(() => {
     <div class="latency" v-text="latency"></div>
     <GrimoirePanel class="panel-grimoire" :seats="seats"></GrimoirePanel>
     <ScriptPanel class="panel-script" :script="script"></ScriptPanel>
-    <!-- <Game class="script" v-if="config && config.page == `Grimoire`" v-bind="config"></Game> -->
   </main>
 </template>
 
@@ -116,7 +103,7 @@ main {
   height: 100%;
 
   display: grid;
-  grid-template-columns: 23% auto 23%;
+  grid-template-columns: 22% auto 23%;
   grid-template-rows: 1fr;
   grid-template-areas: ". grimoire script";
   grid-column-gap: 0px;
@@ -138,14 +125,13 @@ main {
   background-color: rgba(242, 230, 243, 0.95);
   border: 2px solid rgb(76, 10, 71);
   padding: 0rem 1rem;
-  margin: 19% 0;
+  margin: 13% 0 0 0;
 
   overflow: scroll;
 }
 
 .panel-grimoire {
   grid-area: grimoire;
-  background-color: rgba(242, 230, 243, 0.95);
-  border: 2px solid rgb(76, 10, 71);
+  margin-top: -55px;
 }
 </style>
