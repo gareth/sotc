@@ -6,8 +6,7 @@ import { ExtensionState, Script } from "../chrome/types/sotc";
 import { Seat } from "../chrome/types/event";
 import ScriptPanel from "./ScriptPanel.vue";
 import GrimoirePanel from "./GrimoirePanel.vue";
-
-// import * as jose from "jose";
+import { delay } from "underscore";
 
 interface SOTCPubSubMessage {
   type: string;
@@ -22,41 +21,49 @@ interface SOTCPubSubUpdateStateMessage<T extends keyof ExtensionState> {
 
 const logger = new TaggedLogger("OverlayApp");
 
-window.Twitch.ext.onAuthorized((auth) => {
-  // const helix = jose.decodeJwt(auth.helixToken);
-  // const id = jose.decodeJwt(auth.token);
-  // logger.debug({ auth, helix, id });
+const latency = ref<number>(0);
 
-  window.Twitch.ext.listen("broadcast", (target, contentType, rawMessage) => {
-    logger.debug("Received broadcast message", target, contentType, rawMessage);
-    const message = decode(rawMessage) as SOTCPubSubMessage;
-    logger.debug("Decoded, this is", message);
-
-    if (message.type == "updateState") {
-      switch (message.key) {
-        case "script":
-          script.value = (
-            message as SOTCPubSubUpdateStateMessage<"script">
-          ).payload;
-          break;
-
-        case "seats":
-          seats.value = (
-            message as SOTCPubSubUpdateStateMessage<"seats">
-          ).payload;
-          break;
-
-        case "page":
-          page.value = (
-            message as SOTCPubSubUpdateStateMessage<"page">
-          ).payload;
-          break;
-
-        default:
-          break;
-      }
-    }
+setInterval(() => {
+  window.Twitch.ext.onContext((ctx) => {
+    latency.value = ctx.hlsLatencyBroadcaster ?? 0;
   });
+}, 1000);
+
+const broadcastHandler = (
+  target: string,
+  contentType: string,
+  rawMessage: string
+) => {
+  logger.debug("Received broadcast message", target, contentType, rawMessage);
+  const message = decode(rawMessage) as SOTCPubSubMessage;
+  logger.debug("Decoded, this is", message);
+
+  if (message.type == "updateState") {
+    switch (message.key) {
+      case "script":
+        script.value = (
+          message as SOTCPubSubUpdateStateMessage<"script">
+        ).payload;
+        break;
+
+      case "seats":
+        seats.value = (
+          message as SOTCPubSubUpdateStateMessage<"seats">
+        ).payload;
+        break;
+
+      case "page":
+        page.value = (message as SOTCPubSubUpdateStateMessage<"page">).payload;
+        break;
+
+      default:
+        break;
+    }
+  }
+};
+
+window.Twitch.ext.listen("broadcast", (...args) => {
+  delay(broadcastHandler, (0.15 + latency.value) * 1000, ...args);
 });
 
 const context = ref<object>({});
@@ -86,6 +93,7 @@ onMounted(() => {
     if (Twitch.ext.configuration.broadcaster) {
       const content = Twitch.ext.configuration.broadcaster.content;
       const decompressed = decode(content) as Partial<ExtensionState>;
+      logger.debug("Decompressed to", decompressed);
       script.value = decompressed.script;
       page.value = decompressed.page;
       seats.value = decompressed.seats;
@@ -96,6 +104,7 @@ onMounted(() => {
 
 <template>
   <main>
+    <div class="latency" v-text="latency"></div>
     <GrimoirePanel class="panel-grimoire" :seats="seats"></GrimoirePanel>
     <ScriptPanel class="panel-script" :script="script"></ScriptPanel>
     <!-- <Game class="script" v-if="config && config.page == `Grimoire`" v-bind="config"></Game> -->
@@ -112,6 +121,16 @@ main {
   grid-template-areas: ". grimoire script";
   grid-column-gap: 0px;
   grid-row-gap: 0px;
+}
+
+.latency {
+  position: absolute;
+  background: white;
+  color: black;
+  padding: 10px;
+  top: 10px;
+  left: 10px;
+  opacity: 0.3;
 }
 
 .panel-script {
