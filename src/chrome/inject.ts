@@ -2,7 +2,8 @@ import { Seat, sotcEvent } from "./types/event";
 import { TaggedLogger } from "./util/TaggedLogger";
 import type { BOTCVueApp } from "botc";
 import { clone } from "./util/clone";
-import { Character, CharacterAlignments, Script, characterType } from "./types/sotc";
+import { Bounds, Character, CharacterAlignments, Script, characterType } from "./types/sotc";
+import { nextTick } from "vue";
 
 type HTMLVueAppElement = HTMLElement & { __vue_app__: BOTCVueApp };
 function isHTMLVueAppElement(el: HTMLElement | null): el is HTMLVueAppElement {
@@ -17,6 +18,11 @@ const IGNORED_MUTATIONS = ["chat/updateServer", "chat/toggleMuted", "session/set
 function isEmptyObject(o: object): o is Record<string, never> {
   return !Object.keys(o).length;
 }
+
+const round = (x: number, precision: number) => {
+  const factor = Math.pow(10, precision);
+  return Math.round(x * factor) / factor;
+};
 
 function roleToCharacter(role: botc.Role): Character[] {
   const { id, name, ability } = role;
@@ -73,15 +79,25 @@ function inject(container: HTMLVueAppElement) {
   globals.$store.watch(
     (state) => ({ players: state.players.players, users: state.session.users }),
     ({ players, users }) => {
-      const activePlayers = players.map((player): Seat => {
-        const user = users.get(player.id);
-        const role = isEmptyObject(player.role) ? undefined : { ...player.role };
-        return { user: user?.username, role };
+      // `nextTick` because we need Vue to render the result of this change
+      // otherwise the bounds won't be calculated correctly.
+      void nextTick(async () => {
+        const locations = await getTokensBounds(container);
+        if (locations?.length != players.length) {
+          logger.warn(`Incorrect number of tokens (${locations?.length}) found (expected ${players.length})`);
+        }
+        const activePlayers = players.map((player, idx): Seat => {
+          const pos = locations?.[idx];
+          const user = users.get(player.id);
+          const role = isEmptyObject(player.role) ? undefined : { ...player.role };
+          return { user: user?.username, role, pos };
+        });
+
+        logger.info("Players changed", [...activePlayers]);
+
+        document.dispatchEvent(sotcEvent("sotc-playersChanged", { detail: clone(activePlayers) }));
+        updateGrim(container);
       });
-
-      logger.info("Players changed", [...activePlayers]);
-
-      document.dispatchEvent(sotcEvent("sotc-playersChanged", { detail: clone(activePlayers) }));
     },
     { deep: true }
   );
@@ -133,6 +149,61 @@ function inject(container: HTMLVueAppElement) {
 
   logger.info("Adding game watcher");
 }
+
+const updateGrim = (container: HTMLElement) => {
+  const grimBounds = getGrimoireBounds(container);
+  const windowBounds = {
+    x: 0,
+    y: 0,
+    width: window.innerWidth,
+    height: window.innerHeight,
+  };
+  if (grimBounds) {
+    document.dispatchEvent(sotcEvent("sotc-size", { detail: { pos: grimBounds, container: windowBounds } }));
+  }
+};
+
+const getGrimoireBounds = (container: HTMLElement) => {
+  const grim = container.querySelector(".circle");
+  if (grim) {
+    const { x, y, width, height } = grim.getBoundingClientRect();
+    return {
+      x: Math.round(x),
+      y: Math.round(y),
+      width: Math.round(width),
+      height: Math.round(height),
+    };
+  } else {
+    throw new Error(`Grim not found in container .circle`);
+  }
+};
+
+const getElementBounds = (el: Element, base: Bounds) => {
+  const { x, y, width, height } = el.getBoundingClientRect();
+  const result = {
+    x: round((x - base.x) / base.width, 4),
+    y: round((y - base.y) / base.height, 4),
+    width: round(Math.round(width) / base.width, 4),
+    height: round(Math.round(height) / base.height, 4),
+  };
+  return result;
+};
+
+// Get bounds for every token, after waiting for their animations to finish
+const getTokensBounds = async (container: HTMLElement) => {
+  logger.debug("Getting token bounds");
+  const base = getGrimoireBounds(container);
+  logger.debug("Base bounds", base);
+  const tokens = container.querySelectorAll(".circle .player");
+  const promises = [...tokens].map(async (el) => {
+    const animations = el.getAnimations();
+    // If there are no animations, this resolves instantly
+    await Promise.all(animations.map((a) => a.finished));
+    return getElementBounds(el, base);
+  });
+
+  return Promise.all(promises);
+};
 
 const main = document.getElementById("main");
 if (isHTMLVueAppElement(main)) {

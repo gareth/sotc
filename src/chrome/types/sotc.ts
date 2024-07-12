@@ -17,6 +17,13 @@ export const CharacterAlignments = new Map<CharacterType, CharacterAlignment>([
   ["traveler", "unknown"],
 ]);
 
+export interface Bounds {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 export interface Character {
   id: string;
   name: string;
@@ -36,4 +43,5 @@ export interface ExtensionState {
   script: Script;
   page: string;
   seats: Seat[];
+  grim: { pos: Bounds; container: Bounds };
 }

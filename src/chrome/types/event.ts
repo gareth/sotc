@@ -1,4 +1,4 @@
-import { Script } from "./sotc";
+import { Script, Bounds } from "./sotc";
 
 export interface NavigateEventDetail {
   page?: string;
@@ -7,12 +7,14 @@ export interface NavigateEventDetail {
 export type Seat = Partial<{
   user?: string;
   role?: botc.Role;
+  pos: Bounds;
 }>;
 
 export interface SOTCEvent {
   "sotc-navigate": NavigateEventDetail;
   "sotc-scriptChanged": Script;
   "sotc-playersChanged": Seat[];
+  "sotc-size": { pos: Bounds; container: Bounds };
 }
 
 export type SOTCEventMap = {

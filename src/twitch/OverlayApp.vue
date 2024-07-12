@@ -1,12 +1,17 @@
 <script async setup lang="ts">
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { TaggedLogger } from "../chrome/util/TaggedLogger";
 import { decode } from "../chrome/twitch/sync";
-import { ExtensionState, Script } from "../chrome/types/sotc";
+import { Bounds, ExtensionState, Script } from "../chrome/types/sotc";
 import { Seat } from "../chrome/types/event";
 import ScriptPanel from "./ScriptPanel.vue";
 import GrimoirePanel from "./GrimoirePanel.vue";
 import { delay } from "underscore";
+
+interface Point {
+  x: number;
+  y: number;
+}
 
 interface SOTCPubSubMessage {
   type: string;
@@ -56,6 +61,10 @@ const broadcastHandler = (
         page.value = (message as SOTCPubSubUpdateStateMessage<"page">).payload;
         break;
 
+      case "grim":
+        grim.value = (message as SOTCPubSubUpdateStateMessage<"grim">).payload;
+        break;
+
       default:
         break;
     }
@@ -63,37 +72,52 @@ const broadcastHandler = (
 };
 
 window.Twitch.ext.listen("broadcast", (...args) => {
-  delay(broadcastHandler, (0.15 + latency.value) * 1000, ...args);
+  delay(broadcastHandler, latency.value * 1000, ...args);
 });
-
-const context = ref<object>({});
 
 const script = ref<Script | undefined>(undefined);
 const page = ref<string | undefined>(undefined);
 const seats = ref<Seat[] | undefined>(undefined);
+const grim = ref<{ pos: Bounds; container: Bounds } | undefined>(undefined);
 
-window.Twitch.ext.onContext((ctx) => {
-  context.value = ctx;
+// Sample grim offset
+const grimOffset = ref<{
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
+}>({
+  top: -0.002,
+  right: 0.216931216931217,
+  bottom: 0,
+  left: 0.216931216931217,
 });
 
-onMounted(() => {
-  window.Twitch.ext.configuration.onChanged(() => {
-    if (Twitch.ext.configuration.broadcaster) {
-      const content = Twitch.ext.configuration.broadcaster.content;
-      const decompressed = decode(content) as Partial<ExtensionState>;
-      logger.debug("Decompressed to", decompressed);
-      script.value = decompressed.script;
-      page.value = decompressed.page;
-      seats.value = decompressed.seats;
-    }
-  });
+// onMounted(() => {
+window.Twitch.ext.configuration.onChanged(() => {
+  if (Twitch.ext.configuration.broadcaster) {
+    const content = Twitch.ext.configuration.broadcaster.content;
+    const decompressed = decode(content) as Partial<ExtensionState>;
+    logger.debug("Decompressed to", decompressed);
+    script.value = decompressed.script;
+    page.value = decompressed.page;
+    seats.value = decompressed.seats;
+    grim.value = decompressed.grim;
+  }
 });
+// });
 </script>
 
 <template>
   <main>
-    <div class="latency" v-text="latency"></div>
-    <GrimoirePanel class="panel-grimoire" :seats="seats"></GrimoirePanel>
+    <div class="details">
+      <div class="latency" v-text="latency"></div>
+    </div>
+    <GrimoirePanel
+      class="panel-grimoire"
+      :seats="seats"
+      :offset="grimOffset"
+    ></GrimoirePanel>
     <ScriptPanel class="panel-script" :script="script"></ScriptPanel>
   </main>
 </template>
@@ -110,7 +134,15 @@ main {
   grid-row-gap: 0px;
 }
 
-.latency {
+.square {
+  position: absolute;
+  top: 0;
+  left: 0;
+  outline: 2px solid blue;
+  outline-offset: -2px;
+}
+
+.details {
   position: absolute;
   background: white;
   color: black;
@@ -132,6 +164,11 @@ main {
 
 .panel-grimoire {
   grid-area: grimoire;
-  margin-top: -55px;
+  transition: opacity linear 0.3s;
+  opacity: 0.3;
+}
+
+body:hover .panel-grimoire {
+  opacity: 1;
 }
 </style>

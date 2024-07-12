@@ -1,5 +1,5 @@
 import { createPinia, defineStore } from "pinia";
-import { ExtensionState, Script } from "../types/sotc";
+import { Bounds, ExtensionState, Script } from "../types/sotc";
 import { computed, ref, watch } from "vue";
 import { TaggedLogger } from "../util/TaggedLogger";
 import { clone } from "../util/clone";
@@ -39,17 +39,20 @@ export default defineStore("extension", () => {
   const script = ref<Script | undefined>(undefined);
   const page = ref<string | undefined>(undefined);
   const seats = ref<Seat[] | undefined>(undefined);
+  const grim = ref<{ pos: Bounds } | undefined>(undefined);
 
   const state = computed(() => ({
     script: script.value,
     page: page.value,
     seats: seats.value,
+    grim: grim.value,
   }));
 
   const setState = (newState: Partial<ExtensionState>) => {
     script.value = newState.script;
     page.value = newState.page;
     seats.value = newState.seats;
+    grim.value = newState.grim;
   };
 
   logger.debug("Watching", state);
@@ -58,6 +61,7 @@ export default defineStore("extension", () => {
   watch(script, throttle(broadcastState("script"), 1000), { deep: true });
   watch(seats, throttle(broadcastState("seats"), 1000), { deep: true });
   watch(page, throttle(broadcastState("page"), 1000), { deep: true });
+  watch(grim, throttle(broadcastState("grim"), 1000), { deep: true });
 
-  return { script, page, seats, state, setState };
+  return { script, page, seats, grim, state, setState };
 });

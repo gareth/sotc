@@ -1,7 +1,7 @@
 import EventEmitter from "../util/EventEmitter";
 import { LogLevel, TaggedLogger } from "../util/TaggedLogger";
 import { NavigateEventDetail, Seat, isSOTCEventMessage } from "../types/event";
-import { ExtensionState, Script } from "../types/sotc";
+import { Bounds, ExtensionState, Script } from "../types/sotc";
 
 const pinia = createPinia();
 import useExtensionStore from "../stores/extension";
@@ -9,7 +9,7 @@ import { createPinia } from "pinia";
 // import { clone } from "../util/clone";
 const extensionStore = useExtensionStore(pinia);
 
-const logger = new TaggedLogger("GameManager", LogLevel.INFO);
+const logger = new TaggedLogger("GameManager", LogLevel.DEBUG);
 
 type Port = chrome.runtime.Port;
 
@@ -77,6 +77,11 @@ export class GameManager {
           this.state.seats = message.payload as Seat[];
           extensionStore.seats = this.state.seats;
           logger.debug("Seats are now", this.state.seats);
+          break;
+        case "sotc-size":
+          this.state.grim = message.payload as { pos: Bounds; container: Bounds };
+          extensionStore.grim = this.state.grim;
+          logger.debug("Grim is now", this.state.grim);
           break;
       }
       // extensionStore.state = clone(this.state);
