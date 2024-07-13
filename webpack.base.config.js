@@ -33,11 +33,6 @@ export default {
         test: /\.scss$/,
         use: ["vue-style-loader", "css-loader", "sass-loader"],
       },
-      {
-        // Generate a CRX manifest programatically
-        test: /manifest.json$/,
-        use: ["manifest-loader"],
-      },
     ],
   },
 

@@ -17,6 +17,16 @@ export default {
     path: path.resolve(import.meta.dirname, "dist", "chrome"),
   },
 
+  module: {
+    rules: [
+      {
+        // Generate a CRX manifest programatically
+        test: /manifest.json$/,
+        use: ["manifest-loader"],
+      },
+    ],
+  },
+
   plugins: [
     new HtmlWebpackPlugin({
       template: "src/chrome/popup.html",
