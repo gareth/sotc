@@ -165,7 +165,7 @@ main {
 .panel-grimoire {
   grid-area: grimoire;
   transition: opacity linear 0.3s;
-  opacity: 0.3;
+  opacity: 0.7;
 }
 
 body:hover .panel-grimoire {

@@ -27,9 +27,12 @@ declare namespace botc {
     isOfficial: boolean;
   }
 
+  export type Alignment = "g" | "e" | null;
+
   export interface Player {
     id: string;
     role: Role | Record<string, never>; // {} used for blank tokens
+    alignment: Alignment;
   }
 
   export interface User {

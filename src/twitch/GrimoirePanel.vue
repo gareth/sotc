@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { Seat } from "../chrome/types/event";
-import { TaggedLogger } from "../chrome/util/TaggedLogger";
+// import { TaggedLogger } from "../chrome/util/TaggedLogger";
 
-const logger = new TaggedLogger("GrimoirePanel");
+// const logger = new TaggedLogger("GrimoirePanel");
 
 interface Props {
   seats?: Seat[];
@@ -32,11 +32,15 @@ const circles = computed(() => {
       const r = (seat.pos?.width ?? 0) / 2;
       const x = (seat.pos?.x ?? 0) + r;
       const y = (seat.pos?.y ?? 0) + r;
-      logger.info({ seat, idx, x, y, r });
+      const classes = [
+        seat.role?.team || `unknown`,
+        `alignment-${seat.role?.alignment ?? "default"}`,
+      ];
       return {
         seat,
         idx,
         position: { x, y, r },
+        classes,
       };
     });
   }
@@ -55,8 +59,8 @@ const circles = computed(() => {
         </defs>
         <g
           class="seat"
-          :class="seat.role?.team || `unknown`"
-          v-for="{ seat, position } in circles"
+          :class="classes"
+          v-for="{ classes, position } in circles"
         >
           <circle
             :cx="position.x * 100"
@@ -133,6 +137,18 @@ g.seat {
     circle {
       fill: transparent;
       stroke: url(#traveler);
+    }
+  }
+
+  &.alignment-g {
+    circle {
+      stroke: blue;
+    }
+  }
+
+  &.alignment-e {
+    circle {
+      stroke: rgb(200, 12, 12);
     }
   }
 

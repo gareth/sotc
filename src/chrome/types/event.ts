@@ -4,9 +4,13 @@ export interface NavigateEventDetail {
   page?: string;
 }
 
+export interface PlayerCharacter extends botc.Role {
+  alignment: botc.Alignment;
+}
+
 export type Seat = Partial<{
   user?: string;
-  role?: botc.Role;
+  role?: PlayerCharacter;
   pos: Bounds;
 }>;
 
