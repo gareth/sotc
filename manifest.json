@@ -1,6 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Stream on the Clocktower",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAy/NDv7ol3rxsn7TQ0XgfYn74Ws8o0D1if974z/vI2WPmEn1D3H8eT5Ng/hC6AqoPc0C0R/3PuPgaqWq61mHuzWh4sFPrf5eMnyW9P8pwUWOszruIrpj6EoyD5K8/GnDbUUs5q1Qbo5KrELuaakBtRV9VUkp2vn3ble9UYhatf8SrSHGEDOLYpE7l+OxAf2fQq9DHYUxsMN1hPNdII9uNl6p4g26LfIz1sHs2AZK/dmnmIA6sGTgx2Ubgrj9AI9VRWkIoVt11vODUw+ji4kS6pAhOmKSlgo/d+fZCQNKHL+iIogCjXf73gGzwQbJtQp1eGOh+fSfsRIWqw0l6HmMnAQIDAQAB",
   "description": "Blood on the Clocktower streaming companion",
   "permissions": [
     "storage",
