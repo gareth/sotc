@@ -14,12 +14,20 @@ const ebsCallConfig: EbsCallConfig = {
   secret,
 };
 
+const stringInfo = (input: string, _refSize?: number) => `(${input.length}) (${new Blob([input]).size} bytes)`;
+
 export function encode<T extends object>(data: T): string {
   const target = JSON.stringify(data);
-  logger.debug("Compressing", target, `(${target.length})`);
+  logger.debug("Compressing", target, stringInfo(target));
   const compressed = compress(target, { outputEncoding: "BinaryString" }) as string;
   const reduction = (100 * (target.length - compressed.length)) / target.length;
-  logger.debug("Compressed to", compressed, `(${compressed.length}, -${Math.round(reduction)}%)`);
+  const bytesize = new Blob([compressed]).size;
+  const byteReduction = (100 * (target.length - bytesize)) / target.length;
+  logger.debug(
+    "Compressed to",
+    compressed,
+    `(${compressed.length}, -${Math.round(reduction)}%) or (${bytesize}, -${Math.round(byteReduction)}%)`
+  );
   return compressed;
 }
 

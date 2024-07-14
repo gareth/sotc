@@ -33,6 +33,8 @@
     "zip-webpack-plugin": "^4.0.1"
   },
   "dependencies": {
+    "@sentry/browser": "^8.17.0",
+    "@sentry/vue": "^8.17.0",
     "@twurple/api": "^7.1.0",
     "@twurple/auth": "^7.1.0",
     "@twurple/auth-ext": "^7.1.0",

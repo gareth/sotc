@@ -3,10 +3,10 @@ import { LogLevel, TaggedLogger } from "../util/TaggedLogger";
 import { NavigateEventDetail, Seat, isSOTCEventMessage } from "../types/event";
 import { Bounds, ExtensionState, Script } from "../types/sotc";
 
-const pinia = createPinia();
-import useExtensionStore from "../stores/extension";
 import { createPinia } from "pinia";
-// import { clone } from "../util/clone";
+import useExtensionStore from "../stores/extension";
+
+const pinia = createPinia();
 const extensionStore = useExtensionStore(pinia);
 
 const logger = new TaggedLogger("GameManager", LogLevel.DEBUG);

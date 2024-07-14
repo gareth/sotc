@@ -5,13 +5,14 @@ import { clone } from "./util/clone";
 import { Bounds, Character, CharacterAlignments, Script, characterType } from "./types/sotc";
 import { nextTick } from "vue";
 
+import sentry, { promiseHandler } from "./util/sentry";
+const logger = new TaggedLogger("Inject");
+logger.info("initialized");
+
 type HTMLVueAppElement = HTMLElement & { __vue_app__: BOTCVueApp };
 function isHTMLVueAppElement(el: HTMLElement | null): el is HTMLVueAppElement {
   return !!(el && "__vue_app__" in el);
 }
-
-const logger = new TaggedLogger("Inject");
-logger.info("initialized");
 
 const IGNORED_MUTATIONS = ["chat/updateServer", "chat/toggleMuted", "session/setPing", "toggleModal"];
 
@@ -58,6 +59,8 @@ function editionToScript(data: Pick<botc.Store, "edition" | "roles">): Script {
 }
 
 function inject(container: HTMLVueAppElement) {
+  addEventListener("unhandledrejection", promiseHandler);
+
   const vueApp = container.__vue_app__;
   const globals = vueApp._context.config.globalProperties;
   logger.info("Adding Vue hooks to", globals);
@@ -205,8 +208,13 @@ const getTokensBounds = async (container: HTMLElement) => {
   return Promise.all(promises);
 };
 
-const main = document.getElementById("main");
-if (isHTMLVueAppElement(main)) {
-  logger.info("Injecting into Vue app", main.__vue_app__);
-  inject(main);
+try {
+  const main = document.getElementById("main");
+  if (isHTMLVueAppElement(main)) {
+    logger.info("Injecting into Vue app", main.__vue_app__);
+    inject(main);
+  }
+} catch (error) {
+  logger.error("Caught error", error);
+  sentry.captureException(error);
 }
