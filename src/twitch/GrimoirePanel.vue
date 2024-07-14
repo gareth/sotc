@@ -53,8 +53,8 @@ const circles = computed(() => {
       <svg viewBox="0 0 100 100">
         <defs>
           <linearGradient id="traveler">
-            <stop class="stop" offset="45%" stop-color="blue" />
-            <stop class="stop" offset="55%" stop-color="#c80c0c" />
+            <stop offset="45%" stop-color="blue" />
+            <stop offset="55%" stop-color="#c80c0c" />
           </linearGradient>
         </defs>
         <g
@@ -122,7 +122,7 @@ g.seat {
   &.minion {
     circle {
       fill: rgba(234, 121, 121, 0.2);
-      stroke: rgb(234, 121, 121);
+      stroke: rgb(255, 105, 0);
     }
   }
 
