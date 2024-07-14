@@ -92,8 +92,14 @@ function inject(container: HTMLVueAppElement) {
         const activePlayers = players.map((player, idx): Seat => {
           const pos = locations?.[idx];
           const user = users.get(player.id);
-          const role = isEmptyObject(player.role) ? undefined : { ...player.role, alignment: player.alignment };
-          return { user: user?.username, role, pos };
+          const roleDetail = isEmptyObject(player.role)
+            ? undefined
+            : {
+                id: player.role.id,
+                alignment: player.alignment,
+                team: player.role.team,
+              };
+          return { user: user?.username, role: roleDetail, pos };
         });
 
         logger.info("Players changed", [...activePlayers]);

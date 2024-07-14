@@ -4,8 +4,10 @@ export interface NavigateEventDetail {
   page?: string;
 }
 
-export interface PlayerCharacter extends botc.Role {
+export interface PlayerCharacter {
+  id: string;
   alignment: botc.Alignment;
+  team: string;
 }
 
 export type Seat = Partial<{
