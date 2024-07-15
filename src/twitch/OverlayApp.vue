@@ -6,6 +6,7 @@ import { Bounds, ExtensionState, Script } from "../chrome/types/sotc";
 import { Seat } from "../chrome/types/event";
 import ScriptPanel from "./ScriptPanel.vue";
 import GrimoirePanel from "./GrimoirePanel.vue";
+import CalibrationPanel from "./CalibrationPanel.vue";
 import { delay } from "underscore";
 
 interface Point {
@@ -119,6 +120,7 @@ window.Twitch.ext.configuration.onChanged(() => {
       :offset="grimOffset"
     ></GrimoirePanel>
     <ScriptPanel class="panel-script" :script="script"></ScriptPanel>
+    <CalibrationPanel class="panel-calibration"></CalibrationPanel>
   </main>
 </template>
 
@@ -170,5 +172,10 @@ main {
 
 body:hover .panel-grimoire {
   opacity: 1;
+}
+
+.panel-calibration {
+  position: absolute;
+  left: 25px;
 }
 </style>
