@@ -4,8 +4,10 @@ import type { BOTCVueApp } from "botc";
 import { clone } from "./util/clone";
 import { Bounds, Character, CharacterAlignments, Script, characterType } from "./types/sotc";
 import { nextTick } from "vue";
+import { round } from "./util/round";
 
 import sentry, { promiseHandler } from "./util/sentry";
+
 const logger = new TaggedLogger("Inject");
 logger.info("initialized");
 
@@ -19,11 +21,6 @@ const IGNORED_MUTATIONS = ["chat/updateServer", "chat/toggleMuted", "session/set
 function isEmptyObject(o: object): o is Record<string, never> {
   return !Object.keys(o).length;
 }
-
-const round = (x: number, precision: number) => {
-  const factor = Math.pow(10, precision);
-  return Math.round(x * factor) / factor;
-};
 
 function roleToCharacter(role: botc.Role): Character[] {
   const { id, name, ability } = role;
