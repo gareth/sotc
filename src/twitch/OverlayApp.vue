@@ -120,7 +120,7 @@ window.Twitch.ext.configuration.onChanged(() => {
       :offset="grimOffset"
     ></GrimoirePanel>
     <ScriptPanel class="panel-script" :script="script"></ScriptPanel>
-    <CalibrationPanel class="panel-calibration"></CalibrationPanel>
+    <CalibrationPanel :inset="0" class="panel-calibration"></CalibrationPanel>
   </main>
 </template>
 

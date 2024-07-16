@@ -14,8 +14,7 @@ interface Dimensions {
 }
 
 const props = defineProps({
-  seed: String,
-  inset: Number,
+  inset: { type: Number, required: true },
 });
 
 const dimensions = ref<Dimensions | null>(null);
@@ -54,12 +53,27 @@ const setCalibrationBounds = (container: HTMLElement, element: HTMLElement) => {
   const outerBounds = container.getBoundingClientRect();
   const innerBounds = element.getBoundingClientRect();
 
-  bounds.value = {
-    x: round((innerBounds.x - outerBounds.x) / outerBounds.width, 4),
-    y: round((innerBounds.y - outerBounds.y) / outerBounds.height, 4),
-    width: round(innerBounds.width / outerBounds.width, 4),
-    height: round(innerBounds.height / outerBounds.height, 4),
+  const calibratorBounds = {
+    x: (innerBounds.x - outerBounds.x) / outerBounds.width,
+    y: (innerBounds.y - outerBounds.y) / outerBounds.height,
+    width: innerBounds.width / outerBounds.width,
+    height: innerBounds.height / outerBounds.height,
   };
+
+  // Compensate for the inset value, which is the percentage taken off of the
+  // original container.
+  const ratio = 1 - 2 * props.inset;
+
+  const width = calibratorBounds.width / ratio;
+  const height = calibratorBounds.height / ratio;
+
+  bounds.value = {
+    x: round(calibratorBounds.x - width * ((1 - ratio) / 2), 4),
+    y: round(calibratorBounds.y - width * ((1 - ratio) / 2), 4),
+    width: round(width, 4),
+    height: round(height, 4),
+  };
+
   logBoundsChange(bounds.value);
 };
 
