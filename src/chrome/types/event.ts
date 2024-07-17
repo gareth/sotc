@@ -1,4 +1,5 @@
-import { Script, Bounds } from "./sotc";
+import { Bounds } from "../util/bounds";
+import { Script } from "./sotc";
 
 export interface NavigateEventDetail {
   page?: string;

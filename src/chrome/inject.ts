@@ -2,11 +2,12 @@ import { Seat, sotcEvent } from "./types/event";
 import { TaggedLogger } from "./util/TaggedLogger";
 import type { BOTCVueApp } from "botc";
 import { clone } from "./util/clone";
-import { Bounds, Character, CharacterAlignments, Script, characterType } from "./types/sotc";
+import { Character, CharacterAlignments, Script, characterType } from "./types/sotc";
 import { nextTick } from "vue";
 import { round } from "./util/round";
 
 import sentry, { promiseHandler } from "./util/sentry";
+import { Bounds } from "./util/bounds";
 
 const logger = new TaggedLogger("Inject");
 logger.info("initialized");

@@ -1,5 +1,5 @@
 import { createPinia, defineStore } from "pinia";
-import { Bounds, ExtensionState, Script } from "../types/sotc";
+import { ExtensionState, Script } from "../types/sotc";
 import { computed, ref, watch } from "vue";
 import { TaggedLogger } from "../util/TaggedLogger";
 import { clone } from "../util/clone";
@@ -8,6 +8,7 @@ import { broadcastStateChange, synchronizeExtensionState } from "../twitch/sync"
 
 import { throttle } from "underscore";
 import { Seat } from "../types/event";
+import { Bounds } from "../util/bounds";
 
 const pinia = createPinia();
 const localStore = useLocalStore(pinia);

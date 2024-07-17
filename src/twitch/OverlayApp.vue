@@ -2,21 +2,16 @@
 import { computed, onMounted, ref } from "vue";
 import { TaggedLogger } from "../chrome/util/TaggedLogger";
 import { decode } from "../chrome/twitch/sync";
-import { Bounds, ExtensionState, Script } from "../chrome/types/sotc";
+import { ExtensionState, Script } from "../chrome/types/sotc";
 import { Seat } from "../chrome/types/event";
 import ScriptPanel from "./ScriptPanel.vue";
 import GrimoirePanel from "./GrimoirePanel.vue";
 import CalibrationPanel from "./CalibrationPanel.vue";
 import { delay } from "underscore";
-
-interface Point {
-  x: number;
-  y: number;
-}
+import { Bounds, Offsets } from "../chrome/util/bounds";
 
 interface SOTCPubSubMessage {
   type: string;
-  key: string;
 }
 
 interface SOTCPubSubUpdateStateMessage<T extends keyof ExtensionState> {
@@ -25,9 +20,24 @@ interface SOTCPubSubUpdateStateMessage<T extends keyof ExtensionState> {
   payload: ExtensionState[T];
 }
 
+interface SOTCPubSubStartCalibrationMessage {
+  type: "startCalibration";
+  calibrationId: string;
+  inset: number;
+  existingBounds: Offsets;
+}
+
 const logger = new TaggedLogger("OverlayApp");
 
 const latency = ref<number>(0);
+
+interface Calibration {
+  id: string;
+  inset: number;
+  offsets: Offsets;
+}
+
+const activeCalibration = ref<Calibration | null>(null);
 
 setInterval(() => {
   window.Twitch.ext.onContext((ctx) => {
@@ -45,25 +55,30 @@ const broadcastHandler = (
   logger.debug("Decoded, this is", message);
 
   if (message.type == "updateState") {
-    switch (message.key) {
+    const stateMessage = message as SOTCPubSubUpdateStateMessage<any>;
+    switch (stateMessage.key) {
       case "script":
         script.value = (
-          message as SOTCPubSubUpdateStateMessage<"script">
+          stateMessage as SOTCPubSubUpdateStateMessage<"script">
         ).payload;
         break;
 
       case "seats":
         seats.value = (
-          message as SOTCPubSubUpdateStateMessage<"seats">
+          stateMessage as SOTCPubSubUpdateStateMessage<"seats">
         ).payload;
         break;
 
       case "page":
-        page.value = (message as SOTCPubSubUpdateStateMessage<"page">).payload;
+        page.value = (
+          stateMessage as SOTCPubSubUpdateStateMessage<"page">
+        ).payload;
         break;
 
       case "grim":
-        grim.value = (message as SOTCPubSubUpdateStateMessage<"grim">).payload;
+        grim.value = (
+          stateMessage as SOTCPubSubUpdateStateMessage<"grim">
+        ).payload;
         break;
 
       default:
@@ -76,18 +91,38 @@ window.Twitch.ext.listen("broadcast", (...args) => {
   delay(broadcastHandler, latency.value * 1000, ...args);
 });
 
+const whisperHandler = (
+  target: string,
+  contentType: string,
+  rawMessage: string
+) => {
+  logger.debug("Received whisper message", target, contentType, rawMessage);
+  const message = JSON.parse(rawMessage) as SOTCPubSubMessage;
+  logger.debug("Decoded, this is", message);
+  if (message.type == "startCalibration") {
+    const calibrationMessage = message as SOTCPubSubStartCalibrationMessage;
+    activeCalibration.value = {
+      id: calibrationMessage.calibrationId,
+      inset: calibrationMessage.inset,
+      offsets: calibrationMessage.existingBounds,
+    };
+  }
+};
+
+window.Twitch.ext.onAuthorized((auth) => {
+  logger.debug("Got auth", auth);
+  window.Twitch.ext.listen(`whisper-${auth.userId}`, (...args) => {
+    delay(whisperHandler, latency.value * 1000, ...args);
+  });
+});
+
 const script = ref<Script | undefined>(undefined);
 const page = ref<string | undefined>(undefined);
 const seats = ref<Seat[] | undefined>(undefined);
 const grim = ref<{ pos: Bounds; container: Bounds } | undefined>(undefined);
 
 // Sample grim offset
-const grimOffset = ref<{
-  top: number;
-  right: number;
-  bottom: number;
-  left: number;
-}>({
+const grimOffset = ref<Offsets>({
   top: -0.002,
   right: 0.216931216931217,
   bottom: 0,
@@ -120,7 +155,11 @@ window.Twitch.ext.configuration.onChanged(() => {
       :offset="grimOffset"
     ></GrimoirePanel>
     <ScriptPanel class="panel-script" :script="script"></ScriptPanel>
-    <CalibrationPanel :inset="0" class="panel-calibration"></CalibrationPanel>
+    <CalibrationPanel
+      :offsets="activeCalibration?.offsets"
+      :inset="activeCalibration?.inset"
+      class="panel-calibration"
+    ></CalibrationPanel>
   </main>
 </template>
 

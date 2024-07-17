@@ -1,10 +1,11 @@
 import EventEmitter from "../util/EventEmitter";
 import { LogLevel, TaggedLogger } from "../util/TaggedLogger";
 import { NavigateEventDetail, Seat, isSOTCEventMessage } from "../types/event";
-import { Bounds, ExtensionState, Script } from "../types/sotc";
+import { ExtensionState, Script } from "../types/sotc";
 
 import { createPinia } from "pinia";
 import useExtensionStore from "../stores/extension";
+import { Bounds } from "../util/bounds";
 
 const pinia = createPinia();
 const extensionStore = useExtensionStore(pinia);

@@ -1,110 +1,70 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
-import { TaggedLogger } from "../chrome/util/TaggedLogger";
+import { computed, onMounted, ref } from "vue";
+import { Bounds, Offsets } from "../chrome/util/bounds";
 import Draggable from "draggable";
-import { Bounds } from "../chrome/types/sotc";
-import { round } from "../chrome/util/round";
 import { throttle } from "underscore";
+import Calibrator from "./Calibrator.vue";
 
+import { TaggedLogger } from "../chrome/util/TaggedLogger";
 const logger = new TaggedLogger("Calibrator");
 
-interface Dimensions {
-  width: number;
-  height: number;
+interface Props {
+  inset: number;
+  offsets: Offsets;
 }
 
-const props = defineProps({
-  inset: { type: Number, required: true },
+const props = withDefaults(defineProps<Props>(), {
+  inset: 0.15,
+  offsets: () => ({
+    top: -0.002,
+    right: 0.216931216931217,
+    bottom: 0,
+    left: 0.216931216931217,
+  }),
 });
 
-const dimensions = ref<Dimensions | null>(null);
-
-const observer = new ResizeObserver((events) => {
-  events.forEach((event) => {
-    const target = event.target;
-    const parent = target.parentElement;
-    if (target instanceof HTMLElement && parent) {
-      const { width } = event.contentRect;
-      const currentHeight = target.clientHeight;
-      if (Math.abs(width - currentHeight) > 1) {
-        requestAnimationFrame(() => {
-          target.style.height = `${width}px`;
-          setCalibrationBounds(parent, target);
-        });
-      }
-      dimensions.value = {
-        width: Math.round(width),
-        height: Math.round(width),
-      };
-    }
-  });
-});
-
+// Refs to elements that we want to manipulate
 const container = ref<HTMLElement | null>(null);
-const calibrator = ref<HTMLElement | null>(null);
 
-const bounds = ref<Bounds | null>();
+// Stores the (initial/updated) offsets in the format required
+const offsets = ref<Offsets>(props.offsets);
 
-const logBoundsChange = throttle((bounds: Bounds) => {
-  logger.info("Setting bounds", bounds);
-}, 500);
-
-const setCalibrationBounds = (container: HTMLElement, element: HTMLElement) => {
-  const outerBounds = container.getBoundingClientRect();
-  const innerBounds = element.getBoundingClientRect();
-
-  const calibratorBounds = {
-    x: (innerBounds.x - outerBounds.x) / outerBounds.width,
-    y: (innerBounds.y - outerBounds.y) / outerBounds.height,
-    width: innerBounds.width / outerBounds.width,
-    height: innerBounds.height / outerBounds.height,
-  };
-
-  // Compensate for the inset value, which is the percentage taken off of the
-  // original container.
-  const ratio = 1 - 2 * props.inset;
-
-  const width = calibratorBounds.width / ratio;
-  const height = calibratorBounds.height / ratio;
-
-  bounds.value = {
-    x: round(calibratorBounds.x - width * ((1 - ratio) / 2), 4),
-    y: round(calibratorBounds.y - width * ((1 - ratio) / 2), 4),
-    width: round(width, 4),
-    height: round(height, 4),
-  };
-
-  logBoundsChange(bounds.value);
-};
-
-onMounted(() => {
-  const con = container.value;
-  const cal = calibrator.value;
-  if (con && cal) {
-    logger.info("Observing", cal);
-    observer.observe(cal);
-
-    const handle = cal.querySelector(".move-handle");
-
-    if (handle) {
-      new Draggable(cal, {
-        handle,
-        limit: document.body,
-        onDrag: (el, x, y) => {
-          setCalibrationBounds(con, cal);
-        },
-      });
-    }
-  }
-});
+// const observer = new ResizeObserver((events) => {
+//   events.forEach((event) => {
+//     const target = event.target;
+//     const parent = target.parentElement;
+//     if (target instanceof HTMLElement && parent) {
+//       const { width } = event.contentRect;
+//       const currentHeight = target.clientHeight;
+//       if (Math.abs(width - currentHeight) > 1) {
+//         requestAnimationFrame(() => {
+//           target.style.height = `${width}px`;
+//           // setCalibrationBounds(parent, target);
+//         });
+//       }
+//     }
+//   });
+// });
 </script>
 
 <template>
   <div class="container" ref="container">
-    {{ bounds }}
-    <div class="calibrator" ref="calibrator">
-      <div class="move-handle"></div>
-    </div>
+    <!-- {{ props.offsets }}
+    {{ calibratorBounds }}
+    <div
+      v-if="unwrappedBounds"
+      class="unwrapped"
+      :style="mapToPixels({ ...unwrappedBounds })"
+    ></div>
+    <div class="output">
+      {{ mapToPixels({ ...unwrappedBounds }) }}
+    </div> -->
+    <Calibrator
+      :offsets="offsets"
+      :inset="inset"
+      :container="container"
+      v-if="container"
+    ></Calibrator>
   </div>
 </template>
 
@@ -113,33 +73,8 @@ onMounted(() => {
   outline: 1px solid orange;
 }
 
-.calibrator {
+.unwrapped {
   position: absolute;
-  overflow: hidden;
-  top: 0;
-  left: 0;
-  min-width: 150px;
-  min-height: 150px;
-
-  padding: 20px;
-  // The Draggable library tries to override this to `block` which breaks our
-  // positioning
-  display: grid !important;
-
-  border: 2px solid red;
-
-  resize: horizontal;
-
-  &::-moz-resizer {
-    background: red;
-  }
-
-  &::-webkit-resizer {
-    background: red;
-  }
-
-  .move-handle {
-    cursor: move;
-  }
+  outline: 1px solid green;
 }
 </style>

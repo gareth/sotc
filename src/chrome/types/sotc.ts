@@ -1,5 +1,6 @@
 import { Seat } from "./event";
 import { lookup } from "./lookup";
+import { Bounds } from "../util/bounds";
 
 export const CharacterType = ["townsfolk", "outsider", "minion", "demon", "traveler"] as const;
 export type CharacterType = (typeof CharacterType)[number];
@@ -16,13 +17,6 @@ export const CharacterAlignments = new Map<CharacterType, CharacterAlignment>([
   ["demon", "evil"],
   ["traveler", "unknown"],
 ]);
-
-export interface Bounds {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
 
 export interface Character {
   id: string;
