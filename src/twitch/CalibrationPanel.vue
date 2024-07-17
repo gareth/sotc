@@ -1,12 +1,10 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
-import { Bounds, Offsets } from "../chrome/util/bounds";
-import Draggable from "draggable";
-import { throttle } from "underscore";
+import { ref } from "vue";
+import { Offsets } from "../chrome/util/bounds";
 import Calibrator from "./Calibrator.vue";
 
 import { TaggedLogger } from "../chrome/util/TaggedLogger";
-const logger = new TaggedLogger("Calibrator");
+// const logger = new TaggedLogger("Calibrator");
 
 interface Props {
   inset: number;
@@ -28,37 +26,10 @@ const container = ref<HTMLElement | null>(null);
 
 // Stores the (initial/updated) offsets in the format required
 const offsets = ref<Offsets>(props.offsets);
-
-// const observer = new ResizeObserver((events) => {
-//   events.forEach((event) => {
-//     const target = event.target;
-//     const parent = target.parentElement;
-//     if (target instanceof HTMLElement && parent) {
-//       const { width } = event.contentRect;
-//       const currentHeight = target.clientHeight;
-//       if (Math.abs(width - currentHeight) > 1) {
-//         requestAnimationFrame(() => {
-//           target.style.height = `${width}px`;
-//           // setCalibrationBounds(parent, target);
-//         });
-//       }
-//     }
-//   });
-// });
 </script>
 
 <template>
   <div class="container" ref="container">
-    <!-- {{ props.offsets }}
-    {{ calibratorBounds }}
-    <div
-      v-if="unwrappedBounds"
-      class="unwrapped"
-      :style="mapToPixels({ ...unwrappedBounds })"
-    ></div>
-    <div class="output">
-      {{ mapToPixels({ ...unwrappedBounds }) }}
-    </div> -->
     <Calibrator
       :offsets="offsets"
       :inset="inset"

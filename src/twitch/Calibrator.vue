@@ -65,6 +65,23 @@ const mapToPixels = (object: Record<string, number>) =>
     [...Object.entries(object)].map(([k, v]) => [k, `${v}px`])
   );
 
+const observer = new ResizeObserver((events) => {
+  events.forEach((event) => {
+    const target = event.target;
+    const parent = target.parentElement;
+    if (target instanceof HTMLElement && parent) {
+      const { width } = event.contentRect;
+      const currentHeight = target.clientHeight;
+      if (Math.abs(width - currentHeight) > 1) {
+        requestAnimationFrame(() => {
+          target.style.height = `${width}px`;
+          setCalibrationBounds(parent, target);
+        });
+      }
+    }
+  });
+});
+
 const setCalibrationBounds = (container: HTMLElement, element: HTMLElement) => {
   const innerBounds = element.getBoundingClientRect();
   const extrapolatedBounds = invertInsetBoundsBy(innerBounds, props.inset);
@@ -83,8 +100,8 @@ onMounted(() => {
   const con = props.container;
   const cal = calibrator.value;
   if (cal) {
-    // logger.info("Observing", cal);
-    // observer.observe(cal);
+    logger.info("Observing", cal);
+    observer.observe(cal);
 
     const handle = cal.querySelector(".move-handle");
 
@@ -116,7 +133,7 @@ onMounted(() => {
 <style lang="scss">
 .ghost {
   position: absolute;
-  background: green;
+  background: purple;
   opacity: 0.1;
 }
 .calibrator {
