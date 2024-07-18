@@ -54,7 +54,7 @@ port.postMessage({
     phase: number | "start",
   },
   app: {
-    town_square: [x: number, y: number, w: number, h: number, r: number] // good luck!
+    town_square: [left: number, top: number, w: number, h: number, r: number] // good luck!
   }
 }
 ```

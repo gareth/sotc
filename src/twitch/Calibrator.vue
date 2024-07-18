@@ -66,8 +66,8 @@ onMounted(() => {
 });
 
 const boundsToStyle = (bounds: Bounds) => {
-  const { x, y, width, height } = bounds;
-  return mapToPixels({ left: x, top: y, width, height });
+  const { left, top, width, height } = bounds;
+  return mapToPixels({ left, top, width, height });
 };
 
 const mapToPixels = (object: Record<string, number>) =>

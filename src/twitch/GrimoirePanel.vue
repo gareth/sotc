@@ -17,7 +17,7 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const pct = (x: number) => `${x * 100}%`;
+const pct = (left: number) => `${left * 100}%`;
 
 const svgBounds = computed(() => ({
   top: pct(props.offset.top),
@@ -30,8 +30,8 @@ const circles = computed(() => {
   if (props.seats) {
     return props.seats.map((seat: Seat, idx: number) => {
       const r = (seat.pos?.width ?? 0) / 2;
-      const x = (seat.pos?.x ?? 0) + r;
-      const y = (seat.pos?.y ?? 0) + r;
+      const x = (seat.pos?.left ?? 0) + r;
+      const y = (seat.pos?.top ?? 0) + r;
       const classes = [
         seat.role?.team || `unknown`,
         `alignment-${seat.role?.alignment ?? "default"}`,

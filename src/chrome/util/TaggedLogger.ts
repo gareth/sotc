@@ -6,7 +6,7 @@ export enum LogLevel {
 }
 
 // A subset of the Console methods that we want to expose using the #log
-// wrapper. For type compatibility, we can only pick methods of the form (x:
+// wrapper. For type compatibility, we can only pick methods of the form (left:
 // any[]) => void i.e. must allow zero arguments to be passed.
 type Loggables = Pick<Console, "log" | "debug" | "info" | "warn" | "error">;
 

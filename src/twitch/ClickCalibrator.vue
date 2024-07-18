@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { Bounds, Offsets } from "../chrome/util/bounds";
+import { Bounds, invertInsetBoundsBy, Offsets } from "../chrome/util/bounds";
 import { TaggedLogger } from "../chrome/util/TaggedLogger";
+import { round } from "../chrome/util/round";
+import { isEqual } from "underscore";
 
 const logger = new TaggedLogger("ClickCalibrator");
 
@@ -11,6 +13,8 @@ interface Props {
   inset: number;
 }
 
+type BoundsError = "missing" | "orientation" | "steep" | "shallow" | "small";
+
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
@@ -18,8 +22,8 @@ const emit = defineEmits<{
 }>();
 
 interface Point {
-  x: number;
-  y: number;
+  left: number;
+  top: number;
 }
 
 type Handle = Point | undefined;
@@ -33,15 +37,15 @@ const handles = ref<[Handle, Handle]>([undefined, undefined]);
 
 const gradient = computed(() => {
   const [h1, h2] = handles.value;
-  if (h1 && h2) {
-    return (h1.y - h2.y) / (h1.x - h2.x);
+  if (h1 && h2 && !isEqual(h1, h2)) {
+    return (h1.top - h2.top) / (h1.left - h2.left);
   }
 });
 
 const area = computed(() => {
   const [h1, h2] = handles.value;
-  if (h1 && h2) {
-    return Math.abs((h1.y - h2.y) * (h1.x - h2.x));
+  if (h1 && h2 && !isEqual(h1, h2)) {
+    return Math.abs((h1.top - h2.top) * (h1.left - h2.left));
   }
 });
 
@@ -49,41 +53,47 @@ const bounds = computed<Bounds | undefined>(() => {
   const [h1, h2] = handles.value;
   if (h1 && h2) {
     return {
-      x: Math.min(h1.x, h2.x),
-      y: Math.min(h1.y, h2.y),
-      width: Math.abs(h1.x - h2.x),
-      height: Math.abs(h1.y - h2.y),
+      left: Math.min(h1.left, h2.left),
+      top: Math.min(h1.top, h2.top),
+      width: Math.abs(h1.left - h2.left),
+      height: Math.abs(h1.top - h2.top),
     };
   }
 });
 
-const validateBounds = computed(() => {
-  if (undefined !== gradient.value && gradient.value < 0) {
-    return "wrong orientation";
-  }
-
-  if (
-    undefined !== gradient.value &&
-    gradient.value < targetAspectRatio * aspectRatioFactor
-  ) {
-    return "too shallow";
-  }
-
-  if (
-    undefined !== gradient.value &&
-    gradient.value > targetAspectRatio / aspectRatioFactor
-  ) {
-    return "too steep";
-  }
-
-  return bounds.value;
+const validBounds = computed(() => {
+  if (!boundsError.value) return bounds.value;
 });
 
-const handleClick = (event: MouseEvent) => {
+const boundsError = computed<false | BoundsError>(() => {
+  if (undefined == gradient.value) return "missing";
+  if (gradient.value < 0) return "orientation";
+  if (gradient.value < targetAspectRatio * aspectRatioFactor) return "shallow";
+  if (gradient.value > targetAspectRatio / aspectRatioFactor) return "steep";
+  if (area.value && area.value < 150 * 150) return "small";
+
+  return false;
+});
+
+const handleStyle = (handle: Handle, bounds: Bounds | undefined) => {
+  let style = {};
+  if (bounds) {
+    style = Object.assign(style, { backgroundColor: "green" });
+  }
+  if (handle) {
+    style = Object.assign(
+      style,
+      mapToPixels({ left: handle.left, top: handle.top })
+    );
+  }
+  return style;
+};
+
+const processClick = (event: MouseEvent) => {
   logger.info("Click handled", event);
 
   handles.value.shift();
-  handles.value.push({ x: event.clientX, y: event.clientY });
+  handles.value.push({ left: event.clientX, top: event.clientY });
 };
 
 const mapToPixels = (object: Record<string, number>) =>
@@ -94,9 +104,10 @@ const mapToPixels = (object: Record<string, number>) =>
 
 <template>
   <div class="container">
-    <div class="target" @click="handleClick">
+    <div class="target" @click="processClick">
       <div class="details">
-        {{ gradient }} / {{ area }} / {{ validateBounds }}
+        {{ undefined !== gradient ? round(gradient, 2) : gradient }} /
+        {{ area }} / {{ boundsError }} / {{ validBounds }}
       </div>
       <div
         class="ghost"
@@ -106,7 +117,7 @@ const mapToPixels = (object: Record<string, number>) =>
       <div
         class="handle"
         v-for="handle in handles.filter(Boolean)"
-        :style="handle && mapToPixels({ left: handle.x, top: handle.y })"
+        :style="handle && handleStyle(handle, validBounds)"
       ></div>
     </div>
   </div>
@@ -136,7 +147,7 @@ const mapToPixels = (object: Record<string, number>) =>
   width: 10px;
   height: 10px;
   margin: -5px;
-  background: green;
+  background: red;
   border-radius: 10px;
 }
 </style>

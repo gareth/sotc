@@ -160,8 +160,8 @@ function inject(container: HTMLVueAppElement) {
 const updateGrim = (container: HTMLElement) => {
   const grimBounds = getGrimoireBounds(container);
   const windowBounds = {
-    x: 0,
-    y: 0,
+    left: 0,
+    top: 0,
     width: window.innerWidth,
     height: window.innerHeight,
   };
@@ -175,8 +175,8 @@ const getGrimoireBounds = (container: HTMLElement) => {
   if (grim) {
     const { x, y, width, height } = grim.getBoundingClientRect();
     return {
-      x: Math.round(x),
-      y: Math.round(y),
+      left: Math.round(x),
+      top: Math.round(y),
       width: Math.round(width),
       height: Math.round(height),
     };
@@ -188,8 +188,8 @@ const getGrimoireBounds = (container: HTMLElement) => {
 const getElementBounds = (el: Element, base: Bounds) => {
   const { x, y, width, height } = el.getBoundingClientRect();
   const result = {
-    x: round((x - base.x) / base.width, 4),
-    y: round((y - base.y) / base.height, 4),
+    left: round((x - base.left) / base.width, 4),
+    top: round((y - base.top) / base.height, 4),
     width: round(Math.round(width) / base.width, 4),
     height: round(Math.round(height) / base.height, 4),
   };
