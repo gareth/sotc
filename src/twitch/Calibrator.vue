@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref, render } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import {
   Bounds,
   boundsToOffsets,
@@ -11,7 +11,6 @@ import {
 
 import { TaggedLogger } from "../chrome/util/TaggedLogger";
 import Draggable from "draggable";
-import { throttle } from "underscore";
 const logger = new TaggedLogger("Calibrator");
 
 interface Props {
@@ -22,8 +21,19 @@ interface Props {
 
 const props = defineProps<Props>();
 
+const emit = defineEmits<{
+  setBounds: [offsets: Offsets];
+}>();
+
 // Stores the (initial/updated) offsets in the format required
+const initialOffsets = ref<Offsets>(props.offsets);
 const offsets = ref<Offsets>(props.offsets);
+
+// watch(offsets, (newVal, oldVal) => {
+//   logger.debug("Was", oldVal);
+//   logger.debug("Now", newVal);
+//   debugger;
+// });
 
 const calibrator = ref<HTMLElement | undefined>(undefined);
 
@@ -67,6 +77,7 @@ const mapToPixels = (object: Record<string, number>) =>
 
 const observer = new ResizeObserver((events) => {
   events.forEach((event) => {
+    logger.debug("Resize detected", event);
     const target = event.target;
     const parent = target.parentElement;
     if (target instanceof HTMLElement && parent) {
@@ -85,16 +96,9 @@ const observer = new ResizeObserver((events) => {
 const setCalibrationBounds = (container: HTMLElement, element: HTMLElement) => {
   const innerBounds = element.getBoundingClientRect();
   const extrapolatedBounds = invertInsetBoundsBy(innerBounds, props.inset);
-
   offsets.value = boundsToOffsets(extrapolatedBounds, container);
-  throttleLog("Setting", {
-    offsets: offsets.value,
-    innerBounds,
-    extrapolatedBounds,
-  });
+  emit("setBounds", offsets.value);
 };
-
-const throttleLog = throttle(logger.info, 500);
 
 onMounted(() => {
   const con = props.container;
@@ -124,7 +128,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="ghost" :style="boundsToStyle(bounds)"></div>
+  <div class="ghost" :style="boundsToStyle(bounds)">{{ offsets }}</div>
   <div class="calibrator" :style="boundsToStyle(insetBounds)" ref="calibrator">
     <div class="move-handle"></div>
   </div>
@@ -133,8 +137,7 @@ onMounted(() => {
 <style lang="scss">
 .ghost {
   position: absolute;
-  background: purple;
-  opacity: 0.1;
+  background: rgba(128, 0, 128, 0.1);
 }
 .calibrator {
   position: absolute;

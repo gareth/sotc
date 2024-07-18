@@ -156,6 +156,8 @@ window.Twitch.ext.configuration.onChanged(() => {
     ></GrimoirePanel>
     <ScriptPanel class="panel-script" :script="script"></ScriptPanel>
     <CalibrationPanel
+      v-if="activeCalibration"
+      :key="activeCalibration?.id"
       :offsets="activeCalibration?.offsets"
       :inset="activeCalibration?.inset"
       class="panel-calibration"
