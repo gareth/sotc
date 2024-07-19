@@ -1,6 +1,11 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import { Bounds, invertInsetBoundsBy, Offsets } from "../chrome/util/bounds";
+import { computed, ref, watch } from "vue";
+import {
+  Bounds,
+  insetBoundsBy,
+  invertInsetBoundsBy,
+  Offsets,
+} from "../chrome/util/bounds";
 import { TaggedLogger } from "../chrome/util/TaggedLogger";
 import { round } from "../chrome/util/round";
 import { isEqual } from "underscore";
@@ -8,8 +13,9 @@ import { isEqual } from "underscore";
 const logger = new TaggedLogger("ClickCalibrator");
 
 interface Props {
+  calibrationId: string;
   container: HTMLElement;
-  offsets: Offsets;
+  bounds: Bounds;
   inset: number;
 }
 
@@ -32,8 +38,25 @@ const targetAspectRatio = 1;
 
 const aspectRatioTolerance = 10;
 const aspectRatioFactor = 1 - 1 / aspectRatioTolerance;
+const handles = ref<[Handle, Handle]>(handlesFromBounds(props.bounds));
 
-const handles = ref<[Handle, Handle]>([undefined, undefined]);
+watch(
+  { bounds: props.bounds, id: props.calibrationId },
+  ({ bounds, id: _id }) => {
+    handles.value = handlesFromBounds(bounds);
+  }
+);
+
+function handlesFromBounds(bounds: Bounds): [Handle, Handle] {
+  const handleBounds = insetBoundsBy(bounds, props.inset);
+  return [
+    { left: handleBounds.left, top: handleBounds.top },
+    {
+      left: handleBounds.left + handleBounds.width,
+      top: handleBounds.top + handleBounds.height,
+    },
+  ];
+}
 
 const gradient = computed(() => {
   const [h1, h2] = handles.value;
@@ -94,6 +117,8 @@ const processClick = (event: MouseEvent) => {
 
   handles.value.shift();
   handles.value.push({ left: event.clientX, top: event.clientY });
+
+  // emit("setOffsets");
 };
 
 const mapToPixels = (object: Record<string, number>) =>
@@ -139,7 +164,7 @@ const mapToPixels = (object: Record<string, number>) =>
 }
 
 .target {
-  background-color: rgba(128, 0, 0, 0.2);
+  background-color: transparent;
 }
 
 .handle {

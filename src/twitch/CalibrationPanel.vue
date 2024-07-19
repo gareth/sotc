@@ -1,31 +1,30 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { Offsets } from "../chrome/util/bounds";
+import { computed, ref } from "vue";
+import { Offsets, offsetsToBounds } from "../chrome/util/bounds";
 import Calibrator from "./ClickCalibrator.vue";
 
 import { TaggedLogger } from "../chrome/util/TaggedLogger";
 const logger = new TaggedLogger("CalibratorPanel");
 
 interface Props {
+  key: string;
   inset: number;
   offsets: Offsets;
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  inset: 0.2,
-  offsets: () => ({
-    top: -0.002,
-    right: 0.216931216931217,
-    bottom: 0,
-    left: 0.216931216931217,
-  }),
-});
+const props = defineProps<Props>();
 
 // Refs to elements that we want to manipulate
 const container = ref<HTMLElement | null>(null);
 
 // Stores the (initial/updated) offsets in the format required
 const offsets = ref<Offsets>(props.offsets);
+const bounds = computed(() => {
+  if (container.value) {
+    const boundingBox = container.value.getBoundingClientRect();
+    return offsetsToBounds(offsets.value, boundingBox);
+  }
+});
 
 const handleOffsets = (e: Offsets) => {
   logger.info("Changing offsets", e);
@@ -37,11 +36,12 @@ const handleOffsets = (e: Offsets) => {
     <div class="buttons"><button>Reset</button><button>Save</button></div>
     <Calibrator
       class="calibrator"
-      :offsets="offsets"
+      :calibrationId="props.key"
+      :bounds="bounds"
       :inset="inset"
       :container="container"
       @set-offsets="handleOffsets"
-      v-if="container"
+      v-if="container && bounds"
     ></Calibrator>
   </div>
 </template>
@@ -53,7 +53,6 @@ const handleOffsets = (e: Offsets) => {
 }
 
 .container {
-  outline: 1px solid orange;
   display: grid;
 }
 

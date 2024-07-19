@@ -57,13 +57,13 @@ chrome.runtime.onMessage.addListener(
           if (localStore.broadcasterId) {
             const message = {
               type: "startCalibration",
-              calibrationId: "x",
+              calibrationId: crypto.randomUUID(),
               inset: 0.2,
               existingBounds: {
-                top: 0.3,
-                right: 0.2,
-                bottom: 0.5,
-                left: 0.2,
+                top: 0,
+                right: 0.22,
+                bottom: 0,
+                left: 0.22,
               },
             };
             whisper(localStore.broadcasterId, `U${localStore.broadcasterId}`, message).catch((e) => {
