@@ -1,7 +1,11 @@
 import ownerId from ".././config/owner_id";
 import clientId from ".././config/client_id";
 import secret from ".././config/secret";
-import { sendExtensionPubSubBroadcastMessage, setExtensionBroadcasterConfiguration } from "@twurple/ebs-helper";
+import {
+  sendExtensionPubSubBroadcastMessage,
+  sendExtensionPubSubWhisperMessage,
+  setExtensionBroadcasterConfiguration,
+} from "@twurple/ebs-helper";
 import { EbsCallConfig } from "@twurple/ebs-helper";
 import { compress, decompress } from "lzutf8";
 import { TaggedLogger } from "../util/TaggedLogger";
@@ -37,7 +41,7 @@ export function decode(data: string) {
   }
 }
 
-export const synchronizeExtensionState = async (broadcasterId: string, data: object) => {
+export async function synchronizeExtensionState(broadcasterId: string, data: object) {
   logger.debug("Synchronising object", data);
   const encoded = encode(data);
 
@@ -45,9 +49,16 @@ export const synchronizeExtensionState = async (broadcasterId: string, data: obj
     logger.error("Error setting config", e);
     throw e;
   });
-};
+}
 
-export const broadcastStateChange = async (broadcasterId: string, key: string, data: object) => {
-  const message = { type: "updateState", key, payload: data };
+export async function broadcastStateChange(broadcasterId: string, key: string, data: object) {
+  await broadcast(broadcasterId, { type: "updateState", key, payload: data });
+}
+
+export async function broadcast(broadcasterId: string, message: object) {
   await sendExtensionPubSubBroadcastMessage(ebsCallConfig, broadcasterId, encode(message));
-};
+}
+
+export async function whisper(broadcasterId: string, userId: string, message: object) {
+  return await sendExtensionPubSubWhisperMessage(ebsCallConfig, broadcasterId, userId, JSON.stringify(message));
+}

@@ -13,7 +13,13 @@ chrome.runtime
   .then((state: Partial<ExtensionState>) => {
     logger.debug("Loaded state from worker", state);
 
-    createApp(PopupApp, { state }).mount("#app");
+    const container = document.getElementById("app");
+    if (container) {
+      createApp(PopupApp, { state }).mount(container);
+      container.addEventListener("startCalibration", () => {
+        void chrome.runtime.sendMessage("startCalibration");
+      });
+    }
   })
   .catch((e) => {
     logger.error("Error sending message to worker", e);

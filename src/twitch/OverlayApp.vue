@@ -40,7 +40,7 @@ interface Calibration {
 const activeCalibration = ref<Calibration | null>(null);
 
 setInterval(() => {
-  window.Twitch.ext.onContext((ctx) => {
+  Twitch.ext.onContext((ctx) => {
     latency.value = ctx.hlsLatencyBroadcaster ?? 0;
   });
 }, 1000);
@@ -87,7 +87,7 @@ const broadcastHandler = (
   }
 };
 
-window.Twitch.ext.listen("broadcast", (...args) => {
+Twitch.ext.listen("broadcast", (...args) => {
   delay(broadcastHandler, latency.value * 1000, ...args);
 });
 
@@ -109,9 +109,10 @@ const whisperHandler = (
   }
 };
 
-window.Twitch.ext.onAuthorized((auth) => {
+Twitch.ext.onAuthorized((auth) => {
   logger.debug("Got auth", auth);
-  window.Twitch.ext.listen(`whisper-${auth.userId}`, (...args) => {
+  Twitch.ext.listen(`whisper-${auth.userId}`, (...args) => {
+    logger.debug("Received whisper", ...args);
     delay(whisperHandler, latency.value * 1000, ...args);
   });
 });
@@ -129,8 +130,7 @@ const grimOffset = ref<Offsets>({
   left: 0.216931216931217,
 });
 
-// onMounted(() => {
-window.Twitch.ext.configuration.onChanged(() => {
+Twitch.ext.configuration.onChanged(() => {
   if (Twitch.ext.configuration.broadcaster) {
     const content = Twitch.ext.configuration.broadcaster.content;
     const decompressed = decode(content) as Partial<ExtensionState>;
@@ -141,7 +141,6 @@ window.Twitch.ext.configuration.onChanged(() => {
     grim.value = decompressed.grim;
   }
 });
-// });
 </script>
 
 <template>

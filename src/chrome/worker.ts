@@ -1,7 +1,9 @@
 // import { Game } from "./sotc/Game";
 import { GameManager } from "./sotc/GameManager";
+import { whisper } from "./twitch/sync";
 import { TaggedLogger } from "./util/TaggedLogger";
 import { clone } from "./util/clone";
+import useLocalStore from "./stores/local";
 
 import { capture } from "./util/sentry";
 
@@ -46,6 +48,28 @@ chrome.runtime.onMessage.addListener(
           const response = clone(GameManager.instance.state);
           logger.info("Sending game state", response);
           sendResponse(response);
+        }
+        break;
+      case "startCalibration":
+        {
+          const localStore = useLocalStore();
+          logger.info("Calibration started");
+          if (localStore.broadcasterId) {
+            const message = {
+              type: "startCalibration",
+              calibrationId: "x",
+              inset: 0.2,
+              existingBounds: {
+                top: 0.3,
+                right: 0.2,
+                bottom: 0.5,
+                left: 0.2,
+              },
+            };
+            whisper(localStore.broadcasterId, `U${localStore.broadcasterId}`, message).catch((e) => {
+              logger.error(e);
+            });
+          }
         }
         break;
       default: {

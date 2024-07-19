@@ -1,12 +1,16 @@
 <script async setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { TaggedLogger } from "./util/TaggedLogger";
 import { ExtensionState } from "./types/sotc";
 import { indexBy } from "underscore";
 
 const props = defineProps<{ state: Partial<ExtensionState> }>();
+const emit = defineEmits<{
+  startCalibration: [];
+}>();
 
 const logger = new TaggedLogger("App");
+const root = ref<HTMLElement | null>(null);
 
 const activeScript = computed(() =>
   props.state.page == "Grimoire" ? props.state.script : undefined
@@ -27,11 +31,22 @@ const seats = computed(() => {
     };
   });
 });
+
+function startCalibration() {
+  if (root.value) {
+    logger.debug("Sending calibration request to", root.value);
+    const event = new CustomEvent("startCalibration", { bubbles: true });
+    root.value.dispatchEvent(event);
+  }
+}
 </script>
 
 <template>
-  <div class="popup">
+  <div class="popup" ref="root">
     <h1>Stream on the Clocktower</h1>
+    <div class="buttons">
+      <button @click="startCalibration">Calibrate</button>
+    </div>
     <details v-if="activeScript">
       <summary>{{ activeScript.name }}</summary>
       <span>by {{ activeScript.author }}</span>
