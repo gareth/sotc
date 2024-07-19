@@ -111,8 +111,8 @@ const mapToPixels = (object: Record<string, number>) =>
       </div>
       <div
         class="ghost"
-        v-if="bounds"
-        :style="mapToPixels({ ...bounds })"
+        v-if="bounds && validBounds"
+        :style="mapToPixels({ ...invertInsetBoundsBy(bounds, props.inset) })"
       ></div>
       <div
         class="handle"
