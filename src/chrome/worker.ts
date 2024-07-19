@@ -12,6 +12,11 @@ logger.info("initialized");
 type GamePort = chrome.runtime.Port & { name: "gameTab" };
 const isGamePort = (port: chrome.runtime.Port): port is GamePort => port.name == "gameTab";
 
+interface Badge {
+  color: string;
+  visible?: boolean;
+}
+
 // Handle connection from game tabs
 chrome.runtime.onConnect.addListener(
   capture((port) => {
@@ -50,10 +55,14 @@ chrome.runtime.onMessage.addListener(
   })
 );
 
-// GameManager.instance.on("game:updated", (game: Game | undefined) => {
-//   logger.debug("Game updated", game);
-//   chrome.action.setBadgeText({ text: game ? " " : "" });
-// });
+function updateBadge({ color, visible }: Badge) {
+  chrome.action.setBadgeBackgroundColor({ color }).catch((e) => logger.error("Error setting badge color", e));
+  if (undefined !== visible) {
+    chrome.action
+      .setBadgeText({ text: visible ? " " : "" })
+      .catch((e) => logger.error("Error setting badge visibility", e));
+  }
+}
 
 GameManager.instance.on(
   "port:connected",
@@ -67,17 +76,3 @@ GameManager.instance.on(
   "port:disconnected",
   capture(() => updateBadge({ color: "red", visible: false }))
 );
-
-interface Badge {
-  color: string;
-  visible?: boolean;
-}
-
-function updateBadge({ color, visible }: Badge) {
-  chrome.action.setBadgeBackgroundColor({ color }).catch((e) => logger.error("Error setting badge color", e));
-  if (undefined !== visible) {
-    chrome.action
-      .setBadgeText({ text: visible ? " " : "" })
-      .catch((e) => logger.error("Error setting badge visibility", e));
-  }
-}
