@@ -157,6 +157,7 @@ Twitch.ext.configuration.onChanged(() => {
     <CalibrationPanel
       v-if="activeCalibration"
       :key="activeCalibration?.id"
+      :calibrationId="activeCalibration?.id"
       :offsets="activeCalibration?.offsets"
       :inset="activeCalibration?.inset"
       class="panel-calibration"

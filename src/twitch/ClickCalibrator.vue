@@ -21,10 +21,18 @@ interface Props {
 
 type BoundsError = "missing" | "orientation" | "steep" | "shallow" | "small";
 
+const errorMessages = {
+  missing: "Select 2 distinct points",
+  orientation: "Points need to be top-left/bottom-right",
+  steep: "Bounds are not square: too steep",
+  shallow: "Bounds are not square: too shallow",
+  small: "Bounds are too small",
+};
+
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  setOffsets: [offsets: Offsets];
+  setBounds: [bounds: Bounds | undefined];
 }>();
 
 interface Point {
@@ -88,6 +96,11 @@ const validBounds = computed(() => {
   if (!boundsError.value) return bounds.value;
 });
 
+const invertedInsetValidBounds = computed(() => {
+  if (validBounds.value)
+    return invertInsetBoundsBy(validBounds.value, props.inset);
+});
+
 const boundsError = computed<false | BoundsError>(() => {
   if (undefined == gradient.value) return "missing";
   if (gradient.value < 0) return "orientation";
@@ -113,12 +126,9 @@ const handleStyle = (handle: Handle, bounds: Bounds | undefined) => {
 };
 
 const processClick = (event: MouseEvent) => {
-  logger.info("Click handled", event);
-
   handles.value.shift();
   handles.value.push({ left: event.clientX, top: event.clientY });
-
-  // emit("setOffsets");
+  emit("setBounds", invertedInsetValidBounds.value);
 };
 
 const mapToPixels = (object: Record<string, number>) =>
@@ -130,14 +140,13 @@ const mapToPixels = (object: Record<string, number>) =>
 <template>
   <div class="container">
     <div class="target" @click="processClick">
-      <div class="details">
-        {{ undefined !== gradient ? round(gradient, 2) : gradient }} /
-        {{ area }} / {{ boundsError }} / {{ validBounds }}
+      <div class="error" v-if="boundsError">
+        <span>⚠️ {{ errorMessages[boundsError] }}</span>
       </div>
       <div
         class="ghost"
-        v-if="bounds && validBounds"
-        :style="mapToPixels({ ...invertInsetBoundsBy(bounds, props.inset) })"
+        v-if="invertedInsetValidBounds"
+        :style="mapToPixels({ ...invertedInsetValidBounds })"
       ></div>
       <div
         class="handle"
@@ -153,9 +162,21 @@ const mapToPixels = (object: Record<string, number>) =>
   display: grid;
 }
 
-.details {
+.error {
   position: absolute;
-  background-color: white;
+  display: grid;
+  place-items: center;
+
+  pointer-events: none;
+
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  span {
+    background-color: white;
+    padding: 1em;
+  }
 }
 
 .ghost {
