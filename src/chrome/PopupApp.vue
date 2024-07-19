@@ -2,6 +2,7 @@
 import { computed } from "vue";
 import { TaggedLogger } from "./util/TaggedLogger";
 import { ExtensionState } from "./types/sotc";
+import { indexBy } from "underscore";
 
 const props = defineProps<{ state: Partial<ExtensionState> }>();
 
@@ -10,6 +11,22 @@ const logger = new TaggedLogger("App");
 const activeScript = computed(() =>
   props.state.page == "Grimoire" ? props.state.script : undefined
 );
+
+const characters = computed(() => {
+  if (props.state.script) {
+    return indexBy(props.state.script.characters, (char) => char.id);
+  }
+});
+
+const seats = computed(() => {
+  return props.state.seats?.map((seat) => {
+    return {
+      pos: seat.pos,
+      user: seat.user,
+      role: characters.value?.[seat.role?.id!],
+    };
+  });
+});
 </script>
 
 <template>
@@ -29,10 +46,10 @@ const activeScript = computed(() =>
     <details open v-if="props.state.seats">
       <summary>Seats ({{ state.seats?.length }})</summary>
       <ul>
-        <li v-for="player in props.state.seats">
-          <div v-if="player.role">
-            <span>{{ player.role?.name }}</span>
-            <span v-if="player.user"> ({{ player.user }})</span>
+        <li v-for="seat in seats">
+          <div v-if="seat.role">
+            <span>{{ seat.role.name }}</span>
+            <span v-if="seat.user"> ({{ seat.user }})</span>
           </div>
           <div v-else class="empty">[empty]</div>
         </li>
