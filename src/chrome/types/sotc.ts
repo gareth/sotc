@@ -1,6 +1,6 @@
 import { Seat } from "./event";
 import { lookup } from "./lookup";
-import { Bounds } from "../util/bounds";
+import { Bounds, Offsets } from "../util/bounds";
 
 export const CharacterType = ["townsfolk", "outsider", "minion", "demon", "traveler"] as const;
 export type CharacterType = (typeof CharacterType)[number];
@@ -38,4 +38,5 @@ export interface ExtensionState {
   page: string;
   seats: Seat[];
   grim: { pos: Bounds; container: Bounds };
+  overlay: { pos: Offsets };
 }

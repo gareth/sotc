@@ -81,6 +81,12 @@ const broadcastHandler = (
         ).payload;
         break;
 
+      case "overlay":
+        overlay.value = (
+          stateMessage as SOTCPubSubUpdateStateMessage<"overlay">
+        ).payload;
+        break;
+
       default:
         break;
     }
@@ -117,18 +123,18 @@ Twitch.ext.onAuthorized((auth) => {
   });
 });
 
-const script = ref<Script | undefined>(undefined);
-const page = ref<string | undefined>(undefined);
-const seats = ref<Seat[] | undefined>(undefined);
-const grim = ref<{ pos: Bounds; container: Bounds } | undefined>(undefined);
-
-// Sample grim offset
-const grimOffset = ref<Offsets>({
+const defaultOffsets = {
   top: -0.002,
   right: 0.216931216931217,
   bottom: 0,
   left: 0.216931216931217,
-});
+};
+
+const script = ref<Script | undefined>(undefined);
+const page = ref<string | undefined>(undefined);
+const seats = ref<Seat[] | undefined>(undefined);
+const grim = ref<{ pos: Bounds; container: Bounds } | undefined>(undefined);
+const overlay = ref<{ pos: Offsets }>({ pos: defaultOffsets });
 
 Twitch.ext.configuration.onChanged(() => {
   if (Twitch.ext.configuration.broadcaster) {
@@ -139,6 +145,7 @@ Twitch.ext.configuration.onChanged(() => {
     page.value = decompressed.page;
     seats.value = decompressed.seats;
     grim.value = decompressed.grim;
+    overlay.value = decompressed.overlay || { pos: defaultOffsets };
   }
 });
 </script>
@@ -151,7 +158,7 @@ Twitch.ext.configuration.onChanged(() => {
     <GrimoirePanel
       class="panel-grimoire"
       :seats="seats"
-      :offset="grimOffset"
+      :offset="overlay.pos"
     ></GrimoirePanel>
     <ScriptPanel class="panel-script" :script="script"></ScriptPanel>
     <CalibrationPanel

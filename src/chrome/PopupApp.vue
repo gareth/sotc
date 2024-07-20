@@ -3,6 +3,8 @@ import { computed, ref } from "vue";
 import { TaggedLogger } from "./util/TaggedLogger";
 import { ExtensionState } from "./types/sotc";
 import { indexBy } from "underscore";
+import { Seat, sotcEvent } from "./types/event";
+import { parse } from "@babel/core";
 
 const props = defineProps<{ state: Partial<ExtensionState> }>();
 const emit = defineEmits<{
@@ -11,6 +13,8 @@ const emit = defineEmits<{
 
 const logger = new TaggedLogger("App");
 const root = ref<HTMLElement | null>(null);
+
+const calibrationData = ref<string>("");
 
 const activeScript = computed(() =>
   props.state.page == "Grimoire" ? props.state.script : undefined
@@ -23,7 +27,7 @@ const characters = computed(() => {
 });
 
 const seats = computed(() => {
-  return props.state.seats?.map((seat) => {
+  return props.state.seats?.map((seat: Seat) => {
     return {
       pos: seat.pos,
       user: seat.user,
@@ -39,13 +43,41 @@ function startCalibration() {
     root.value.dispatchEvent(event);
   }
 }
+
+function saveCalibration() {
+  if (root.value) {
+    const parsedJSON = JSON.parse(calibrationData.value);
+    if (parsedJSON instanceof Array) {
+      const [top, right, bottom, left] = parsedJSON;
+      if (
+        typeof top == "number" &&
+        typeof right == "number" &&
+        typeof bottom == "number" &&
+        typeof left == "number"
+      ) {
+        const offsets = { top, right, bottom, left };
+        logger.debug("Sending calibration result to", root.value);
+        const event = sotcEvent("sotc-overlayOffsets", {
+          bubbles: true,
+          detail: { offsets },
+        });
+        root.value.dispatchEvent(event);
+      }
+    }
+  }
+}
 </script>
 
 <template>
   <div class="popup" ref="root">
     <h1>Stream on the Clocktower</h1>
-    <div class="buttons">
-      <button @click="startCalibration">Calibrate</button>
+    <div class="calibration">
+      <div class="div">
+        <button @click="startCalibration">Calibrate</button>
+      </div>
+      <input v-model="calibrationData" /><button @click="saveCalibration">
+        Save
+      </button>
     </div>
     <details v-if="activeScript">
       <summary>{{ activeScript.name }}</summary>

@@ -5,7 +5,7 @@ import { ExtensionState, Script } from "../types/sotc";
 
 import { createPinia } from "pinia";
 import useExtensionStore from "../stores/extension";
-import { Bounds } from "../util/bounds";
+import { Bounds, Offsets } from "../util/bounds";
 
 const pinia = createPinia();
 const extensionStore = useExtensionStore(pinia);
@@ -88,6 +88,12 @@ export class GameManager {
       // extensionStore.state = clone(this.state);
       logger.info("State is now", this.state);
     });
+  }
+
+  set overlay(value: { pos: Offsets }) {
+    this.state.overlay = value;
+    extensionStore.overlay = this.state.overlay;
+    logger.debug("Overlay is now", this.state.overlay);
   }
 
   get #connection() {

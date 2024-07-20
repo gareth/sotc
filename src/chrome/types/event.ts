@@ -1,4 +1,4 @@
-import { Bounds } from "../util/bounds";
+import { Bounds, Offsets } from "../util/bounds";
 import { Script } from "./sotc";
 
 export interface NavigateEventDetail {
@@ -22,6 +22,7 @@ export interface SOTCEvent {
   "sotc-scriptChanged": Script;
   "sotc-playersChanged": Seat[];
   "sotc-size": { pos: Bounds; container: Bounds };
+  "sotc-overlayOffsets": { offsets: Offsets };
 }
 
 export type SOTCEventMap = {

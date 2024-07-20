@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { useStorageAsync } from "@vueuse/core";
+import { Offsets } from "../util/bounds";
 
 export interface Auth {
   access_token: string;
@@ -38,6 +39,7 @@ export default defineStore("sotc", {
     // serialized the object as "[object Object]". By forcing it always to be an
     // object (if only a partial object), we avoided that problem.
     id: useStorageAsync<Partial<{ data: OIDCIdentity }>>("id", {}, new ChromeStorageWrapper(chrome.storage.local)),
+    overlay: useStorageAsync<Partial<{ pos: Offsets }>>("overlay", {}, new ChromeStorageWrapper(chrome.storage.local)),
   }),
   getters: {
     accessToken: (state) => state.auth.access_token,

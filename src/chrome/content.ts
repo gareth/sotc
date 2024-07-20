@@ -83,6 +83,7 @@ function injectScript() {
   relay("sotc-scriptChanged");
   relay("sotc-playersChanged");
   relay("sotc-size");
+  relay("sotc-overlayOffsets");
 
   (document.head || document.documentElement).appendChild(script);
 }

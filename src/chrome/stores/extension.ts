@@ -8,7 +8,7 @@ import { broadcastStateChange, synchronizeExtensionState } from "../twitch/sync"
 
 import { throttle } from "underscore";
 import { Seat } from "../types/event";
-import { Bounds } from "../util/bounds";
+import { Bounds, Offsets } from "../util/bounds";
 
 const pinia = createPinia();
 const localStore = useLocalStore(pinia);
@@ -41,12 +41,14 @@ export default defineStore("extension", () => {
   const page = ref<string | undefined>(undefined);
   const seats = ref<Seat[] | undefined>(undefined);
   const grim = ref<{ pos: Bounds } | undefined>(undefined);
+  const overlay = ref<{ pos: Offsets } | undefined>(undefined);
 
   const state = computed(() => ({
     script: script.value,
     page: page.value,
     seats: seats.value,
     grim: grim.value,
+    overlay: overlay.value,
   }));
 
   const setState = (newState: Partial<ExtensionState>) => {
@@ -54,6 +56,7 @@ export default defineStore("extension", () => {
     page.value = newState.page;
     seats.value = newState.seats;
     grim.value = newState.grim;
+    overlay.value = newState.overlay;
   };
 
   logger.debug("Watching", state);
@@ -63,6 +66,7 @@ export default defineStore("extension", () => {
   watch(seats, throttle(broadcastState("seats"), 1000), { deep: true });
   watch(page, throttle(broadcastState("page"), 1000), { deep: true });
   watch(grim, throttle(broadcastState("grim"), 1000), { deep: true });
+  watch(overlay, throttle(broadcastState("overlay"), 1000), { deep: true });
 
-  return { script, page, seats, grim, state, setState };
+  return { script, page, seats, grim, state, overlay, setState };
 });
