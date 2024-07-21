@@ -126,9 +126,36 @@ const handleStyle = (handle: Handle, bounds: Bounds | undefined) => {
   return style;
 };
 
+function distance(p1: [number, number], p2: [number, number]) {
+  const dx = p1[0] - p2[0];
+  const dy = p1[1] - p2[1];
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
 const processClick = (event: MouseEvent) => {
-  handles.value.shift();
-  handles.value.push({ left: event.clientX, top: event.clientY });
+  const clickLocation = { left: event.clientX, top: event.clientY };
+  testExisting: {
+    for (let i in handles.value) {
+      const handle = handles.value[i];
+      logger.debug("Processing click against handle", handle);
+      if (handle) {
+        const d = distance(
+          [clickLocation.left, clickLocation.top],
+          [handle.left, handle.top]
+        );
+        if (d < 50) {
+          handles.value[i] = clickLocation;
+          break testExisting;
+        }
+      }
+    }
+
+    // If we got here then the click wasn't near any of the existing handles, so
+    // we remove the oldest handle and place a new one
+    handles.value.shift();
+    handles.value.push({ left: event.clientX, top: event.clientY });
+  }
+
   emit("setBounds", invertedInsetValidBounds.value);
 };
 </script>
