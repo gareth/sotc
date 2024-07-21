@@ -76,6 +76,12 @@ const circles = computed(() => {
 <style scoped lang="scss">
 .grimoire {
   position: absolute;
+  transition: opacity linear 0.3s;
+  opacity: 0.4;
+
+  &:hover {
+    opacity: 1;
+  }
 }
 
 svg {
