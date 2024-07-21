@@ -70,16 +70,27 @@ chrome.runtime.onMessage.addListener(
                   type: "startCalibration",
                   calibrationId: crypto.randomUUID(),
                   inset: 0.2,
-                  existingBounds: {
-                    top: 0,
-                    right: 0.22,
-                    bottom: 0,
-                    left: 0.22,
-                  },
+                  existingBounds: localStore.overlay.pos,
                 };
                 whisper(localStore.broadcasterId, `U${localStore.broadcasterId}`, message).catch((e) => {
                   logger.error(e);
                 });
+                GameManager.instance.startCalibration();
+              }
+            }
+            break;
+          case "endCalibration":
+            {
+              logger.info("Calibration ending");
+              if (localStore.broadcasterId) {
+                const message = {
+                  type: "endCalibration",
+                  calibrationId: crypto.randomUUID(),
+                };
+                whisper(localStore.broadcasterId, `U${localStore.broadcasterId}`, message).catch((e) => {
+                  logger.error(e);
+                });
+                GameManager.instance.endCalibration();
               }
             }
             break;

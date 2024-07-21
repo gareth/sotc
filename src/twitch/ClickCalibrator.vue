@@ -4,6 +4,7 @@ import {
   Bounds,
   insetBoundsBy,
   invertInsetBoundsBy,
+  mapToPixels,
   Offsets,
 } from "../chrome/util/bounds";
 import { TaggedLogger } from "../chrome/util/TaggedLogger";
@@ -130,11 +131,6 @@ const processClick = (event: MouseEvent) => {
   handles.value.push({ left: event.clientX, top: event.clientY });
   emit("setBounds", invertedInsetValidBounds.value);
 };
-
-const mapToPixels = (object: Record<string, number>) =>
-  Object.fromEntries(
-    [...Object.entries(object)].map(([k, v]) => [k, `${v}px`])
-  );
 </script>
 
 <template>
@@ -166,6 +162,7 @@ const mapToPixels = (object: Record<string, number>) =>
   position: absolute;
   display: grid;
   place-items: center;
+  opacity: 0.7;
 
   pointer-events: none;
 

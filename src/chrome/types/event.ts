@@ -23,6 +23,8 @@ export interface SOTCEvent {
   "sotc-playersChanged": Seat[];
   "sotc-size": { pos: Bounds; container: Bounds };
   "sotc-overlayOffsets": { offsets: Offsets };
+  "sotc-startCalibration": void;
+  "sotc-endCalibration": void;
 }
 
 export type SOTCEventMap = {

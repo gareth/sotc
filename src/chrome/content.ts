@@ -28,7 +28,7 @@
  * they will be distributed to any other port listeners.
  */
 
-import { SOTCEvent } from "./types/event";
+import { sotcEvent, SOTCEvent } from "./types/event";
 import { TaggedLogger } from "./util/TaggedLogger";
 
 const logger = new TaggedLogger("Content");
@@ -47,6 +47,32 @@ const connectPort = () => {
   // Reconnect on fail
   port.onDisconnect.addListener(() => {
     connectPort();
+  });
+
+  port.onMessage.addListener((message) => {
+    logger.debug("Message received", message);
+    if (typeof message == "object" && "type" in message) {
+      switch ((message as { type: string }).type) {
+        case "startCalibration":
+          {
+            const event = sotcEvent("sotc-startCalibration", {});
+            logger.debug("Dispatching", event);
+            dispatchEvent(event);
+          }
+          break;
+
+        case "endCalibration":
+          {
+            const event = sotcEvent("sotc-endCalibration", {});
+            logger.debug("Dispatching", event);
+            dispatchEvent(event);
+          }
+          break;
+
+        default:
+          break;
+      }
+    }
   });
 };
 connectPort();

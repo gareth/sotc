@@ -119,4 +119,12 @@ export class GameManager {
   on = (event: string, callback: (..._data: unknown[]) => void) => this.#events.on(event, callback);
   off = (event: string, callback: (..._data: unknown[]) => void) => this.#events.off(event, callback);
   #emit = (event: string, ...data: unknown[]) => this.#events.emit(event, ...data);
+
+  startCalibration() {
+    this.port?.postMessage({ type: "startCalibration" });
+  }
+
+  endCalibration() {
+    this.port?.postMessage({ type: "endCalibration" });
+  }
 }

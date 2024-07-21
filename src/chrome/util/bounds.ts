@@ -50,3 +50,6 @@ export const invertInsetBoundsBy = (bounds: Bounds, inset: number): Bounds => {
     height: bounds.height / ratio,
   };
 };
+
+export const mapToPixels = (object: Record<string, number>) =>
+  Object.fromEntries([...Object.entries(object)].map(([k, v]) => [k, `${v}px`]));

@@ -44,6 +44,14 @@ function startCalibration() {
   }
 }
 
+function cancelCalibration() {
+  if (root.value) {
+    logger.debug("Cancelling calibration request to", root.value);
+    const event = new CustomEvent("cancelCalibration", { bubbles: true });
+    root.value.dispatchEvent(event);
+  }
+}
+
 function saveCalibration() {
   if (root.value) {
     const parsedJSON = JSON.parse(calibrationData.value);
@@ -74,6 +82,7 @@ function saveCalibration() {
     <div class="calibration">
       <div class="div">
         <button @click="startCalibration">Calibrate</button>
+        <button @click="cancelCalibration">Cancel</button>
       </div>
       <input v-model="calibrationData" /><button @click="saveCalibration">
         Save

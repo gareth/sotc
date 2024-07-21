@@ -27,6 +27,10 @@ interface SOTCPubSubStartCalibrationMessage {
   existingBounds: Offsets;
 }
 
+interface SOTCPubSubEndCalibrationMessage {
+  type: "endCalibration";
+}
+
 const logger = new TaggedLogger("OverlayApp");
 
 const latency = ref<number>(0);
@@ -105,13 +109,25 @@ const whisperHandler = (
   logger.debug("Received whisper message", target, contentType, rawMessage);
   const message = JSON.parse(rawMessage) as SOTCPubSubMessage;
   logger.debug("Decoded, this is", message);
-  if (message.type == "startCalibration") {
-    const calibrationMessage = message as SOTCPubSubStartCalibrationMessage;
-    activeCalibration.value = {
-      id: calibrationMessage.calibrationId,
-      inset: calibrationMessage.inset,
-      offsets: calibrationMessage.existingBounds,
-    };
+
+  switch (message.type) {
+    case "startCalibration":
+      {
+        const calibrationMessage = message as SOTCPubSubStartCalibrationMessage;
+        activeCalibration.value = {
+          id: calibrationMessage.calibrationId,
+          inset: calibrationMessage.inset,
+          offsets: calibrationMessage.existingBounds,
+        };
+      }
+      break;
+
+    case "endCalibration":
+      activeCalibration.value = null;
+      break;
+
+    default:
+      break;
   }
 };
 
@@ -119,7 +135,8 @@ Twitch.ext.onAuthorized((auth) => {
   logger.debug("Got auth", auth);
   Twitch.ext.listen(`whisper-${auth.userId}`, (...args) => {
     logger.debug("Received whisper", ...args);
-    delay(whisperHandler, latency.value * 1000, ...args);
+    whisperHandler(...args);
+    // delay(whisperHandler, latency.value * 1000, ...args);
   });
 });
 
@@ -215,7 +232,7 @@ main {
 .panel-grimoire {
   grid-area: grimoire;
   transition: opacity linear 0.3s;
-  opacity: 0.7;
+  opacity: 0.4;
 }
 
 body:hover .panel-grimoire {

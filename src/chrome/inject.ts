@@ -7,7 +7,7 @@ import { nextTick } from "vue";
 import { round } from "./util/round";
 
 import sentry, { promiseHandler } from "./util/sentry";
-import { Bounds } from "./util/bounds";
+import { Bounds, mapToPixels } from "./util/bounds";
 
 const logger = new TaggedLogger("Inject");
 logger.info("initialized");
@@ -76,10 +76,20 @@ function inject(container: HTMLVueAppElement) {
     }
   );
 
+  addEventListener("sotc-startCalibration", () => {
+    addCalibrationOverlay(container);
+  });
+
+  addEventListener("sotc-endCalibration", () => {
+    hideCalibrationOverlay(container);
+  });
+
   logger.info("Adding players watcher");
   globals.$store.watch(
     (state) => ({ players: state.players.players, users: state.session.users }),
     ({ players, users }) => {
+      // addCalibrationOverlay(container);
+
       // `nextTick` because we need Vue to render the result of this change
       // otherwise the bounds won't be calculated correctly.
       void nextTick(async () => {
@@ -169,6 +179,62 @@ const updateGrim = (container: HTMLElement) => {
     document.dispatchEvent(sotcEvent("sotc-size", { detail: { pos: grimBounds, container: windowBounds } }));
   }
 };
+
+const calibratorClass = "sotc-overlay";
+
+function addCalibrationOverlay(container: HTMLElement) {
+  logger.info("Adding calibration overlay to", container);
+  let calibrator: HTMLElement | null = container.querySelector(`.${calibratorClass}`);
+  if (!calibrator) {
+    calibrator = document.createElement("div");
+    calibrator.classList.add("sotc-overlay");
+    Object.assign(calibrator.style, {
+      position: "absolute",
+      pointerEvents: "none",
+      zIndex: 1000,
+    });
+    const handleStyle = {
+      position: "absolute",
+      width: "20px",
+      height: "20px",
+      borderRadius: "10px",
+      outline: "15px solid black",
+      background: "yellow",
+      transform: "translateX(-50%) translateY(-50%)",
+    };
+    const handle1 = document.createElement("div");
+    Object.assign(handle1.style, {
+      ...handleStyle,
+      top: "20%",
+      left: "20%",
+      transform: "translateX(-50%) translateY(-50%)",
+    });
+    const handle2 = document.createElement("div");
+    Object.assign(handle2.style, {
+      ...handleStyle,
+      bottom: "20%",
+      right: "20%",
+      transform: "translateX(50%) translateY(50%)",
+    });
+
+    calibrator.appendChild(handle1);
+    calibrator.appendChild(handle2);
+    container.appendChild(calibrator);
+  } else {
+    calibrator.style.display = "block";
+  }
+
+  const grimBounds = getGrimoireBounds(container);
+  Object.assign(calibrator.style, { ...mapToPixels(grimBounds) });
+}
+
+function hideCalibrationOverlay(container: HTMLElement) {
+  logger.info("Removing calibration overlay from", container);
+  const calibrator: HTMLElement | null = container.querySelector(`.${calibratorClass}`);
+  if (calibrator) {
+    calibrator.style.display = "none";
+  }
+}
 
 const getGrimoireBounds = (container: HTMLElement) => {
   const grim = container.querySelector(".circle");
