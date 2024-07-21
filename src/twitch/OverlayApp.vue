@@ -43,6 +43,8 @@ interface Calibration {
 
 const activeCalibration = ref<Calibration | null>(null);
 
+const scriptExpanded = ref(false);
+
 setInterval(() => {
   Twitch.ext.onContext((ctx) => {
     latency.value = ctx.hlsLatencyBroadcaster ?? 0;
@@ -177,7 +179,25 @@ Twitch.ext.configuration.onChanged(() => {
       :seats="seats"
       :offset="overlay.pos"
     ></GrimoirePanel>
-    <ScriptPanel class="panel-script" :script="script"></ScriptPanel>
+    <input
+      v-model="scriptExpanded"
+      type="checkbox"
+      class="panel-script--handleState"
+      id="panel-script--handleState"
+    />
+    <div class="panel-script">
+      <div class="panel-script--handle">
+        <label for="panel-script--handleState">
+          <span class="arrow">{{ scriptExpanded ? "▲" : "▼" }}</span>
+          Characters
+          <span class="arrow">{{ scriptExpanded ? "▲" : "▼" }}</span>
+        </label>
+      </div>
+      <ScriptPanel
+        class="panel-script--contents"
+        :script="script"
+      ></ScriptPanel>
+    </div>
     <CalibrationPanel
       v-if="activeCalibration"
       :key="activeCalibration?.id"
@@ -193,12 +213,7 @@ Twitch.ext.configuration.onChanged(() => {
 main {
   height: 100%;
 
-  display: grid;
-  grid-template-columns: 22% auto 23%;
-  grid-template-rows: 1fr;
-  grid-template-areas: ". grimoire script";
-  grid-column-gap: 0px;
-  grid-row-gap: 0px;
+  font-family: "Gothic A1", sans-serif;
 }
 
 .square {
@@ -220,13 +235,65 @@ main {
 }
 
 .panel-script {
-  grid-area: script;
-  background-color: rgba(242, 230, 243, 0.95);
-  border: 2px solid rgb(76, 10, 71);
-  padding: 0rem 1rem;
-  margin: 13% 0 0 0;
+  --script-background-color: white;
+  --script-border-color: purple;
+  --script-border-size: 3px;
+  --script-width: 30%;
 
+  transition: left ease-in-out 0.5s;
+
+  position: absolute;
+  top: 5rem;
+  bottom: 5rem;
+  left: 100%;
+  min-height: 15em;
+  width: var(--script-width);
+  border: var(--script-border-size) solid var(--script-border-color);
+  border-radius: 0 0 0 calc(4px + var(--script-border-size));
+
+  background-color: var(--script-background-color);
+
+  .panel-script--handle {
+    font-family: "Germania One";
+
+    position: absolute;
+    display: grid;
+    top: calc(-1 * var(--script-border-size));
+    right: 100%;
+    writing-mode: vertical-rl;
+    text-orientation: sideways;
+    border: var(--script-border-size) solid var(--script-border-color);
+    border-right-width: 1px;
+    height: 30%;
+    min-height: 8em;
+    border-radius: 0.2em 0 0 2em;
+
+    background-color: var(--script-background-color);
+    background-color: rgb(219, 202, 106);
+
+    label {
+      padding: 1em 0.5em;
+      cursor: pointer;
+    }
+
+    .arrow {
+      font-size: 0.7em;
+      color: #666;
+    }
+  }
+}
+
+.panel-script--contents {
   overflow: scroll;
+  max-height: 100%;
+}
+
+#panel-script--handleState:checked + .panel-script {
+  left: 70%;
+}
+
+main:hover .panel-script {
+  left: calc(100% - 7rem);
 }
 
 .panel-grimoire {

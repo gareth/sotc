@@ -4,7 +4,6 @@ import { TaggedLogger } from "./util/TaggedLogger";
 import { ExtensionState } from "./types/sotc";
 import { indexBy } from "underscore";
 import { Seat, sotcEvent } from "./types/event";
-import { parse } from "@babel/core";
 
 const props = defineProps<{ state: Partial<ExtensionState> }>();
 const emit = defineEmits<{
@@ -185,9 +184,7 @@ function saveCalibration() {
 
 h1 {
   margin: 0 0 0.3em 0;
-
   font-family: "Pirata One", serif;
-  font-optical-sizing: auto;
   font-style: normal;
 }
 
@@ -207,8 +204,6 @@ summary {
   background-color: #ddd;
   padding: 5px;
   list-style: none;
-
-  user-select: none;
 
   &::before {
     display: inline-block;

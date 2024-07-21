@@ -14,7 +14,7 @@ const props = defineProps<Partial<Props>>();
 </script>
 
 <template>
-  <div>
+  <div class="script">
     <h1>{{ props.script?.name ?? "Stream on the Clocktower" }}</h1>
     <div v-if="props.script">
       <div class="author">by {{ props.script.author }}</div>
@@ -31,9 +31,14 @@ const props = defineProps<Partial<Props>>();
 </template>
 
 <style scoped lang="scss">
+.script {
+  padding: 0rem 1rem;
+}
+
 h1 {
-  font-size: 1.2em;
-  margin-bottom: 0;
+  font-family: "Germania One", serif;
+  font-style: normal;
+  margin: 0.3em auto 0;
 }
 
 .author {
@@ -70,14 +75,33 @@ h1 {
 
 details {
   margin-bottom: 0.1rem;
+
+  > summary {
+    list-style: none;
+    cursor: pointer;
+    font-weight: 800;
+
+    &::before {
+      // display: none;
+      display: inline-block;
+      text-align: center;
+      width: 0.3em;
+      margin-right: 0.7em;
+      content: "+";
+      // font-size: 0.7em;
+    }
+  }
 }
 
-summary {
-  cursor: pointer;
-  font-weight: bold;
+details[open] {
+  > summary {
+    margin-bottom: 0.3em;
+  }
 
-  list-style-position: outside;
-  padding-left: 5px;
-  margin-left: 1rem;
+  padding-bottom: 1em;
+
+  > summary::before {
+    content: "-";
+  }
 }
 </style>
