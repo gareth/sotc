@@ -11,14 +11,25 @@ interface Props {
 }
 
 const props = defineProps<Partial<Props>>();
+
+const handleDetailsToggle = (event: ToggleEvent) => {
+  if (!(event.target instanceof HTMLDetailsElement)) return;
+
+  if (event.target.open) {
+    event.target.scrollIntoView({ block: "nearest" });
+  }
+};
 </script>
 
 <template>
   <div class="script">
-    <h1>{{ props.script?.name ?? "Stream on the Clocktower" }}</h1>
+    <h1>
+      {{ props.script?.name ?? "Stream on the Clocktower" }}
+    </h1>
     <div v-if="props.script">
       <div class="author">by {{ props.script.author }}</div>
       <details
+        @toggle="handleDetailsToggle"
         v-for="role in props.script.characters"
         class="script-role"
         :class="role.type"

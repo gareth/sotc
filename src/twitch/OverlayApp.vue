@@ -214,6 +214,8 @@ main {
   height: 100%;
 
   font-family: "Gothic A1", sans-serif;
+
+  scroll-behavior: smooth;
 }
 
 .square {
@@ -232,6 +234,8 @@ main {
   top: 10px;
   left: 10px;
   opacity: 0.3;
+
+  display: none;
 }
 
 .panel-script {
@@ -240,10 +244,11 @@ main {
   --script-border-size: 3px;
   --script-width: 30%;
 
-  transition: left ease-in-out 0.5s;
+  transition: left cubic-bezier(0.39, 0.575, 0.565, 1) 0.4s;
 
   position: absolute;
   top: 5rem;
+  max-height: calc(100% - 10rem);
   bottom: 5rem;
   left: 100%;
   min-height: 15em;
@@ -255,6 +260,7 @@ main {
 
   .panel-script--handle {
     font-family: "Germania One";
+    font-size: 1.3em;
 
     position: absolute;
     display: grid;
@@ -264,9 +270,8 @@ main {
     text-orientation: sideways;
     border: var(--script-border-size) solid var(--script-border-color);
     border-right-width: 1px;
-    height: 30%;
-    min-height: 8em;
     border-radius: 0.2em 0 0 2em;
+    padding-bottom: 2em;
 
     background-color: var(--script-background-color);
     background-color: rgb(219, 202, 106);
@@ -278,7 +283,7 @@ main {
 
     .arrow {
       font-size: 0.7em;
-      color: #666;
+      color: var(--script-border-color);
     }
   }
 }
@@ -288,8 +293,12 @@ main {
   max-height: 100%;
 }
 
-#panel-script--handleState:checked + .panel-script {
-  left: 70%;
+#panel-script--handleState {
+  display: none;
+
+  &:checked + .panel-script {
+    left: calc(100% - var(--script-width) - 7rem);
+  }
 }
 
 main:hover .panel-script {
