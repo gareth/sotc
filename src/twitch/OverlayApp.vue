@@ -196,7 +196,9 @@ Twitch.ext.configuration.onChanged(() => {
       <div class="latency" v-text="latency"></div>
     </div>
     <GrimoirePanel
+      v-if="script"
       class="panel-grimoire"
+      :script="script"
       :seats="seats"
       :offset="overlay.pos"
     ></GrimoirePanel>

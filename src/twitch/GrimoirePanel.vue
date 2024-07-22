@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { Seat } from "../chrome/types/event";
+import { mapToPercent } from "../chrome/util/bounds";
+import { Character, Script } from "../chrome/types/sotc";
 // import { TaggedLogger } from "../chrome/util/TaggedLogger";
 
 // const logger = new TaggedLogger("GrimoirePanel");
 
 interface Props {
+  script: Script;
   seats?: Seat[];
   offset: {
     top: number;
@@ -36,8 +39,12 @@ const circles = computed(() => {
         seat.role?.team || `unknown`,
         `alignment-${seat.role?.alignment ?? "default"}`,
       ];
+      const seatRole = props.script.characters.find(
+        (char: Character) => char.id == seat.role?.id
+      );
       return {
         seat,
+        seatRole,
         idx,
         position: { x, y, r },
         classes,
@@ -69,6 +76,36 @@ const circles = computed(() => {
           ></circle>
         </g>
       </svg>
+      <div class="labels">
+        <div v-for="{ seat, seatRole, position, classes } in circles">
+          <span
+            class="label"
+            :class="classes"
+            v-if="seatRole"
+            :style="{
+              ...mapToPercent({
+                left: 0.015 + position.x * 0.97,
+                top: position.y,
+              }),
+            }"
+          >
+            {{ seatRole.name }}
+          </span>
+          <span
+            class="label"
+            :class="classes"
+            v-if="seat.user"
+            :style="{
+              ...mapToPercent({
+                left: 0.015 + position.x * 0.97,
+                top: position.y + 0.05,
+              }),
+            }"
+          >
+            {{ seat.user }}
+          </span>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -169,5 +206,24 @@ g.seat {
       opacity: 1;
     }
   }
+}
+
+.label {
+  position: absolute;
+  transform: translateX(-50%) translateY(-50%);
+  font-weight: bold;
+  font-size: 1.3em;
+  background-color: rgb(197, 197, 197);
+  outline: 1px solid black;
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+
+  transition: opacity linear 0.3s;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.grimoire:hover .label {
+  opacity: 1;
 }
 </style>
