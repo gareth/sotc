@@ -1,5 +1,4 @@
-import packageJson from "../package.json" with { type: "json" };
-const { version: packageVersion } = packageJson;
+import packageVersion from "../src/chrome/version.js";
 import keys from "../src/chrome/config/manifest_key.js";
 
 // Convert from Semver (example: 0.1.0-beta6)

@@ -66,6 +66,7 @@ const broadcastHandler = (
   logger.debug("Decoded, this is", message);
 
   switch (message.type) {
+    // TODO: Remove this (unused?) message handler
     case "updateState":
       {
         const stateMessage = message as SOTCPubSubUpdateStateMessage<any>;

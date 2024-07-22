@@ -66,6 +66,7 @@ export async function synchronizeExtensionState(broadcasterId: string, data: obj
   });
 }
 
+// TODO: Remove this (unused) method?
 export async function broadcastStateChange(broadcasterId: string, key: string, data: object) {
   await broadcast(broadcasterId, { type: "updateState", key, payload: data });
 }
