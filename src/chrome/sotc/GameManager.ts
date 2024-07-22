@@ -1,11 +1,11 @@
 import EventEmitter from "../util/EventEmitter";
 import { LogLevel, TaggedLogger } from "../util/TaggedLogger";
 import { NavigateEventDetail, Seat, isSOTCEventMessage } from "../types/event";
-import { ExtensionState, Script } from "../types/sotc";
+import { ExtensionState, Grimoire, Script } from "../types/sotc";
 
 import { createPinia } from "pinia";
 import useExtensionStore from "../stores/extension";
-import { Bounds, Offsets } from "../util/bounds";
+import { Offsets } from "../util/bounds";
 
 const pinia = createPinia();
 const extensionStore = useExtensionStore(pinia);
@@ -80,7 +80,7 @@ export class GameManager {
           logger.debug("Seats are now", this.state.seats);
           break;
         case "sotc-size":
-          this.state.grim = message.payload as { pos: Bounds; container: Bounds };
+          this.state.grim = message.payload as Grimoire;
           extensionStore.grim = this.state.grim;
           logger.debug("Grim is now", this.state.grim);
           break;

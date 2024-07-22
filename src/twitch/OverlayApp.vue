@@ -2,7 +2,7 @@
 import { computed, onMounted, ref } from "vue";
 import { TaggedLogger } from "../chrome/util/TaggedLogger";
 import { decode } from "../chrome/twitch/sync";
-import { ExtensionState, Script } from "../chrome/types/sotc";
+import { ExtensionState, Grimoire, Script } from "../chrome/types/sotc";
 import { Seat } from "../chrome/types/event";
 import ScriptPanel from "./ScriptPanel.vue";
 import GrimoirePanel from "./GrimoirePanel.vue";
@@ -173,7 +173,7 @@ const defaultOffsets = {
 const script = ref<Script | undefined>(undefined);
 const page = ref<string | undefined>(undefined);
 const seats = ref<Seat[] | undefined>(undefined);
-const grim = ref<{ pos: Bounds; container: Bounds } | undefined>(undefined);
+const grim = ref<Grimoire | undefined>(undefined);
 const overlay = ref<{ pos: Offsets }>({ pos: defaultOffsets });
 
 Twitch.ext.configuration.onChanged(() => {
@@ -196,8 +196,9 @@ Twitch.ext.configuration.onChanged(() => {
       <div class="latency" v-text="latency"></div>
     </div>
     <GrimoirePanel
-      v-if="script"
+      v-if="script && grim"
       class="panel-grimoire"
+      :mode="grim.mode"
       :script="script"
       :seats="seats"
       :offset="overlay.pos"

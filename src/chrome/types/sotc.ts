@@ -33,10 +33,16 @@ export interface Script {
   characters: Character[];
 }
 
+export interface Grimoire {
+  pos: Bounds;
+  container: Bounds;
+  mode: string | undefined;
+}
+
 export interface ExtensionState {
   script: Script;
   page: string;
   seats: Seat[];
-  grim: { pos: Bounds; container: Bounds };
+  grim: Grimoire;
   overlay: { pos: Offsets };
 }

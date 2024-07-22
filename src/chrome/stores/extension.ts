@@ -1,5 +1,5 @@
 import { createPinia, defineStore } from "pinia";
-import { ExtensionState, Script } from "../types/sotc";
+import { ExtensionState, Grimoire, Script } from "../types/sotc";
 import { computed, ref, watch } from "vue";
 import { TaggedLogger } from "../util/TaggedLogger";
 import { clone } from "../util/clone";
@@ -8,7 +8,7 @@ import { broadcastBulkStateChange, synchronizeExtensionState } from "../twitch/s
 
 import { throttle } from "underscore";
 import { Seat } from "../types/event";
-import { Bounds, Offsets } from "../util/bounds";
+import { Offsets } from "../util/bounds";
 
 const pinia = createPinia();
 const localStore = useLocalStore(pinia);
@@ -29,7 +29,7 @@ export default defineStore("extension", () => {
   const script = ref<Script | undefined>(undefined);
   const page = ref<string | undefined>(undefined);
   const seats = ref<Seat[] | undefined>(undefined);
-  const grim = ref<{ pos: Bounds; container: Bounds } | undefined>(undefined);
+  const grim = ref<Grimoire | undefined>(undefined);
   const overlay = ref<{ pos: Offsets } | undefined>(undefined);
 
   const state = computed(() => ({

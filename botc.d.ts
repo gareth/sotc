@@ -33,6 +33,9 @@ declare namespace botc {
     id: string;
     role: Role | Record<string, never>; // {} used for blank tokens
     alignment: Alignment;
+    isDead: boolean;
+    isVoteless: boolean;
+    revealed: boolean;
   }
 
   export interface User {
@@ -46,6 +49,9 @@ declare namespace botc {
       history: never[];
       phase: never;
       isRunning: never;
+    };
+    grimoire: {
+      mode: string | undefined;
     };
     players: {
       players: Player[];

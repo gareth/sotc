@@ -1,5 +1,5 @@
 import { Bounds, Offsets } from "../util/bounds";
-import { Script } from "./sotc";
+import { Grimoire, Script } from "./sotc";
 
 export interface NavigateEventDetail {
   page?: string;
@@ -15,13 +15,17 @@ export type Seat = Partial<{
   user?: string;
   role?: PlayerCharacter;
   pos: Bounds;
-}>;
+}> & {
+  isDead: boolean;
+  isVoteless: boolean;
+  revealed: boolean;
+};
 
 export interface SOTCEvent {
   "sotc-navigate": NavigateEventDetail;
   "sotc-scriptChanged": Script;
   "sotc-playersChanged": Seat[];
-  "sotc-size": { pos: Bounds; container: Bounds };
+  "sotc-size": Grimoire;
   "sotc-overlayOffsets": { offsets: Offsets };
   "sotc-startCalibration": void;
   "sotc-endCalibration": void;

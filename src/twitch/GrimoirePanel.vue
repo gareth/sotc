@@ -8,6 +8,7 @@ import { Character, Script } from "../chrome/types/sotc";
 // const logger = new TaggedLogger("GrimoirePanel");
 
 interface Props {
+  mode?: string;
   script: Script;
   seats?: Seat[];
   offset: {
@@ -35,14 +36,16 @@ const circles = computed(() => {
       const r = (seat.pos?.width ?? 0) / 2;
       const x = (seat.pos?.left ?? 0) + r;
       const y = (seat.pos?.top ?? 0) + r;
+      const visible = props.mode == "reveal" ? seat.revealed : true;
       const classes = [
-        seat.role?.team || `unknown`,
+        (visible && seat.role?.team) || `unknown`,
         `alignment-${seat.role?.alignment ?? "default"}`,
       ];
       const seatRole = props.script.characters.find(
         (char: Character) => char.id == seat.role?.id
       );
       return {
+        visible,
         seat,
         seatRole,
         idx,
@@ -77,11 +80,11 @@ const circles = computed(() => {
         </g>
       </svg>
       <div class="labels">
-        <div v-for="{ seat, seatRole, position, classes } in circles">
+        <div v-for="{ visible, seat, seatRole, position, classes } in circles">
           <span
             class="label"
             :class="classes"
-            v-if="seatRole"
+            v-if="seatRole && visible"
             :style="{
               ...mapToPercent({
                 left: 0.04 + position.x * 0.92,

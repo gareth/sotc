@@ -86,8 +86,8 @@ function inject(container: HTMLVueAppElement) {
 
   logger.info("Adding players watcher");
   globals.$store.watch(
-    (state) => ({ players: state.players.players, users: state.session.users }),
-    ({ players, users }) => {
+    (state) => ({ players: state.players.players, users: state.session.users, mode: state.grimoire.mode }),
+    ({ players, users, mode }) => {
       // addCalibrationOverlay(container);
 
       // `nextTick` because we need Vue to render the result of this change
@@ -107,18 +107,32 @@ function inject(container: HTMLVueAppElement) {
                 alignment: player.alignment,
                 team: player.role.team,
               };
-          return { user: user?.username, role: roleDetail, pos };
+          return {
+            user: user?.username,
+            role: roleDetail,
+            pos,
+            isDead: player.isDead,
+            isVoteless: player.isVoteless,
+            revealed: player.revealed,
+          };
         });
 
         logger.info("Players changed", [...activePlayers]);
 
         document.dispatchEvent(sotcEvent("sotc-playersChanged", { detail: clone(activePlayers) }));
-        updateGrim(container);
+        updateGrim(container, mode);
       }).catch((e) => {
         sentry.captureException(e);
       });
     },
     { deep: true }
+  );
+
+  globals.$store.watch(
+    (state) => state.grimoire.mode,
+    (value, oldValue) => {
+      logger.debug("Grimoire mode changed from", oldValue, "to", value);
+    }
   );
 
   // logger.info("Adding game watcher");
@@ -160,16 +174,16 @@ function inject(container: HTMLVueAppElement) {
   document.dispatchEvent(event);
 
   logger.info("Adding mutation watcher");
-  globals.$store.subscribe((mutation, _state) => {
+  globals.$store.subscribe((mutation, state) => {
     if (IGNORED_MUTATIONS.includes(mutation.type)) return;
 
-    // logger.debug("VueX mutation", mutation, state);
+    logger.debug("VueX mutation", mutation, state);
   });
 
   logger.info("Adding game watcher");
 }
 
-const updateGrim = (container: HTMLElement) => {
+const updateGrim = (container: HTMLElement, mode: string | undefined) => {
   const grimBounds = getGrimoireBounds(container);
   const windowBounds = {
     left: 0,
@@ -178,7 +192,7 @@ const updateGrim = (container: HTMLElement) => {
     height: window.innerHeight,
   };
   if (grimBounds) {
-    document.dispatchEvent(sotcEvent("sotc-size", { detail: { pos: grimBounds, container: windowBounds } }));
+    document.dispatchEvent(sotcEvent("sotc-size", { detail: { pos: grimBounds, container: windowBounds, mode } }));
   }
 };
 
