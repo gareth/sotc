@@ -92,7 +92,7 @@ function inject(container: HTMLVueAppElement) {
 
       // `nextTick` because we need Vue to render the result of this change
       // otherwise the bounds won't be calculated correctly.
-      void nextTick(async () => {
+      nextTick(async () => {
         const locations = await getTokensBounds(container);
         if (locations?.length != players.length) {
           logger.warn(`Incorrect number of tokens (${locations?.length}) found (expected ${players.length})`);
@@ -114,6 +114,8 @@ function inject(container: HTMLVueAppElement) {
 
         document.dispatchEvent(sotcEvent("sotc-playersChanged", { detail: clone(activePlayers) }));
         updateGrim(container);
+      }).catch((e) => {
+        sentry.captureException(e);
       });
     },
     { deep: true }
