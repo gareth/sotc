@@ -7,6 +7,7 @@ export default {
   extends: [path.resolve(import.meta.dirname, "webpack.chrome.config.js")],
 
   mode: "production",
+  devtool: false,
   output: {
     clean: true,
     path: path.resolve(import.meta.dirname, "dist", "chrome-production"),

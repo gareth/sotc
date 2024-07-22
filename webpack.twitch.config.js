@@ -23,5 +23,9 @@ export default {
       template: "src/twitch/overlay.html",
       chunks: ["overlay"],
     }),
+    new HtmlWebpackPlugin({
+      filename: "config.html",
+      chunks: [],
+    }),
   ],
 };
