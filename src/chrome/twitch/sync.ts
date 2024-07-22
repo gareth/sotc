@@ -9,6 +9,7 @@ import {
 import { EbsCallConfig } from "@twurple/ebs-helper";
 import { compress, decompress } from "lzutf8";
 import { TaggedLogger } from "../util/TaggedLogger";
+import sentry from "../util/sentry";
 
 const logger = new TaggedLogger("Sync");
 
@@ -46,8 +47,7 @@ export async function synchronizeExtensionState(broadcasterId: string, data: obj
   const encoded = encode(data);
 
   await setExtensionBroadcasterConfiguration(ebsCallConfig, broadcasterId, encoded).catch((e) => {
-    logger.error("Error setting config", e);
-    throw e;
+    sentry.captureException(e);
   });
 }
 
@@ -56,9 +56,15 @@ export async function broadcastStateChange(broadcasterId: string, key: string, d
 }
 
 export async function broadcast(broadcasterId: string, message: object) {
-  await sendExtensionPubSubBroadcastMessage(ebsCallConfig, broadcasterId, encode(message));
+  await sendExtensionPubSubBroadcastMessage(ebsCallConfig, broadcasterId, encode(message)).catch((e) => {
+    sentry.captureException(e);
+  });
 }
 
 export async function whisper(broadcasterId: string, userId: string, message: object) {
-  return await sendExtensionPubSubWhisperMessage(ebsCallConfig, broadcasterId, userId, JSON.stringify(message));
+  return await sendExtensionPubSubWhisperMessage(ebsCallConfig, broadcasterId, userId, JSON.stringify(message)).catch(
+    (e) => {
+      sentry.captureException(e);
+    }
+  );
 }
