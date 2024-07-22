@@ -4,7 +4,7 @@ import { computed, ref, watch } from "vue";
 import { TaggedLogger } from "../util/TaggedLogger";
 import { clone } from "../util/clone";
 import useLocalStore from "../stores/local";
-import { broadcastStateChange, synchronizeExtensionState } from "../twitch/sync";
+import { broadcastBulkStateChange, synchronizeExtensionState } from "../twitch/sync";
 
 import { throttle } from "underscore";
 import { Seat } from "../types/event";
@@ -25,22 +25,11 @@ const synchroniseState = async (newState: object) => {
   }
 };
 
-const broadcastState = <T extends object>(key: string) => {
-  return async (newState: T) => {
-    if (localStore.broadcasterId) {
-      logger.info("Broadcasting extension state for", key);
-      await broadcastStateChange(localStore.broadcasterId, key, newState);
-    } else {
-      logger.info("Not broadcasting - no authenticated user");
-    }
-  };
-};
-
 export default defineStore("extension", () => {
   const script = ref<Script | undefined>(undefined);
   const page = ref<string | undefined>(undefined);
   const seats = ref<Seat[] | undefined>(undefined);
-  const grim = ref<{ pos: Bounds } | undefined>(undefined);
+  const grim = ref<{ pos: Bounds; container: Bounds } | undefined>(undefined);
   const overlay = ref<{ pos: Offsets } | undefined>(undefined);
 
   const state = computed(() => ({
@@ -50,6 +39,8 @@ export default defineStore("extension", () => {
     grim: grim.value,
     overlay: overlay.value,
   }));
+
+  const synchroniser = new BatchSynchroniser();
 
   const setState = (newState: Partial<ExtensionState>) => {
     script.value = newState.script;
@@ -62,11 +53,40 @@ export default defineStore("extension", () => {
   logger.debug("Watching", state);
   watch(state, throttle(synchroniseState, 1000), { deep: true });
 
-  watch(script, throttle(broadcastState("script"), 1000), { deep: true });
-  watch(seats, throttle(broadcastState("seats"), 1000), { deep: true });
-  watch(page, throttle(broadcastState("page"), 1000), { deep: true });
-  watch(grim, throttle(broadcastState("grim"), 1000), { deep: true });
-  watch(overlay, throttle(broadcastState("overlay"), 1000), { deep: true });
+  watch(script, synchroniser.updater("script"), { deep: true });
+  watch(seats, synchroniser.updater("seats"), { deep: true });
+  watch(page, synchroniser.updater("page"), { deep: true });
+  watch(grim, synchroniser.updater("grim"), { deep: true });
+  watch(overlay, synchroniser.updater("overlay"), { deep: true });
 
   return { script, page, seats, grim, state, overlay, setState };
 });
+
+class BatchSynchroniser {
+  diff: Partial<ExtensionState> = {};
+
+  updater(key: keyof ExtensionState) {
+    return this.update.bind(this, key);
+  }
+
+  async update<T extends keyof ExtensionState>(key: T, value: ExtensionState[T] | undefined) {
+    logger.debug("Updating", key, value);
+    if (undefined === value) {
+      delete this.diff[key];
+    } else {
+      this.diff[key] = value;
+    }
+    await this.synchronise();
+  }
+
+  synchronise = throttle(async () => {
+    if (localStore.broadcasterId) {
+      const batch = clone(this.diff);
+      this.diff = {};
+      logger.info("Broadcasting extension state for keys", Object.keys(batch));
+      await broadcastBulkStateChange(localStore.broadcasterId, batch);
+    } else {
+      logger.info("Not broadcasting - no authenticated user");
+    }
+  }, 1000 / 3);
+}

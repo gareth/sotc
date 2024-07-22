@@ -20,6 +20,11 @@ interface SOTCPubSubUpdateStateMessage<T extends keyof ExtensionState> {
   payload: ExtensionState[T];
 }
 
+interface SOTCPubSubBulkUpdateStateMessage {
+  type: "bulkUpdateState";
+  payload: Partial<ExtensionState>;
+}
+
 interface SOTCPubSubStartCalibrationMessage {
   type: "startCalibration";
   calibrationId: string;
@@ -56,46 +61,61 @@ const broadcastHandler = (
   contentType: string,
   rawMessage: string
 ) => {
-  logger.debug("Received broadcast message", target, contentType, rawMessage);
+  logger.info("Received broadcast message", target, contentType);
   const message = decode(rawMessage) as SOTCPubSubMessage;
   logger.debug("Decoded, this is", message);
 
-  if (message.type == "updateState") {
-    const stateMessage = message as SOTCPubSubUpdateStateMessage<any>;
-    switch (stateMessage.key) {
-      case "script":
-        script.value = (
-          stateMessage as SOTCPubSubUpdateStateMessage<"script">
-        ).payload;
-        break;
+  switch (message.type) {
+    case "updateState":
+      {
+        const stateMessage = message as SOTCPubSubUpdateStateMessage<any>;
+        switch (stateMessage.key) {
+          case "script":
+            script.value = (
+              stateMessage as SOTCPubSubUpdateStateMessage<"script">
+            ).payload;
+            break;
 
-      case "seats":
-        seats.value = (
-          stateMessage as SOTCPubSubUpdateStateMessage<"seats">
-        ).payload;
-        break;
+          case "seats":
+            seats.value = (
+              stateMessage as SOTCPubSubUpdateStateMessage<"seats">
+            ).payload;
+            break;
 
-      case "page":
-        page.value = (
-          stateMessage as SOTCPubSubUpdateStateMessage<"page">
-        ).payload;
-        break;
+          case "page":
+            page.value = (
+              stateMessage as SOTCPubSubUpdateStateMessage<"page">
+            ).payload;
+            break;
 
-      case "grim":
-        grim.value = (
-          stateMessage as SOTCPubSubUpdateStateMessage<"grim">
-        ).payload;
-        break;
+          case "grim":
+            grim.value = (
+              stateMessage as SOTCPubSubUpdateStateMessage<"grim">
+            ).payload;
+            break;
 
-      case "overlay":
-        overlay.value = (
-          stateMessage as SOTCPubSubUpdateStateMessage<"overlay">
-        ).payload;
-        break;
+          case "overlay":
+            overlay.value = (
+              stateMessage as SOTCPubSubUpdateStateMessage<"overlay">
+            ).payload;
+            break;
 
-      default:
-        break;
-    }
+          default:
+            break;
+        }
+      }
+      break;
+    case "bulkUpdateState":
+      const stateMessage = message as SOTCPubSubBulkUpdateStateMessage;
+      const data = stateMessage.payload;
+
+      if (undefined !== data.script) script.value = data.script;
+      if (undefined !== data.page) page.value = data.page;
+      if (undefined !== data.seats) seats.value = data.seats;
+      if (undefined !== data.grim) grim.value = data.grim;
+      if (undefined !== data.overlay) overlay.value = data.overlay;
+
+      break;
   }
 };
 

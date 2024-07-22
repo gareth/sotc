@@ -19,6 +19,9 @@ const ebsCallConfig: EbsCallConfig = {
   secret,
 };
 
+import { HttpStatusCodeError } from "@twurple/api-call";
+import { ExtensionState } from "../types/sotc";
+
 const stringInfo = (input: string, refSize?: number) => {
   const inputSize = new Blob([input]).size;
   const comparison = refSize ? `, ${Math.round((100 * (inputSize - refSize)) / refSize)}%` : "";
@@ -47,12 +50,28 @@ export async function synchronizeExtensionState(broadcasterId: string, data: obj
   const encoded = encode(data);
 
   await setExtensionBroadcasterConfiguration(ebsCallConfig, broadcasterId, encoded).catch((e) => {
-    sentry.captureException(e);
+    if (e instanceof HttpStatusCodeError) {
+      switch (e.statusCode) {
+        case 409: // Conflict
+          // TODO: Handle conflict error
+          logger.warn("State wasn't synchronised, deferring until next update");
+          break;
+
+        case 429: // Too many requests
+          // TODO: Handle rate limit error
+          break;
+      }
+      sentry.captureException(e);
+    }
   });
 }
 
 export async function broadcastStateChange(broadcasterId: string, key: string, data: object) {
   await broadcast(broadcasterId, { type: "updateState", key, payload: data });
+}
+
+export async function broadcastBulkStateChange(broadcasterId: string, data: Partial<ExtensionState>) {
+  await broadcast(broadcasterId, { type: "bulkUpdateState", payload: data });
 }
 
 export async function broadcast(broadcasterId: string, message: object) {
