@@ -313,7 +313,7 @@ main {
 }
 
 .panel-script--contents {
-  overflow: scroll;
+  overflow-y: scroll;
   max-height: 100%;
 }
 
