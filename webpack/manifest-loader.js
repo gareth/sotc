@@ -1,5 +1,6 @@
 import packageJson from "../package.json" with { type: "json" };
 const { version: packageVersion } = packageJson;
+import keys from "../src/chrome/config/manifest_key.js";
 
 // Convert from Semver (example: 0.1.0-beta6)
 const [major, minor, patch, label = 0] = packageVersion
@@ -22,7 +23,10 @@ const manifest = {
 };
 
 export default function (source) {
-  const merged = Object.assign({}, JSON.parse(source), manifest);
+  const mode = this._compiler?.options?.mode || "production";
+  const key = keys[mode];
+
+  const merged = Object.assign({}, JSON.parse(source), manifest, { key });
 
   const manifestJson = JSON.stringify(merged, null, 2);
   // In Webpack, loaders ultimately produce JavaScript. In order to produce
@@ -30,4 +34,4 @@ export default function (source) {
   this.emitFile("manifest.json", manifestJson);
   // Return the processed JSON to be used by the next item in the loader chain.
   return "{}";
-};
+}
