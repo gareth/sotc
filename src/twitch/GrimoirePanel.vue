@@ -84,7 +84,7 @@ const circles = computed(() => {
             v-if="seatRole"
             :style="{
               ...mapToPercent({
-                left: 0.015 + position.x * 0.97,
+                left: 0.04 + position.x * 0.92,
                 top: position.y,
               }),
             }"
@@ -92,12 +92,12 @@ const circles = computed(() => {
             {{ seatRole.name }}
           </span>
           <span
-            class="label"
+            class="label user"
             :class="classes"
             v-if="seat.user"
             :style="{
               ...mapToPercent({
-                left: 0.015 + position.x * 0.97,
+                left: 0.04 + position.x * 0.92,
                 top: position.y + 0.05,
               }),
             }"
@@ -213,6 +213,7 @@ g.seat {
   transform: translateX(-50%) translateY(-50%);
   font-weight: bold;
   font-size: 1.3em;
+  text-align: center;
   background-color: rgb(197, 197, 197);
   outline: 1px solid black;
   padding: 0.2em 0.4em;
@@ -221,6 +222,12 @@ g.seat {
   transition: opacity linear 0.3s;
   opacity: 0;
   pointer-events: none;
+
+  &.user {
+    transform: translateX(-50%);
+    font-weight: normal;
+    font-size: inherit;
+  }
 }
 
 .grimoire:hover .label {
