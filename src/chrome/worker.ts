@@ -7,6 +7,7 @@ import useLocalStore from "./stores/local";
 
 import { capture } from "./util/sentry";
 import { SOTCEventMessage } from "./types/event";
+import { Offsets } from "./util/bounds";
 
 const logger = new TaggedLogger("Worker");
 
@@ -19,6 +20,13 @@ interface Badge {
   color: string;
   visible?: boolean;
 }
+
+const defaultOffsets: Offsets = {
+  top: 0,
+  right: 0.22,
+  bottom: 0,
+  left: 0.22,
+};
 
 const localStore = useLocalStore();
 
@@ -64,13 +72,13 @@ chrome.runtime.onMessage.addListener(
             break;
           case "startCalibration":
             {
-              logger.info("Calibration started");
+              logger.info("Calibration requested");
               if (localStore.broadcasterId) {
                 const message = {
                   type: "startCalibration",
                   calibrationId: crypto.randomUUID(),
                   inset: 0.2,
-                  existingBounds: localStore.overlay.pos,
+                  existingBounds: localStore.overlay.pos ?? defaultOffsets,
                 };
                 whisper(localStore.broadcasterId, `U${localStore.broadcasterId}`, message).catch((e) => {
                   logger.error(e);
