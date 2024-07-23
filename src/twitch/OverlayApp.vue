@@ -263,8 +263,8 @@ main {
 }
 
 .panel-script {
-  --script-background-color: white;
-  --script-border-color: purple;
+  --script-background-color: rgb(210, 200, 186);
+  --script-border-color: rgb(90, 20, 90);
   --script-border-size: 3px;
   --script-width: 30%;
 
