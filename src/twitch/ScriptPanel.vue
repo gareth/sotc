@@ -24,7 +24,7 @@ const handleDetailsToggle = (event: ToggleEvent) => {
 <template>
   <div class="script">
     <h1>
-      {{ props.script?.name ?? "Stream on the Clocktower" }}
+      {{ props.script?.name ?? "Custom script" }}
     </h1>
     <div v-if="props.script">
       <div class="author">by {{ props.script.author }}</div>
