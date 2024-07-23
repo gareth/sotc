@@ -315,6 +315,8 @@ main {
 .panel-script--contents {
   overflow-y: scroll;
   max-height: 100%;
+
+  pointer-events: none;
 }
 
 #panel-script--handleState {
@@ -322,6 +324,10 @@ main {
 
   &:checked + .panel-script {
     left: calc(100% - var(--script-width) - 7rem);
+
+    .panel-script--contents {
+      pointer-events: all;
+    }
   }
 }
 
