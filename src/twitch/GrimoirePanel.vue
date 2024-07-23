@@ -1,11 +1,8 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { Seat } from "../chrome/types/event";
 import { mapToPercent } from "../chrome/util/bounds";
 import { Character, Script } from "../chrome/types/sotc";
-// import { TaggedLogger } from "../chrome/util/TaggedLogger";
-
-// const logger = new TaggedLogger("GrimoirePanel");
 
 interface Props {
   mode?: string;
@@ -55,11 +52,33 @@ const circles = computed(() => {
     });
   }
 });
+
+const selectedCharacter = ref<Character | undefined>(undefined);
+
+function select(seat: unknown, role: Character | undefined) {
+  selectedCharacter.value = role;
+}
+
+function deselect() {
+  selectedCharacter.value = undefined;
+}
 </script>
 
 <template>
   <div class="panel-grimoire">
     <div class="grimoire" :style="svgBounds">
+      <div class="infoBox">
+        <Transition name="infoBox">
+          <div class="characterInfo" v-if="selectedCharacter">
+            <div class="name">
+              {{ selectedCharacter.name }}
+            </div>
+            <div class="ability">
+              {{ selectedCharacter.ability }}
+            </div>
+          </div>
+        </Transition>
+      </div>
       <svg viewBox="0 0 100 100">
         <defs>
           <linearGradient id="traveler">
@@ -70,43 +89,49 @@ const circles = computed(() => {
         <g
           class="seat"
           :class="classes"
-          v-for="{ classes, position } in circles"
+          v-for="{ classes, position, seat, seatRole } in circles"
         >
           <circle
+            @mouseenter="select(seat, seatRole)"
+            @mouseout="deselect()"
             :cx="position.x * 100"
             :cy="position.y * 100"
             :r="position.r * 100 - 0.2"
           ></circle>
         </g>
       </svg>
-      <div class="labels">
-        <div v-for="{ visible, seat, seatRole, position, classes } in circles">
-          <span
-            class="label"
-            :class="classes"
-            v-if="seatRole && visible"
-            :style="{
-              ...mapToPercent({
-                left: 0.04 + position.x * 0.92,
-                top: position.y,
-              }),
-            }"
+      <div class="labelContainer">
+        <div class="labels">
+          <div
+            v-for="{ visible, seat, seatRole, position, classes } in circles"
           >
-            {{ seatRole.name }}
-          </span>
-          <span
-            class="label user"
-            :class="classes"
-            v-if="seat.user"
-            :style="{
-              ...mapToPercent({
-                left: 0.04 + position.x * 0.92,
-                top: position.y + 0.05,
-              }),
-            }"
-          >
-            {{ seat.user }}
-          </span>
+            <span
+              class="label"
+              :class="classes"
+              v-if="seatRole && visible"
+              :style="{
+                ...mapToPercent({
+                  left: position.x,
+                  top: position.y,
+                }),
+              }"
+            >
+              {{ seatRole.name }}
+            </span>
+            <span
+              class="label user"
+              :class="classes"
+              v-if="seat.user"
+              :style="{
+                ...mapToPercent({
+                  left: position.x,
+                  top: position.y + position.r,
+                }),
+              }"
+            >
+              {{ seat.user }}
+            </span>
+          </div>
         </div>
       </div>
     </div>
@@ -118,10 +143,42 @@ const circles = computed(() => {
   position: absolute;
   transition: opacity linear 0.3s;
   opacity: 0.4;
+  container: grimoire / size;
 
   &:hover {
     opacity: 1;
   }
+
+  --character-fill: 255, 255, 255;
+  --character-stroke: 0, 0, 0;
+}
+
+.townsfolk {
+  --character-fill: 0, 0, 255;
+  --character-stroke: 0, 0, 255;
+}
+
+.outsider {
+  --character-fill: 79, 187, 224;
+  --character-stroke: 79, 187, 224;
+}
+
+.minion {
+  --character-fill: 234, 121, 121;
+  --character-stroke: 255, 105, 0;
+}
+
+.demon {
+  --character-fill: 200, 12, 12;
+  --character-stroke: 200, 12, 12;
+}
+
+.alignment-g {
+  --alignment-color: 0, 0, 255;
+}
+
+.alignment-e {
+  --alignment-color: 200, 12, 12;
 }
 
 svg {
@@ -135,48 +192,16 @@ g.seat {
     stroke-width: 0.5;
     // cursor: pointer;
   }
-  text {
-    pointer-events: none;
-    opacity: 0;
-    font-weight: bold;
-    fill: white;
-    stroke: black;
-    stroke-width: 0.2;
-  }
 
   &.unknown circle {
     stroke-width: 0;
-    stroke: white;
     fill: white;
     opacity: 0.06;
   }
 
-  &.townsfolk {
-    circle {
-      fill: rgba(0, 0, 255, 0.2);
-      stroke: rgb(0, 0, 255);
-    }
-  }
-
-  &.outsider {
-    circle {
-      fill: rgba(79, 187, 224, 0.2);
-      stroke: rgb(79, 187, 224);
-    }
-  }
-
-  &.minion {
-    circle {
-      fill: rgba(234, 121, 121, 0.2);
-      stroke: rgb(255, 105, 0);
-    }
-  }
-
-  &.demon {
-    circle {
-      fill: rgba(200, 12, 12, 0.2);
-      stroke: rgb(200, 12, 12);
-    }
+  circle {
+    fill: rgba(var(--character-fill), 0.2);
+    stroke: RGB(var(--character-stroke));
   }
 
   &.traveler {
@@ -186,15 +211,10 @@ g.seat {
     }
   }
 
-  &.alignment-g {
-    circle {
-      stroke: blue;
-    }
-  }
-
+  &.alignment-g,
   &.alignment-e {
     circle {
-      stroke: rgb(200, 12, 12);
+      stroke: RGB(var(--alignment-color));
     }
   }
 
@@ -205,15 +225,67 @@ g.seat {
 
   circle:hover {
     stroke: white;
-    & + text {
-      opacity: 1;
-    }
+  }
+}
+
+.labelContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  display: flex;
+  // flex-direction: column;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.labels {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  // pointer-events: none;
+}
+
+@container (aspect-ratio < 1) {
+  .labelContainer {
+    flex-direction: column;
+  }
+}
+
+.infoBox {
+  position: absolute;
+  top: 30%;
+  left: 30%;
+  bottom: 35%;
+  right: 30%;
+  display: grid;
+  place-items: center;
+  z-index: 1000;
+  // outline: 1px solid white;
+}
+
+.characterInfo {
+  text-align: center;
+  background-color: antiquewhite;
+  border-radius: 4px;
+
+  .name {
+    font-weight: bold;
+    font-size: 1.2em;
+    border-bottom: 1px solid brown;
+    padding: 0.3em;
+  }
+
+  .ability {
+    background-color: antiquewhite;
+    padding: 0.3em;
   }
 }
 
 .label {
   position: absolute;
-  transform: translateX(-50%) translateY(-50%);
+  transform: translate(-50%, -50%);
   font-weight: bold;
   font-size: 1.3em;
   text-align: center;
@@ -223,17 +295,42 @@ g.seat {
   border-radius: 3px;
 
   transition: opacity linear 0.3s;
-  opacity: 0;
-  pointer-events: none;
+  display: none;
+  // pointer-events: none;
 
   &.user {
     transform: translateX(-50%);
     font-weight: normal;
     font-size: inherit;
+    display: block;
+    color: antiquewhite;
+    // background-color: var(--alignment-color, var(--character-fill));
+    background-color: color-mix(
+      in oklab,
+      RGB(var(--alignment-color, var(--character-fill))) 30%,
+      black 70%
+    );
   }
+
+  color: white;
+  opacity: 0;
 }
 
 .grimoire:hover .label {
   opacity: 1;
+}
+
+.infoBox-enter-active {
+  transition: all 0.2s ease-out;
+}
+
+.infoBox-leave-active {
+  transition: all 0.2s ease-in-out;
+}
+
+.infoBox-enter-from,
+.infoBox-leave-to {
+  // transform: translateX(20px);
+  opacity: 0;
 }
 </style>
