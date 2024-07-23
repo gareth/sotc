@@ -35,6 +35,7 @@ const circles = computed(() => {
       const y = (seat.pos?.top ?? 0) + r;
       const visible = props.mode == "reveal" ? seat.revealed : true;
       const classes = [
+        seat.isDead ? "status-dead" : "status-alive",
         (visible && seat.role?.team) || `unknown`,
         `alignment-${seat.role?.alignment ?? "default"}`,
       ];
@@ -85,19 +86,30 @@ function deselect() {
             <stop offset="45%" stop-color="blue" />
             <stop offset="55%" stop-color="#c80c0c" />
           </linearGradient>
+          <g id="shroud">
+            <path d="M -3.3 0 l 0 8.8 l 3.3 -2.8 l 3.3 2.8 l 0 -8.8 Z"></path>
+          </g>
         </defs>
         <g
           class="seat"
           :class="classes"
           v-for="{ classes, position, seat, seatRole } in circles"
+          :transform="`translate(${position.x * 100}, ${position.y * 100})`"
         >
           <circle
             @mouseenter="select(seat, seatRole)"
             @mouseout="deselect()"
-            :cx="position.x * 100"
-            :cy="position.y * 100"
             :r="position.r * 100 - 0.2"
           ></circle>
+          <Transition name="shroud" :duration="3000">
+            <g v-if="seat.isDead">
+              <use
+                class="shroud"
+                href="#shroud"
+                :transform="`translate(0, ${-position.r * 100})`"
+              ></use>
+            </g>
+          </Transition>
         </g>
       </svg>
       <div class="labelContainer">
@@ -145,10 +157,6 @@ function deselect() {
   opacity: 0.4;
   container: grimoire / size;
 
-  &:hover {
-    opacity: 1;
-  }
-
   --character-fill: 255, 255, 255;
   --character-stroke: 0, 0, 0;
 }
@@ -190,18 +198,28 @@ g.seat {
   circle {
     stroke: black;
     stroke-width: 0.5;
-    // cursor: pointer;
+
+    transition: all linear 0.3s;
+  }
+
+  .shroud {
+    pointer-events: none;
+    stroke-width: 0.5;
+    fill: #303030;
+    stroke: #222;
+    transition: opacity 0.3s linear;
+    opacity: 0;
+  }
+
+  circle {
+    fill: rgba(var(--character-fill), 0.2);
+    stroke: RGB(var(--character-stroke));
   }
 
   &.unknown circle {
     stroke-width: 0;
     fill: white;
     opacity: 0.06;
-  }
-
-  circle {
-    fill: rgba(var(--character-fill), 0.2);
-    stroke: RGB(var(--character-stroke));
   }
 
   &.traveler {
@@ -218,11 +236,6 @@ g.seat {
     }
   }
 
-  text {
-    text-anchor: middle;
-    font-size: 9px;
-  }
-
   circle:hover {
     stroke: white;
   }
@@ -236,7 +249,6 @@ g.seat {
   bottom: 0;
 
   display: flex;
-  // flex-direction: column;
   justify-content: center;
   pointer-events: none;
 }
@@ -244,13 +256,45 @@ g.seat {
 .labels {
   position: relative;
   aspect-ratio: 1 / 1;
-  // pointer-events: none;
 }
 
 @container (aspect-ratio < 1) {
   .labelContainer {
     flex-direction: column;
   }
+}
+
+.label {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-weight: bold;
+  font-size: 1.3em;
+  text-align: center;
+  background-color: rgb(197, 197, 197);
+  outline: 1px solid black;
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+
+  transition: opacity linear 0.3s;
+  display: none;
+  // pointer-events: none;
+
+  &.user {
+    margin-top: 5px;
+    transform: translateX(-50%);
+    font-weight: normal;
+    font-size: inherit;
+    display: block;
+    color: antiquewhite;
+    background-color: color-mix(
+      in oklab,
+      RGB(var(--alignment-color, var(--character-fill))) 30%,
+      black 70%
+    );
+  }
+
+  color: white;
+  opacity: 0;
 }
 
 .infoBox {
@@ -274,50 +318,25 @@ g.seat {
     font-weight: bold;
     font-size: 1.2em;
     border-bottom: 1px solid brown;
-    padding: 0.3em;
+    padding: 0.3em 0.6em;
   }
 
   .ability {
     background-color: antiquewhite;
-    padding: 0.3em;
+    padding: 0.3em 0.6em;
   }
 }
 
-.label {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  font-weight: bold;
-  font-size: 1.3em;
-  text-align: center;
-  background-color: rgb(197, 197, 197);
-  outline: 1px solid black;
-  padding: 0.2em 0.4em;
-  border-radius: 3px;
-
-  transition: opacity linear 0.3s;
-  display: none;
-  // pointer-events: none;
-
-  &.user {
-    transform: translateX(-50%);
-    font-weight: normal;
-    font-size: inherit;
-    display: block;
-    color: antiquewhite;
-    // background-color: var(--alignment-color, var(--character-fill));
-    background-color: color-mix(
-      in oklab,
-      RGB(var(--alignment-color, var(--character-fill))) 30%,
-      black 70%
-    );
-  }
-
-  color: white;
-  opacity: 0;
-}
-
-.grimoire:hover .label {
+.grimoire:hover {
   opacity: 1;
+
+  .label {
+    opacity: 1;
+  }
+
+  .shroud {
+    opacity: 1;
+  }
 }
 
 .infoBox-enter-active {
@@ -331,6 +350,20 @@ g.seat {
 .infoBox-enter-from,
 .infoBox-leave-to {
   // transform: translateX(20px);
+  opacity: 0;
+}
+
+.shroud-enter-active {
+  transition: all 0.3s ease-out;
+}
+
+.shroud-leave-active {
+  transition: all 0.3s ease-in;
+}
+
+.shroud-enter-from,
+.shroud-leave-to {
+  transform: scale(1.15);
   opacity: 0;
 }
 </style>
