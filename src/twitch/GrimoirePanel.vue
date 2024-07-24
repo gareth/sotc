@@ -189,6 +189,11 @@ function deselect() {
   --character-stroke: 200, 12, 12;
 }
 
+.traveler {
+  --character-fill: 166, 65, 191;
+  --character-stroke: 160, 19, 195;
+}
+
 .alignment-g {
   --alignment-color: 0, 0, 255;
 }
@@ -228,13 +233,6 @@ g.seat {
     stroke-width: 0;
     fill: white;
     opacity: 0.06;
-  }
-
-  &.traveler {
-    circle {
-      fill: transparent;
-      stroke: url(#traveler);
-    }
   }
 
   &.alignment-g,
@@ -327,20 +325,6 @@ g.seat {
   .shroud {
     opacity: 1;
   }
-}
-
-.infoBox-enter-active {
-  transition: all 0.2s ease-out;
-}
-
-.infoBox-leave-active {
-  transition: all 0.2s ease-in-out;
-}
-
-.infoBox-enter-from,
-.infoBox-leave-to {
-  // transform: translateX(20px);
-  opacity: 0;
 }
 
 .shroud-enter-active {
