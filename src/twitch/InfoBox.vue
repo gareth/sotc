@@ -6,7 +6,7 @@ const slots = defineSlots<{
 </script>
 
 <template>
-  <Transition :duration="2000" name="infoBox">
+  <Transition name="infoBox">
     <div class="contents" v-if="$slots.default">
       <div class="head" v-if="$slots.head">
         <slot name="head"></slot>
@@ -32,7 +32,6 @@ const slots = defineSlots<{
   }
 
   .body {
-    background-color: antiquewhite;
     padding: 0.3em 0.6em;
   }
 }

@@ -84,6 +84,18 @@ function inject(container: HTMLVueAppElement) {
     hideCalibrationOverlay(container);
   });
 
+  function roleDetail(player: botc.Player) {
+    if (isEmptyObject(player.role)) return;
+
+    const team = characterType(player.role.team);
+    if (!team) throw new Error(`Unable to lookup team type ${player.role.team}`);
+    return {
+      id: player.role.id,
+      alignment: player.alignment,
+      team: team,
+    };
+  }
+
   logger.info("Adding players watcher");
   globals.$store.watch(
     (state) => ({ players: state.players.players, users: state.session.users, mode: state.grimoire.mode }),
@@ -100,16 +112,9 @@ function inject(container: HTMLVueAppElement) {
         const activePlayers = players.map((player, idx): Seat => {
           const pos = locations?.[idx];
           const user = users.get(player.id);
-          const roleDetail = isEmptyObject(player.role)
-            ? undefined
-            : {
-                id: player.role.id,
-                alignment: player.alignment,
-                team: player.role.team,
-              };
           return {
             user: user?.username,
-            role: roleDetail,
+            role: roleDetail(player),
             pos,
             isDead: player.isDead,
             isVoteless: player.isVoteless,

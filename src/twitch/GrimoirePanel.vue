@@ -4,6 +4,7 @@ import { Seat } from "../chrome/types/event";
 import { mapToPercent } from "../chrome/util/bounds";
 import { Character, Script } from "../chrome/types/sotc";
 import InfoBox from "./InfoBox.vue";
+import PlayerCounts from "./PlayerCounts.vue";
 
 interface Props {
   mode?: string;
@@ -56,6 +57,7 @@ const circles = computed(() => {
 });
 
 const selectedCharacter = ref<Character | undefined>(undefined);
+const showInfoPanel = ref(false);
 
 function select(seat: unknown, role: Character | undefined) {
   selectedCharacter.value = role;
@@ -69,13 +71,20 @@ function deselect() {
 <template>
   <div class="panel-grimoire">
     <div class="grimoire" :style="svgBounds">
-      <div class="infoBox">
+      <div
+        class="infoBox"
+        @mouseenter="showInfoPanel = true"
+        @mouseleave="showInfoPanel = false"
+      >
         <InfoBox>
           <template #head v-if="selectedCharacter">
             {{ selectedCharacter.name }}
           </template>
           <template #default v-if="selectedCharacter">
             {{ selectedCharacter.ability }}
+          </template>
+          <template #default v-else-if="showInfoPanel">
+            <PlayerCounts :seats="seats"></PlayerCounts>
           </template>
         </InfoBox>
       </div>

@@ -1,5 +1,5 @@
 import { Bounds, Offsets } from "../util/bounds";
-import { Grimoire, Script } from "./sotc";
+import { CharacterType, Grimoire, Script } from "./sotc";
 
 export interface NavigateEventDetail {
   page?: string;
@@ -8,7 +8,7 @@ export interface NavigateEventDetail {
 export interface PlayerCharacter {
   id: string;
   alignment: botc.Alignment;
-  team: string;
+  team: CharacterType;
 }
 
 export type Seat = Partial<{

@@ -237,7 +237,7 @@ Twitch.ext.configuration.onChanged(() => {
 main {
   height: 100%;
 
-  font-family: "Gothic A1", sans-serif;
+  font-family: "Radley", "Gothic A1", sans-serif;
 
   scroll-behavior: smooth;
 }
