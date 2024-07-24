@@ -3,6 +3,7 @@ import { computed, ref } from "vue";
 import { Seat } from "../chrome/types/event";
 import { mapToPercent } from "../chrome/util/bounds";
 import { Character, Script } from "../chrome/types/sotc";
+import InfoBox from "./InfoBox.vue";
 
 interface Props {
   mode?: string;
@@ -69,16 +70,14 @@ function deselect() {
   <div class="panel-grimoire">
     <div class="grimoire" :style="svgBounds">
       <div class="infoBox">
-        <Transition name="infoBox">
-          <div class="characterInfo" v-if="selectedCharacter">
-            <div class="name">
-              {{ selectedCharacter.name }}
-            </div>
-            <div class="ability">
-              {{ selectedCharacter.ability }}
-            </div>
-          </div>
-        </Transition>
+        <InfoBox>
+          <template #head v-if="selectedCharacter">
+            {{ selectedCharacter.name }}
+          </template>
+          <template #default v-if="selectedCharacter">
+            {{ selectedCharacter.ability }}
+          </template>
+        </InfoBox>
       </div>
       <svg viewBox="0 0 100 100">
         <defs>
@@ -307,24 +306,6 @@ g.seat {
   place-items: center;
   z-index: 1000;
   // outline: 1px solid white;
-}
-
-.characterInfo {
-  text-align: center;
-  background-color: antiquewhite;
-  border-radius: 4px;
-
-  .name {
-    font-weight: bold;
-    font-size: 1.2em;
-    border-bottom: 1px solid brown;
-    padding: 0.3em 0.6em;
-  }
-
-  .ability {
-    background-color: antiquewhite;
-    padding: 0.3em 0.6em;
-  }
 }
 
 .grimoire:hover {
