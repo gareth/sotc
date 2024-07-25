@@ -39,7 +39,7 @@ const circles = computed(() => {
       const classes = [
         seat.isDead ? "status-dead" : "status-alive",
         (visible && seat.role?.team) || `unknown`,
-        `alignment-${seat.role?.alignment ?? "default"}`,
+        visible && `alignment-${seat.role?.alignment ?? "default"}`,
       ];
       const seatRole = props.script.characters.find(
         (char: Character) => char.id == seat.role?.id
