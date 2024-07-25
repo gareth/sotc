@@ -79,14 +79,31 @@ class BatchSynchroniser {
     await this.synchronise();
   }
 
-  synchronise = throttle(async () => {
-    if (localStore.broadcasterId) {
-      const batch = clone(this.diff);
-      this.diff = {};
-      logger.info("Broadcasting extension state for keys", Object.keys(batch));
-      await broadcastBulkStateChange(localStore.broadcasterId, batch);
-    } else {
-      logger.info("Not broadcasting - no authenticated user");
-    }
-  }, 1000 / 3);
+  // The inner throttle makes sure we only call the PubSub API at a limited
+  // rate. It uses the default `throttle` settings to make the first API call
+  // immediately and then make sure that any subsequent calls are batched. We
+  // need this `leading: true` behaviour to make sure that infrequent calls are
+  // not delayed by default.
+  //
+  // However sometimes we *expect* a batch of calls that happen at the same time
+  // (e.g. grim reveal). In that case, if we only let the first call through and
+  // batch the rest, we get weird rendering issues.
+  //
+  // So the outer throttle makes sure that all *very tightly* grouped calls are
+  // batched up with no `leading: true`. Then, this batch triggers as a single
+  // call to the inner, slower throttle.
+  synchronise = throttle(
+    throttle(async () => {
+      if (localStore.broadcasterId) {
+        const batch = clone(this.diff);
+        this.diff = {};
+        logger.info("Broadcasting extension state for keys", Object.keys(batch));
+        await broadcastBulkStateChange(localStore.broadcasterId, batch);
+      } else {
+        logger.info("Not broadcasting - no authenticated user");
+      }
+    }, 1000 / 3),
+    10,
+    { leading: false }
+  );
 }
