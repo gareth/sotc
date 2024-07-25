@@ -190,7 +190,7 @@ function deselect() {
 }
 
 .traveler {
-  --character-fill: 166, 65, 191;
+  --character-fill: 103, 65, 191;
   --character-stroke: 160, 19, 195;
 }
 
