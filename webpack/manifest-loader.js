@@ -8,22 +8,24 @@ const [major, minor, patch, label = 0] = packageVersion
   // split into version parts
   .split(/[-.]/);
 
-const timestamp = new Date()
-  .toISOString()
-  .replace(/[-:ZT]/g, "")
-  .replace(/\..*/, "");
-
-const version = `${major}.${minor}.${patch}.${label}`;
-const version_name = `${version} (${timestamp})`;
-
-const manifest = {
-  version,
-  version_name,
-};
-
 export default function (source) {
   const mode = this._compiler?.options?.mode || "production";
   const key = keys[mode];
+
+  const timestamp = new Date()
+    .toISOString()
+    .replace(/[-:ZT]/g, "")
+    .replace(/\..*/, "");
+
+  const version = `${major}.${minor}.${patch}.${label}`;
+  const version_suffix = mode == "production" ? "" : `-${mode}`;
+  const version_name = `${version} (${timestamp}${version_suffix})`;
+  console.info(version_name);
+
+  const manifest = {
+    version,
+    version_name,
+  };
 
   const merged = Object.assign({}, JSON.parse(source), manifest, { key });
 
