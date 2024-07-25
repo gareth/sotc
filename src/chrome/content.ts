@@ -41,7 +41,11 @@ const connectPort = () => {
 
   // Keep the port alive before the 30 second idle timeout
   setInterval(() => {
-    port.postMessage("ping");
+    try {
+      port.postMessage("ping");
+    } catch (e) {
+      logger.info("Ping failed", e);
+    }
   }, 25000);
 
   // Reconnect on fail
