@@ -106,9 +106,8 @@ function inject(container: HTMLVueAppElement) {
       // otherwise the bounds won't be calculated correctly.
       nextTick(async () => {
         const locations = await getTokensBounds(container);
-        if (locations?.length != players.length) {
-          logger.warn(`Incorrect number of tokens (${locations?.length}) found (expected ${players.length})`);
-        }
+        if (locations?.length != players.length) return;
+
         const activePlayers = players.map((player, idx): Seat => {
           const pos = locations?.[idx];
           const user = users.get(player.id);
@@ -292,7 +291,7 @@ const getTokensBounds = async (container: HTMLElement) => {
   const promises = [...tokens].map(async (el) => {
     const animations = el.getAnimations();
     // If there are no animations, this resolves instantly
-    await Promise.all(animations.map((a) => a.finished));
+    await Promise.allSettled(animations.map((a) => a.finished));
     return getElementBounds(el, base);
   });
 
