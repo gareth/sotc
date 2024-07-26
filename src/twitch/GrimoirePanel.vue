@@ -71,23 +71,6 @@ function deselect() {
 <template>
   <div class="panel-grimoire">
     <div class="grimoire" :style="svgBounds">
-      <div
-        class="infoBox"
-        @mouseenter="showInfoPanel = true"
-        @mouseleave="showInfoPanel = false"
-      >
-        <InfoBox>
-          <template #head v-if="selectedCharacter">
-            {{ selectedCharacter.name }}
-          </template>
-          <template #default v-if="selectedCharacter">
-            {{ selectedCharacter.ability }}
-          </template>
-          <template #default v-else-if="showInfoPanel">
-            <PlayerCounts :seats="seats"></PlayerCounts>
-          </template>
-        </InfoBox>
-      </div>
       <svg viewBox="0 0 100 100">
         <defs>
           <linearGradient id="traveler">
@@ -122,6 +105,23 @@ function deselect() {
       </svg>
       <div class="labelContainer">
         <div class="labels">
+          <div
+            class="infoBox"
+            @mouseenter="showInfoPanel = true"
+            @mouseleave="showInfoPanel = false"
+          >
+            <InfoBox>
+              <template #head v-if="selectedCharacter">
+                {{ selectedCharacter.name }}
+              </template>
+              <template #default v-if="selectedCharacter">
+                {{ selectedCharacter.ability }}
+              </template>
+              <template #default v-else-if="showInfoPanel">
+                <PlayerCounts :seats="seats"></PlayerCounts>
+              </template>
+            </InfoBox>
+          </div>
           <div
             v-for="{ visible, seat, seatRole, position, classes } in circles"
           >
@@ -312,7 +312,8 @@ g.seat {
   display: grid;
   place-items: center;
   z-index: 1000;
-  // outline: 1px solid white;
+
+  pointer-events: auto;
 }
 
 .grimoire:hover {
