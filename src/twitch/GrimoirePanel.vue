@@ -84,11 +84,11 @@ function deselect() {
         <g
           class="seat"
           :class="classes"
-          v-for="{ classes, position, seat, seatRole } in circles"
+          v-for="{ visible, classes, position, seat, seatRole } in circles"
           :transform="`translate(${position.x * 100}, ${position.y * 100})`"
         >
           <circle
-            @mouseenter="select(seat, seatRole)"
+            @mouseenter="visible && select(seat, seatRole)"
             @mouseout="deselect()"
             :r="position.r * 100 - 0.2"
           ></circle>
