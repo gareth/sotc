@@ -8,6 +8,7 @@ const logger = new TaggedLogger("OverlayApp");
 
 interface Props {
   script: Script;
+  expanded: boolean;
 }
 
 const props = defineProps<Partial<Props>>();
@@ -19,10 +20,12 @@ const handleDetailsToggle = (event: ToggleEvent) => {
     event.target.scrollIntoView({ block: "nearest", behavior: "smooth" });
   }
 };
+
+const classes = computed(() => (props.expanded ? "expanded" : "contracted"));
 </script>
 
 <template>
-  <div class="script">
+  <div class="script" :class="classes">
     <h1>
       {{ props.script?.name ?? "Custom script" }}
     </h1>
@@ -114,5 +117,9 @@ details[open] {
   > summary::before {
     content: "-";
   }
+}
+
+.contracted details {
+  pointer-events: none;
 }
 </style>

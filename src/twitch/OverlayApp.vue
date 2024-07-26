@@ -203,7 +203,7 @@ Twitch.ext.configuration.onChanged(() => {
       :seats="seats"
       :offset="overlay.pos"
     ></GrimoirePanel>
-    <div class="panel-script--container">
+    <div class="panel-script--container" v-if="script">
       <input
         v-model="scriptExpanded"
         type="checkbox"
@@ -219,8 +219,10 @@ Twitch.ext.configuration.onChanged(() => {
           </label>
         </div>
         <ScriptPanel
+          @click="scriptExpanded = true"
           class="panel-script--contents"
           :script="script"
+          :expanded="scriptExpanded"
         ></ScriptPanel>
       </div>
     </div>
@@ -283,7 +285,7 @@ main {
   --script-background-color: rgb(210, 200, 186);
   --script-border-color: rgb(90, 20, 90);
   --script-border-size: 3px;
-  --script-width: 30vw;
+  --script-width: 25vw;
 
   transition: left cubic-bezier(0.39, 0.575, 0.565, 1) 0.4s;
 
@@ -333,7 +335,7 @@ main {
   overflow-y: scroll;
   max-height: 100%;
 
-  pointer-events: none;
+  cursor: pointer;
 }
 
 #panel-script--handleState {
@@ -345,7 +347,7 @@ main {
     );
 
     .panel-script--contents {
-      pointer-events: all;
+      cursor: initial;
     }
   }
 }
