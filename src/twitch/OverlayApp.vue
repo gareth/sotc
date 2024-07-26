@@ -203,24 +203,26 @@ Twitch.ext.configuration.onChanged(() => {
       :seats="seats"
       :offset="overlay.pos"
     ></GrimoirePanel>
-    <input
-      v-model="scriptExpanded"
-      type="checkbox"
-      class="panel-script--handleState"
-      id="panel-script--handleState"
-    />
-    <div class="panel-script">
-      <div class="panel-script--handle">
-        <label for="panel-script--handleState">
-          <span class="arrow">{{ scriptExpanded ? "▲" : "▼" }}</span>
-          Characters
-          <span class="arrow">{{ scriptExpanded ? "▲" : "▼" }}</span>
-        </label>
+    <div class="panel-script--container">
+      <input
+        v-model="scriptExpanded"
+        type="checkbox"
+        class="panel-script--handleState"
+        id="panel-script--handleState"
+      />
+      <div class="panel-script">
+        <div class="panel-script--handle">
+          <label for="panel-script--handleState">
+            <span class="arrow">{{ scriptExpanded ? "▲" : "▼" }}</span>
+            Characters
+            <span class="arrow">{{ scriptExpanded ? "▲" : "▼" }}</span>
+          </label>
+        </div>
+        <ScriptPanel
+          class="panel-script--contents"
+          :script="script"
+        ></ScriptPanel>
       </div>
-      <ScriptPanel
-        class="panel-script--contents"
-        :script="script"
-      ></ScriptPanel>
     </div>
     <CalibrationPanel
       v-if="activeCalibration"
@@ -240,6 +242,7 @@ main {
   font-family: "Radley", "Gothic A1", sans-serif;
 
   scroll-behavior: smooth;
+  transform: rotate(0deg);
 }
 
 .square {
@@ -262,15 +265,29 @@ main {
   display: none;
 }
 
+.panel-script--container {
+  --script-container-width: 24rem;
+
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  width: var(--script-container-width);
+
+  contain: layout;
+}
+
 .panel-script {
   --script-background-color: rgb(210, 200, 186);
   --script-border-color: rgb(90, 20, 90);
   --script-border-size: 3px;
-  --script-width: 30%;
+  --script-width: 30vw;
 
   transition: left cubic-bezier(0.39, 0.575, 0.565, 1) 0.4s;
 
-  position: absolute;
+  position: fixed;
   top: 5rem;
   max-height: calc(100% - 10rem);
   bottom: 5rem;
@@ -323,7 +340,9 @@ main {
   display: none;
 
   &:checked + .panel-script {
-    left: calc(100% - var(--script-width) - 7rem);
+    left: calc(
+      0rem - var(--script-width) + var(--script-container-width) - 7rem
+    );
 
     .panel-script--contents {
       pointer-events: all;
@@ -331,7 +350,7 @@ main {
   }
 }
 
-main:hover .panel-script {
+.panel-script--container:hover .panel-script {
   left: calc(100% - 7rem);
 }
 
