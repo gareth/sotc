@@ -283,8 +283,8 @@ main {
 
 .panel-script {
   --script-background-color: rgb(210, 200, 186);
-  --script-border-color: rgb(90, 20, 90);
-  --script-border-size: 3px;
+  --script-border-color: rgb(118, 86, 55);
+  --script-border-size: 2px;
   --script-width: 25vw;
 
   transition: left cubic-bezier(0.39, 0.575, 0.565, 1) 0.4s;
@@ -297,7 +297,7 @@ main {
   min-height: 15em;
   width: var(--script-width);
   border: var(--script-border-size) solid var(--script-border-color);
-  border-radius: 0 0 0 calc(4px + var(--script-border-size));
+  border-radius: calc(2px + var(--script-border-size));
 
   background-color: var(--script-background-color);
 
@@ -307,7 +307,7 @@ main {
 
     position: absolute;
     display: grid;
-    top: calc(-1 * var(--script-border-size));
+    top: 1rem;
     right: 100%;
     writing-mode: vertical-rl;
     text-orientation: sideways;

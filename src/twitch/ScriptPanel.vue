@@ -37,7 +37,9 @@ const classes = computed(() => (props.expanded ? "expanded" : "contracted"));
         class="script-role"
         :class="role.type"
       >
-        <summary>{{ role.name }}</summary>
+        <summary>
+          <span class="role-name">{{ role.name }}</span>
+        </summary>
         {{ role.ability }}
       </details>
     </div>
@@ -65,58 +67,71 @@ h1 {
 
 .script-role.townsfolk {
   & summary {
-    color: blue;
+    background-color: color-mix(in oklab, blue 30%, black 50%);
   }
 }
 
 .script-role.outsider {
   & summary {
-    color: rgb(35, 163, 206);
+    background-color: color-mix(in oklab, rgb(35, 163, 206) 30%, black 50%);
   }
 }
 
 .script-role.minion {
   & summary {
-    color: rgb(241, 72, 72);
+    background-color: color-mix(in oklab, rgb(241, 131, 72) 30%, black 50%);
   }
 }
 
 .script-role.demon {
   & summary {
-    color: rgb(148, 0, 0);
+    background-color: color-mix(in oklab, rgb(230, 0, 0) 30%, black 50%);
   }
 }
 
 details {
-  margin-bottom: 0.1rem;
-
   > summary {
+    display: flex;
+    align-items: center;
+    margin: 0 -1rem 0.1rem;
+    padding: 0.3em 1rem;
     list-style: none;
     cursor: pointer;
-    font-weight: 800;
+
+    color: antiquewhite;
+
+    font-family: "Germania One", serif;
+    font-size: 1.1em;
+    background: rgba(179, 161, 143, 0.641);
 
     &::before {
-      // display: none;
+      display: none;
+    }
+    &::after {
       display: inline-block;
       text-align: center;
       width: 0.3em;
       margin-right: 0.7em;
-      content: "+";
-      // font-size: 0.7em;
+      font-size: 0.7em;
+      content: "▶";
     }
   }
+}
+
+.role-name {
+  flex-grow: 1;
 }
 
 details[open] {
   > summary {
     margin-bottom: 0.3em;
+
+    &::after {
+      content: "▼";
+    }
   }
 
-  padding-bottom: 1em;
-
-  > summary::before {
-    content: "-";
-  }
+  padding-bottom: 0.4em;
 }
 
 .contracted details {
