@@ -16,7 +16,7 @@ const handleDetailsToggle = (event: ToggleEvent) => {
   if (!(event.target instanceof HTMLDetailsElement)) return;
 
   if (event.target.open) {
-    event.target.scrollIntoView({ block: "nearest" });
+    event.target.scrollIntoView({ block: "nearest", behavior: "smooth" });
   }
 };
 </script>
