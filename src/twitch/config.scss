@@ -1,0 +1,29 @@
+html {
+  display: grid;
+  min-height: calc(100% - 31px);
+}
+
+body {
+  height: 100%;
+  overflow: hidden;
+  margin: 0;
+
+  background: #223;
+  color: antiquewhite;
+
+  font-family: "Radley", "Gothic A1", sans-serif;
+  font-size: 1.2em;
+
+  display: grid;
+  place-items: center;
+}
+
+h1, h2 {
+  font-family: "Germania One";
+  color: rgb(179, 140, 84);
+}
+
+#app {
+  height: 100%;
+  max-width: 400px;
+}
