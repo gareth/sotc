@@ -23,6 +23,7 @@ const slots = defineSlots<{
   text-align: center;
   background-color: antiquewhite;
   border-radius: 4px;
+  border: 1px solid brown;
 
   pointer-events: none;
 
