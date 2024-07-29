@@ -128,7 +128,7 @@ function updateBadge({ color, visible }: Badge) {
   chrome.action.setBadgeBackgroundColor({ color }).catch((e) => logger.error("Error setting badge color", e));
   if (undefined !== visible) {
     chrome.action
-      .setBadgeText({ text: visible ? " " : "" })
+      .setBadgeText({ text: visible ? "." : "" })
       .catch((e) => logger.error("Error setting badge visibility", e));
   }
 }

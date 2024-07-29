@@ -1,7 +1,7 @@
 import path from "path";
 import ZipPlugin from "zip-webpack-plugin";
 
-import WebpackBundleAnalyzer from "webpack-bundle-analyzer";
+// import WebpackBundleAnalyzer from "webpack-bundle-analyzer";
 
 export default {
   extends: [path.resolve(import.meta.dirname, "webpack.chrome.config.js")],
@@ -13,7 +13,7 @@ export default {
     path: path.resolve(import.meta.dirname, "dist", "chrome-production"),
   },
   plugins: [
-    new WebpackBundleAnalyzer.BundleAnalyzerPlugin(),
+    // new WebpackBundleAnalyzer.BundleAnalyzerPlugin(),
     new ZipPlugin({
       filename: "stream-on-the-clocktower.zip",
     }),

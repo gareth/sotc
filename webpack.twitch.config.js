@@ -6,6 +6,7 @@ export default {
 
   entry: {
     overlay: "./src/twitch/overlay.ts",
+    config: "./src/twitch/config.ts",
   },
   output: {
     clean: true,
@@ -25,7 +26,8 @@ export default {
     }),
     new HtmlWebpackPlugin({
       filename: "config.html",
-      chunks: [],
+      template: "src/twitch/config.html",
+      chunks: ["config"],
     }),
   ],
 };
