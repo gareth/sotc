@@ -268,7 +268,7 @@ main {
 }
 
 .panel-script--container {
-  --script-container-width: 24rem;
+  --script-container-width: 17rem;
 
   position: absolute;
   top: 0;
