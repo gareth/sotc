@@ -2,19 +2,22 @@ import HtmlWebpackPlugin from "html-webpack-plugin";
 import path from "path";
 
 export default {
-  extends: [path.resolve(import.meta.dirname, "webpack.base.config.js")],
+  extends: [path.resolve(import.meta.dirname, "../../webpack.base.config.js")],
 
+  resolveLoader: {
+    modules: [path.resolve(import.meta.dirname, "webpack")],
+  },
   entry: {
-    popup: "./src/chrome/popup.ts",
-    content: "./src/chrome/content.ts",
-    inject: "./src/chrome/inject.ts",
-    worker: "./src/chrome/worker.ts",
-    options: "./src/chrome/options.ts",
+    popup: "./popup.ts",
+    content: "./content.ts",
+    inject: "./inject.ts",
+    worker: "./worker.ts",
+    options: "./options.ts",
     manifest: "./manifest.json",
   },
   output: {
     clean: true,
-    path: path.resolve(import.meta.dirname, "dist", "chrome"),
+    path: path.resolve(import.meta.dirname, "../..", "dist", "chrome"),
   },
 
   module: {
@@ -29,11 +32,11 @@ export default {
 
   plugins: [
     new HtmlWebpackPlugin({
-      template: "src/chrome/popup.html",
+      template: "popup.html",
       chunks: ["popup"],
     }),
     new HtmlWebpackPlugin({
-      template: "src/chrome/options.html",
+      template: "options.html",
       chunks: ["options"],
       filename: "options.html",
     }),

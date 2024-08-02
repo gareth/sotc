@@ -1,5 +1,4 @@
 import { VueLoaderPlugin } from "vue-loader";
-import path from "path";
 import webpack from "webpack";
 
 export default {
@@ -8,7 +7,7 @@ export default {
   devtool: "source-map",
 
   resolveLoader: {
-    modules: [path.resolve(import.meta.dirname, "webpack"), "node_modules"],
+    modules: ["node_modules"],
   },
   resolve: {
     extensions: [".ts", ".tsx", ".js"],

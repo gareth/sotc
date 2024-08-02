@@ -1,5 +1,5 @@
-import packageVersion from "../src/chrome/version.js";
-import keys from "../src/core/config/manifest_key.js";
+import packageVersion from "../version.js";
+import keys from "../../core/config/manifest_key.js";
 
 // Convert from Semver (example: 0.1.0-beta6)
 const [major, minor, patch, label = 0] = packageVersion
@@ -20,7 +20,6 @@ export default function (source) {
   const version = `${major}.${minor}.${patch}.${label}`;
   const version_suffix = mode == "production" ? "" : `-${mode}`;
   const version_name = `${version} (${timestamp}${version_suffix})`;
-  console.info(version_name);
 
   const manifest = {
     version,
