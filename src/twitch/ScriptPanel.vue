@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { TaggedLogger } from "../chrome/util/TaggedLogger";
+import { TaggedLogger } from "../core/util/TaggedLogger";
 import { computed } from "vue";
 import { ExtensionState, Script } from "../chrome/types/sotc";
 import { Seat } from "../chrome/types/event";

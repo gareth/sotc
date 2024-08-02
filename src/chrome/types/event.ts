@@ -1,4 +1,4 @@
-import { Bounds, Offsets } from "../util/bounds";
+import { Bounds, Offsets } from "../../core/util/bounds";
 import { CharacterType, Grimoire, Script } from "./sotc";
 
 export interface NavigateEventDetail {

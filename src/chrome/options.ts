@@ -2,15 +2,15 @@ import { createApp } from "vue";
 import { createPinia } from "pinia";
 
 // import "@/style.css";
-import { TaggedLogger } from "./util/TaggedLogger";
+import { TaggedLogger } from "../core/util/TaggedLogger";
 import OptionsApp from "./OptionsApp.vue";
 
 const logger = new TaggedLogger("Options");
 logger.info("initialized");
 
-import ownerId from "./config/owner_id";
-import clientId from "./config/client_id";
-import secret from "./config/secret";
+import ownerId from "../core/config/owner_id";
+import clientId from "../core/config/client_id";
+import secret from "../core/config/secret";
 
 const pinia = createPinia();
 const app = createApp(OptionsApp, {

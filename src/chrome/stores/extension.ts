@@ -1,14 +1,14 @@
 import { createPinia, defineStore } from "pinia";
 import { ExtensionState, Grimoire, Script } from "../types/sotc";
 import { computed, ref, watch } from "vue";
-import { TaggedLogger } from "../util/TaggedLogger";
-import { clone } from "../util/clone";
+import { TaggedLogger } from "../../core/util/TaggedLogger";
+import { clone } from "../../core/util/clone";
 import useLocalStore from "../stores/local";
 import { broadcastBulkStateChange, synchronizeExtensionState } from "../twitch/sync";
 
 import { throttle } from "underscore";
 import { Seat } from "../types/event";
-import { Offsets } from "../util/bounds";
+import { Offsets } from "../../core/util/bounds";
 
 const pinia = createPinia();
 const localStore = useLocalStore(pinia);

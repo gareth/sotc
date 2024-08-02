@@ -1,6 +1,6 @@
-import ownerId from ".././config/owner_id";
-import clientId from ".././config/client_id";
-import secret from ".././config/secret";
+import ownerId from "../../core/config/owner_id";
+import clientId from "../../core/config/client_id";
+import secret from "../../core/config/secret";
 import {
   sendExtensionPubSubBroadcastMessage,
   sendExtensionPubSubWhisperMessage,
@@ -8,8 +8,8 @@ import {
 } from "@twurple/ebs-helper";
 import { EbsCallConfig } from "@twurple/ebs-helper";
 import { compress, decompress } from "lzutf8";
-import { TaggedLogger } from "../util/TaggedLogger";
-import sentry from "../util/sentry";
+import { TaggedLogger } from "../../core/util/TaggedLogger";
+import sentry from "../../core/util/sentry";
 
 const logger = new TaggedLogger("Sync");
 

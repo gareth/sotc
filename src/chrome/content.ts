@@ -29,7 +29,7 @@
  */
 
 import { sotcEvent, SOTCEvent } from "./types/event";
-import { TaggedLogger } from "./util/TaggedLogger";
+import { TaggedLogger } from "../core/util/TaggedLogger";
 
 const logger = new TaggedLogger("Content");
 logger.info("initialized");

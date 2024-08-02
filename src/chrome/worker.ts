@@ -1,13 +1,13 @@
 // import { Game } from "./sotc/Game";
 import { GameManager } from "./sotc/GameManager";
 import { whisper } from "./twitch/sync";
-import { TaggedLogger } from "./util/TaggedLogger";
-import { clone } from "./util/clone";
+import { TaggedLogger } from "../core/util/TaggedLogger";
+import { clone } from "../core/util/clone";
 import useLocalStore from "./stores/local";
 
-import { capture } from "./util/sentry";
+import { capture } from "../core/util/sentry";
 import { SOTCEventMessage } from "./types/event";
-import { Offsets } from "./util/bounds";
+import { Offsets } from "../core/util/bounds";
 
 const logger = new TaggedLogger("Worker");
 

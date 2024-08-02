@@ -1,9 +1,9 @@
 import { Auth, OIDCIdentity } from "../stores/local";
-import { TaggedLogger } from "../util/TaggedLogger";
-import client_id from ".././config/client_id";
+import { TaggedLogger } from "../../core/util/TaggedLogger";
+import client_id from "../../core/config/client_id";
 
 import * as jose from "jose";
-import { clone } from "../util/clone";
+import { clone } from "../../core/util/clone";
 
 const logger = new TaggedLogger("Auth");
 

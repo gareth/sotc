@@ -1,6 +1,6 @@
 <script async setup lang="ts">
 import { computed, onMounted, ref } from "vue";
-import { TaggedLogger } from "../chrome/util/TaggedLogger";
+import { TaggedLogger } from "../core/util/TaggedLogger";
 import { decode } from "../chrome/twitch/sync";
 import { ExtensionState, Grimoire, Script } from "../chrome/types/sotc";
 import { Seat } from "../chrome/types/event";
@@ -8,7 +8,7 @@ import ScriptPanel from "./ScriptPanel.vue";
 import GrimoirePanel from "./GrimoirePanel.vue";
 import CalibrationPanel from "./CalibrationPanel.vue";
 import { delay } from "underscore";
-import { Bounds, Offsets } from "../chrome/util/bounds";
+import { Bounds, Offsets } from "../core/util/bounds";
 
 interface SOTCPubSubMessage {
   type: string;

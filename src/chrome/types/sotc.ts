@@ -1,6 +1,6 @@
 import { Seat } from "./event";
 import { lookup } from "./lookup";
-import { Bounds, Offsets } from "../util/bounds";
+import { Bounds, Offsets } from "../../core/util/bounds";
 
 export const CharacterType = ["townsfolk", "outsider", "minion", "demon", "traveler"] as const;
 export type CharacterType = (typeof CharacterType)[number];

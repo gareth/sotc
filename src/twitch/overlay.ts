@@ -1,7 +1,7 @@
 import { createApp } from "vue";
 import "./overlay.scss";
 import OverlayApp from "./OverlayApp.vue";
-import { TaggedLogger } from "../chrome/util/TaggedLogger";
+import { TaggedLogger } from "../core/util/TaggedLogger";
 
 // import * as Sentry from "@sentry/vue";
 // import { twitchExtensionDSN } from "../chrome/config/dsn";

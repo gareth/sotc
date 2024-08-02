@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { useStorageAsync } from "@vueuse/core";
-import { Offsets } from "../util/bounds";
+import { Offsets } from "../../core/util/bounds";
 
 export interface Auth {
   access_token: string;

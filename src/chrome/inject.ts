@@ -1,13 +1,13 @@
 import { Seat, sotcEvent } from "./types/event";
-import { TaggedLogger } from "./util/TaggedLogger";
+import { TaggedLogger } from "../core/util/TaggedLogger";
 import type { BOTCVueApp } from "botc";
-import { clone } from "./util/clone";
+import { clone } from "../core/util/clone";
 import { Character, CharacterAlignments, Script, characterType } from "./types/sotc";
 import { nextTick } from "vue";
-import { round } from "./util/round";
+import { round } from "../core/util/round";
 
-import sentry, { promiseHandler } from "./util/sentry";
-import { Bounds, mapToPixels } from "./util/bounds";
+import sentry, { promiseHandler } from "../core/util/sentry";
+import { Bounds, mapToPixels } from "../core/util/bounds";
 
 const logger = new TaggedLogger("Inject");
 logger.info("initialized");

@@ -2,8 +2,8 @@ import { createApp } from "vue";
 // import "@/style.css";
 import PopupApp from "./PopupApp.vue";
 import { ExtensionState } from "./types/sotc";
-import { TaggedLogger } from "./util/TaggedLogger";
-import { Offsets } from "./util/bounds";
+import { TaggedLogger } from "../core/util/TaggedLogger";
+import { Offsets } from "../core/util/bounds";
 
 const logger = new TaggedLogger("Popup");
 logger.info("initialized");

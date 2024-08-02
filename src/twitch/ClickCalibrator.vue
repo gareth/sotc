@@ -6,9 +6,9 @@ import {
   invertInsetBoundsBy,
   mapToPixels,
   Offsets,
-} from "../chrome/util/bounds";
-import { TaggedLogger } from "../chrome/util/TaggedLogger";
-import { round } from "../chrome/util/round";
+} from "../core/util/bounds";
+import { TaggedLogger } from "../core/util/TaggedLogger";
+import { round } from "../core/util/round";
 import { isEqual } from "underscore";
 
 const logger = new TaggedLogger("ClickCalibrator");

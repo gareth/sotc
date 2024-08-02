@@ -5,11 +5,11 @@ import {
   boundsToOffsets,
   Offsets,
   offsetsToBounds,
-} from "../chrome/util/bounds";
+} from "../core/util/bounds";
 import Calibrator from "./ClickCalibrator.vue";
 
-import { TaggedLogger } from "../chrome/util/TaggedLogger";
-import { round } from "../chrome/util/round";
+import { TaggedLogger } from "../core/util/TaggedLogger";
+import { round } from "../core/util/round";
 const logger = new TaggedLogger("CalibratorPanel");
 
 interface Props {

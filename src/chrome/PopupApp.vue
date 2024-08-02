@@ -1,6 +1,6 @@
 <script async setup lang="ts">
 import { computed, ref } from "vue";
-import { TaggedLogger } from "./util/TaggedLogger";
+import { TaggedLogger } from "../core/util/TaggedLogger";
 import { ExtensionState } from "./types/sotc";
 import { indexBy } from "underscore";
 import { Seat, sotcEvent } from "./types/event";
