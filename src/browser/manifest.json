@@ -11,9 +11,6 @@
   },
   "background": {
     "service_worker": "worker.js",
-    "scripts": [
-      "worker.js"
-    ],
     "type": "module"
   },
   "options_ui": {
@@ -39,11 +36,5 @@
         "*://botc.app/*"
       ]
     }
-  ],
-  "browser_specific_settings": {
-    "gecko": {
-      "id": "extension@streamontheclocktower.example",
-      "strict_min_version": "42.0"
-    }
-  }
+  ]
 }

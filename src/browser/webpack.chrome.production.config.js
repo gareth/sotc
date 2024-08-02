@@ -10,7 +10,7 @@ export default {
   devtool: false,
   output: {
     clean: true,
-    path: path.resolve(import.meta.dirname, "dist", "chrome-production"),
+    path: path.resolve(import.meta.dirname, "../../dist/chrome-production"),
   },
   plugins: [
     // new WebpackBundleAnalyzer.BundleAnalyzerPlugin(),
