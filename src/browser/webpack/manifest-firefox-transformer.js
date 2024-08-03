@@ -10,9 +10,12 @@ export default function (source) {
   config.browser_specific_settings = {
     gecko: {
       id: "extension@streamontheclocktower.example",
-      strict_min_version: "42.0",
+      strict_min_version: "128.0",
     },
   };
+
+  if (config.key) delete config.key;
+  if (config.version_name) delete config.version_name;
 
   return JSON.stringify(config);
 }
