@@ -91,11 +91,20 @@ function saveCalibration() {
     }
   }
 }
+
+function openOptionsPage() {
+  chrome.runtime.openOptionsPage();
+}
 </script>
 
 <template>
   <div class="popup" ref="root">
-    <h1>Stream on the Clocktower</h1>
+    <header>
+      <h1>Stream on the Clocktower</h1>
+      <button class="settings" @click="openOptionsPage" title="Settings">
+        ⚙️
+      </button>
+    </header>
     <details>
       <summary>Detected state</summary>
       <p>
@@ -222,7 +231,33 @@ ol {
   margin-left: 0;
 }
 
-button:not(:first-child) {
+.controls button:not(:first-child) {
   margin-left: 0.2em;
+}
+
+header {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: flex-start;
+
+  h1 {
+    flex-grow: 1;
+  }
+
+  button.settings {
+    appearance: none;
+    font-size: 1.5em;
+
+    background-color: #ddd;
+    border-radius: 4px;
+
+    border: 1px solid #999;
+
+    cursor: pointer;
+
+    &:hover {
+      background-color: #999;
+    }
+  }
 }
 </style>
