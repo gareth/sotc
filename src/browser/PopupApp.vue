@@ -217,13 +217,15 @@ summary {
   &::before {
     display: inline-block;
     width: 1em;
+    text-align: center;
     margin-right: 0.3em;
     content: "▶";
+    transition: transform 0.15s ease-in-out;
   }
 }
 
 details[open] > summary::before {
-  content: "▼";
+  transform: rotate(90deg);
 }
 
 ol {
