@@ -1,7 +1,7 @@
 import { createApp } from "vue";
 import { createPinia } from "pinia";
 
-// import "@/style.css";
+import "./global.scss";
 import { TaggedLogger } from "../core/util/TaggedLogger";
 import OptionsApp from "./OptionsApp.vue";
 
