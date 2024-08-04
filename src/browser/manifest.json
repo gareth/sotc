@@ -6,6 +6,9 @@
     "storage",
     "identity"
   ],
+  "icons": {
+    "354": "public/icon-zoom.png"
+  },
   "action": {
     "default_popup": "index.html"
   },

@@ -1,4 +1,6 @@
 import HtmlWebpackPlugin from "html-webpack-plugin";
+import CopyPlugin from "copy-webpack-plugin";
+
 import path from "path";
 
 export default {
@@ -15,8 +17,21 @@ export default {
     options: "./options.ts",
     manifest: "./manifest.json",
   },
-
+  module: {
+    rules: [
+      {
+        test: /\.(png|jpe?g|gif)$/i,
+        loader: "file-loader",
+        options: {
+          name: "[path][name].[ext]",
+        },
+      },
+    ],
+  },
   plugins: [
+    new CopyPlugin({
+      patterns: [{ from: "public", to: "public" }],
+    }),
     new HtmlWebpackPlugin({
       template: "popup.html",
       chunks: ["popup"],
