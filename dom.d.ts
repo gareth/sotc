@@ -1,4 +1,4 @@
-import { SOTCEventMap } from "./src/types/event";
+import { SOTCEventMap } from "./src/browser/types/event";
 
 // Declare the event types for our custom events. This allows for compile-time
 // checking of our own event handling code, otherwise event data would be

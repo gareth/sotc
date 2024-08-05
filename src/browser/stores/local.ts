@@ -32,14 +32,61 @@ class ChromeStorageWrapper {
   removeItem = (key: string) => this.storage.remove(key);
 }
 
+interface StorageEventDetail {
+  key: string;
+  newValue: string | null | undefined;
+  oldValue: string | null | undefined;
+}
+
+class StorageEvent extends Event {
+  key: string;
+  newValue: string | null | undefined;
+  oldValue: string | null | undefined;
+
+  constructor(type: string, options: EventInit & StorageEventDetail) {
+    const superOptions: Partial<EventInit & StorageEventDetail> = { ...options };
+    delete superOptions.key;
+    delete superOptions.newValue;
+    delete superOptions.oldValue;
+    super(type, superOptions);
+    this.key = options.key;
+    this.newValue = options.newValue;
+    this.oldValue = options.oldValue;
+  }
+}
+
+// Proxy the extension-native `chrome.storage` change event into a "fake"
+// `StorageEvent`.
+//
+// This is because @vueuse attaches a `storage` event listener to its "window"
+// object. We're not in a window though, so we have to make vueuse believe we
+// are.
+chrome.storage.onChanged.addListener((changes) => {
+  Object.entries(changes).forEach(([key, change]) => {
+    const detail = {
+      key: key,
+      oldValue: change.oldValue as string | null | undefined,
+      newValue: change.newValue as string | null | undefined,
+    };
+    const event = new StorageEvent("storage", { ...detail });
+    dispatchEvent(event);
+  });
+});
+
 export default defineStore("sotc", {
   state: () => ({
-    auth: useStorageAsync<Partial<Auth>>("auth", {}, new ChromeStorageWrapper(chrome.storage.local)),
+    auth: useStorageAsync<Partial<Auth>>("auth", {}, new ChromeStorageWrapper(chrome.storage.local), {
+      window: self,
+    }),
     // There were problems using `OIDCIdentity | undefined` because Pinia
     // serialized the object as "[object Object]". By forcing it always to be an
     // object (if only a partial object), we avoided that problem.
-    id: useStorageAsync<Partial<{ data: OIDCIdentity }>>("id", {}, new ChromeStorageWrapper(chrome.storage.local)),
-    overlay: useStorageAsync<Partial<{ pos: Offsets }>>("overlay", {}, new ChromeStorageWrapper(chrome.storage.local)),
+    id: useStorageAsync<Partial<{ data: OIDCIdentity }>>("id", {}, new ChromeStorageWrapper(chrome.storage.local), {
+      window: self,
+    }),
+    overlay: useStorageAsync<Partial<{ pos: Offsets }>>("overlay", {}, new ChromeStorageWrapper(chrome.storage.local), {
+      window: self,
+    }),
   }),
   getters: {
     accessToken: (state) => state.auth.access_token,
