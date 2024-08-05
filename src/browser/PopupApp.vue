@@ -121,17 +121,19 @@ function openOptionsPage() {
           </ul>
         </details>
 
-        <details open v-if="props.state.seats">
+        <details class="seatInfo" open v-if="props.state.seats">
           <summary>Seats ({{ state.seats?.length }})</summary>
-          <ul>
+          <ol>
             <li v-for="seat in seats">
-              <div v-if="seat.role">
-                <span>{{ seat.role.name }}</span>
-                <span v-if="seat.user"> ({{ seat.user }})</span>
-              </div>
-              <div v-else class="empty">[empty]</div>
+              <span class="seatInfo__user" v-if="seat.user">
+                {{ seat.user }}</span
+              >
+              <span class="seatInfo__user seatInfo--empty" v-else>[empty]</span>
+              <span class="seatInfo__role" v-if="seat.role">{{
+                seat.role.name
+              }}</span>
             </li>
-          </ul>
+          </ol>
         </details>
       </div>
       <div v-else>Grimoire not visible on {{ state.page }} page</div>
@@ -259,6 +261,35 @@ header {
 
     &:hover {
       background-color: #999;
+    }
+  }
+}
+
+.seatInfo ol {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+
+  padding: 0;
+
+  counter-reset: seatInfo;
+
+  li {
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: span 3;
+
+    span:not(:last-child) {
+      margin-right: 1em;
+    }
+
+    &::before {
+      counter-increment: seatInfo;
+      content: counter(seatInfo) ".";
+      margin-right: 0.3em;
+    }
+
+    .seatInfo--empty {
+      color: #888;
     }
   }
 }
