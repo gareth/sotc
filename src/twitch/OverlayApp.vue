@@ -1,9 +1,9 @@
 <script async setup lang="ts">
 import { computed, onMounted, ref } from "vue";
 import { TaggedLogger } from "../core/util/TaggedLogger";
-import { decode } from "../chrome/twitch/sync";
-import { ExtensionState, Grimoire, Script } from "../chrome/types/sotc";
-import { Seat } from "../chrome/types/event";
+import { decode } from "../browser/twitch/sync";
+import { ExtensionState, Grimoire, Script } from "../browser/types/sotc";
+import { Seat } from "../browser/types/event";
 import ScriptPanel from "./ScriptPanel.vue";
 import GrimoirePanel from "./GrimoirePanel.vue";
 import CalibrationPanel from "./CalibrationPanel.vue";

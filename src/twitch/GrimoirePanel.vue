@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { Seat } from "../chrome/types/event";
+import { Seat } from "../browser/types/event";
 import { mapToPercent } from "../core/util/bounds";
-import { Character, Script } from "../chrome/types/sotc";
+import { Character, Script } from "../browser/types/sotc";
 import InfoBox from "./InfoBox.vue";
 import PlayerCounts from "./PlayerCounts.vue";
 

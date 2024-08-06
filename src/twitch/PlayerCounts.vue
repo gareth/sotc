@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { Seat } from "../chrome/types/event";
+import { Seat } from "../browser/types/event";
 import playerCountMap from "./player_counts";
-import { CharacterType } from "../chrome/types/sotc";
+import { CharacterType } from "../browser/types/sotc";
 
 interface Props {
   seats: Seat[];

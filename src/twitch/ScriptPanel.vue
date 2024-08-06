@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { TaggedLogger } from "../core/util/TaggedLogger";
 import { computed } from "vue";
-import { ExtensionState, Script } from "../chrome/types/sotc";
-import { Seat } from "../chrome/types/event";
+import { ExtensionState, Script } from "../browser/types/sotc";
+import { Seat } from "../browser/types/event";
 
 const logger = new TaggedLogger("OverlayApp");
 

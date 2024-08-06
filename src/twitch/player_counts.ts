@@ -1,4 +1,4 @@
-import type { CharacterType } from "../chrome/types/sotc";
+import type { CharacterType } from "../browser/types/sotc";
 
 type Breakdown = Record<CharacterType[number], number>;
 
