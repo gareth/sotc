@@ -91,10 +91,17 @@ export function relay<T extends keyof SOTCEvent>(eventName: T) {
       const detail = e.detail as unknown;
       logger.info("Relaying event", eventName, detail, port);
 
-      port.postMessage({
-        type: eventName,
-        payload: detail,
-      });
+      try {
+        port.postMessage({
+          type: eventName,
+          payload: detail,
+        });
+      } catch (error) {
+        if (error instanceof Error && error.message == "Extension context invalidated") {
+          logger.warn("Extension has been updated, refreshing to inject updated content");
+          window.location.reload();
+        }
+      }
     }
   });
 }
