@@ -3,7 +3,7 @@ import { computed, onMounted, ref } from "vue";
 import { TaggedLogger } from "../core/util/TaggedLogger";
 import { decode } from "../browser/twitch/sync";
 import { ExtensionState, Grimoire, Script } from "../browser/types/sotc";
-import { Seat } from "../browser/types/event";
+import { GameState, Seat } from "../browser/types/event";
 import ScriptPanel from "./ScriptPanel.vue";
 import GrimoirePanel from "./GrimoirePanel.vue";
 import CalibrationPanel from "./CalibrationPanel.vue";
@@ -101,6 +101,12 @@ const broadcastHandler = (
             ).payload;
             break;
 
+          case "game":
+            game.value = (
+              stateMessage as SOTCPubSubUpdateStateMessage<"game">
+            ).payload;
+            break;
+
           default:
             break;
         }
@@ -115,6 +121,7 @@ const broadcastHandler = (
       if (undefined !== data.seats) seats.value = data.seats;
       if (undefined !== data.grim) grim.value = data.grim;
       if (undefined !== data.overlay) overlay.value = data.overlay;
+      if (undefined !== data.game) game.value = data.game;
 
       break;
   }
@@ -175,6 +182,7 @@ const page = ref<string | undefined>(undefined);
 const seats = ref<Seat[] | undefined>(undefined);
 const grim = ref<Grimoire | undefined>(undefined);
 const overlay = ref<{ pos: Offsets }>({ pos: defaultOffsets });
+const game = ref<GameState | undefined>(undefined);
 
 Twitch.ext.configuration.onChanged(() => {
   if (Twitch.ext.configuration.broadcaster) {
@@ -186,6 +194,7 @@ Twitch.ext.configuration.onChanged(() => {
     seats.value = decompressed.seats;
     grim.value = decompressed.grim;
     overlay.value = decompressed.overlay || { pos: defaultOffsets };
+    game.value = decompressed.game;
   }
 });
 </script>

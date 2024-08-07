@@ -37,7 +37,7 @@ export function encode<T extends object>(data: T): string {
 }
 
 export function decode(data: string) {
-  logger.debug("Retrieving", data);
+  logger.debug("Retrieving", data, stringInfo(data));
   if (data) {
     return JSON.parse(decompress(data, { inputEncoding: "BinaryString" }) as string) as object;
   } else {

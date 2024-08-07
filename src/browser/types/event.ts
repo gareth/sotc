@@ -21,6 +21,12 @@ export type Seat = Partial<{
   revealed: boolean;
 };
 
+export interface GameState {
+  phase: number;
+  isRunning: boolean;
+  isNight: boolean;
+}
+
 export interface SOTCEvent {
   "sotc-navigate": NavigateEventDetail;
   "sotc-scriptChanged": Script;
@@ -29,6 +35,7 @@ export interface SOTCEvent {
   "sotc-overlayOffsets": { offsets: Offsets };
   "sotc-startCalibration": void;
   "sotc-endCalibration": void;
+  "sotc-gameState": GameState;
 }
 
 export type SOTCEventMap = {

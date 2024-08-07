@@ -121,6 +121,7 @@ function injectScript() {
   relay("sotc-playersChanged");
   relay("sotc-size");
   relay("sotc-overlayOffsets");
+  relay("sotc-gameState");
 
   (document.head || document.documentElement).appendChild(script);
 }

@@ -47,8 +47,8 @@ declare namespace botc {
     roles: Map<string, Role>;
     game: {
       history: never[];
-      phase: never;
-      isRunning: never;
+      phase: number;
+      isRunning: boolean;
     };
     grimoire: {
       mode: string | undefined;
@@ -59,6 +59,10 @@ declare namespace botc {
     session: {
       users: Map<string, User>;
     };
+  }
+
+  export interface StoreGetters {
+    "game/isNight": boolean;
   }
 }
 

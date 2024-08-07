@@ -139,29 +139,28 @@ function inject(container: HTMLVueAppElement) {
     }
   );
 
-  // logger.info("Adding game watcher");
-  // const unwatchGame = globals.$store.watch(
-  //   (state, getters) => ({
-  //     history: state.game.history,
-  //     phase: state.game.phase,
-  //     isRunning: state.game.isRunning,
-  //     isNight: getters["game/isNight"],
-  //   }),
-  //   ({ history, phase, isRunning, isNight }) => {
-  //     const newState = { history, phase, isRunning, isNight };
-  //     logger.info("Detected VueX game change", newState);
+  logger.info("Adding game watcher");
+  globals.$store.watch(
+    (state, getters: botc.StoreGetters) => ({
+      history: state.game.history,
+      phase: state.game.phase,
+      isRunning: state.game.isRunning,
+      isNight: getters["game/isNight"],
+    }),
+    ({ history, phase, isRunning, isNight }) => {
+      const newState = { history, phase, isRunning, isNight };
+      logger.info("Detected VueX game change", newState);
 
-  //     const detail = JSON.parse(
-  //       JSON.stringify({
-  //         history,
-  //         phase,
-  //         isRunning,
-  //         isNight,
-  //       })
-  //     );
-  //     document.dispatchEvent(new CustomEvent("sotc-gameState", { detail }));
-  //   }
-  // );
+      const detail = clone({
+        history: history.length,
+        phase,
+        isRunning,
+        isNight,
+      });
+      const event = sotcEvent("sotc-gameState", { detail });
+      document.dispatchEvent(event);
+    }
+  );
 
   logger.info("Adding route watcher to", globals.$router);
   globals.$router.afterEach((to) => {

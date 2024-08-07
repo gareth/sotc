@@ -1,6 +1,6 @@
 import EventEmitter from "../../core/util/EventEmitter";
 import { LogLevel, TaggedLogger } from "../../core/util/TaggedLogger";
-import { NavigateEventDetail, Seat, isSOTCEventMessage } from "../types/event";
+import { GameState, NavigateEventDetail, Seat, isSOTCEventMessage } from "../types/event";
 import { ExtensionState, Grimoire, Script } from "../types/sotc";
 
 import { createPinia } from "pinia";
@@ -83,6 +83,11 @@ export class GameManager {
           this.state.grim = message.payload as Grimoire;
           extensionStore.grim = this.state.grim;
           logger.debug("Grim is now", this.state.grim);
+          break;
+        case "sotc-gameState":
+          this.state.game = message.payload as GameState;
+          extensionStore.game = this.state.game;
+          logger.debug("Game is now", this.state.game);
           break;
       }
       // extensionStore.state = clone(this.state);

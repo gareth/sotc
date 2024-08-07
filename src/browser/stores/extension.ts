@@ -7,7 +7,7 @@ import useLocalStore from "../stores/local";
 import { broadcastBulkStateChange, synchronizeExtensionState } from "../twitch/sync";
 
 import { throttle } from "underscore";
-import { Seat } from "../types/event";
+import { GameState, Seat } from "../types/event";
 import { Offsets } from "../../core/util/bounds";
 
 const pinia = createPinia();
@@ -31,6 +31,7 @@ export default defineStore("extension", () => {
   const seats = ref<Seat[] | undefined>(undefined);
   const grim = ref<Grimoire | undefined>(undefined);
   const overlay = ref<{ pos: Offsets } | undefined>(undefined);
+  const game = ref<GameState | undefined>(undefined);
 
   const state = computed(() => ({
     script: script.value,
@@ -38,6 +39,7 @@ export default defineStore("extension", () => {
     seats: seats.value,
     grim: grim.value,
     overlay: overlay.value,
+    game: game.value,
   }));
 
   const synchroniser = new BatchSynchroniser();
@@ -48,6 +50,7 @@ export default defineStore("extension", () => {
     seats.value = newState.seats;
     grim.value = newState.grim;
     overlay.value = newState.overlay;
+    game.value = newState.game;
   };
 
   logger.debug("Watching", state);
@@ -58,8 +61,9 @@ export default defineStore("extension", () => {
   watch(page, synchroniser.updater("page"), { deep: true });
   watch(grim, synchroniser.updater("grim"), { deep: true });
   watch(overlay, synchroniser.updater("overlay"), { deep: true });
+  watch(game, synchroniser.updater("game"), { deep: true });
 
-  return { script, page, seats, grim, state, overlay, setState };
+  return { script, page, seats, grim, state, overlay, game, setState };
 });
 
 class BatchSynchroniser {
