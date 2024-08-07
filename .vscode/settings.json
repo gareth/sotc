@@ -11,5 +11,6 @@
     "twurple",
     "vueuse",
     "vuex"
-  ]
+  ],
+  "scm.showHistoryGraph": false
 }
