@@ -1,4 +1,4 @@
-import { GameState, Seat } from "./event";
+import { GamePhase, Seat } from "./event";
 import { lookup } from "./lookup";
 import { Bounds, Offsets } from "../../core/util/bounds";
 
@@ -45,5 +45,5 @@ export interface ExtensionState {
   seats: Seat[];
   grim: Grimoire;
   overlay: { pos: Offsets };
-  game: GameState;
+  game: GamePhase;
 }

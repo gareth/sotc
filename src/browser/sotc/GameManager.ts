@@ -1,6 +1,6 @@
 import EventEmitter from "../../core/util/EventEmitter";
 import { LogLevel, TaggedLogger } from "../../core/util/TaggedLogger";
-import { GameState, NavigateEventDetail, Seat, isSOTCEventMessage } from "../types/event";
+import { GamePhase, GameState, NavigateEventDetail, Seat, isSOTCEventMessage } from "../types/event";
 import { ExtensionState, Grimoire, Script } from "../types/sotc";
 
 import { createPinia } from "pinia";
@@ -33,7 +33,9 @@ export class GameManager {
   #events: EventEmitter = new EventEmitter();
   #_connection: Connection = DISCONNECTED;
 
-  state: Partial<ExtensionState> = {};
+  state: Pick<ExtensionState, "game"> & Partial<ExtensionState> = {
+    game: { phase: "inactive" },
+  };
 
   connect(port: chrome.runtime.Port) {
     logger.debug("Received connection from port", port);
@@ -72,6 +74,7 @@ export class GameManager {
         case "sotc-scriptChanged":
           this.state.script = message.payload as Script;
           extensionStore.script = this.state.script;
+          this.step({ phase: "inactive" });
           logger.debug("Script is now", this.state.script);
           break;
         case "sotc-playersChanged":
@@ -82,12 +85,21 @@ export class GameManager {
         case "sotc-size":
           this.state.grim = message.payload as Grimoire;
           extensionStore.grim = this.state.grim;
+          if (this.state.grim.mode == "reveal") {
+            this.step({ phase: "reveal" });
+          } else if (this.state.game.phase == "reveal" && this.state.grim.mode == "grimoire") {
+            this.step({ phase: "inactive" });
+          }
           logger.debug("Grim is now", this.state.grim);
           break;
         case "sotc-gameState":
-          this.state.game = message.payload as GameState;
-          extensionStore.game = this.state.game;
-          logger.debug("Game is now", this.state.game);
+          {
+            const gameState = message.payload as GameState;
+            if (gameState.isRunning) {
+              this.step({ phase: "running", count: gameState.phase });
+            }
+            logger.debug("Game is now", this.state.game);
+          }
           break;
       }
       // extensionStore.state = clone(this.state);
@@ -109,6 +121,12 @@ export class GameManager {
     logger.debug("Connection state change", connection);
     this.#_connection = connection;
     this.#emit(`port:${connection.state}`, connection);
+  }
+
+  step(phase: GamePhase) {
+    const newPhase = GamePhaseState.step(this.state.game, phase);
+    this.state.game = newPhase;
+    extensionStore.game = newPhase;
   }
 
   get port() {
@@ -133,3 +151,20 @@ export class GameManager {
     this.port?.postMessage({ type: "endCalibration" });
   }
 }
+
+class GamePhaseState {
+  static step(phase: GamePhase, newPhase: GamePhase): GamePhase {
+    if (newPhase.phase == "running" || newPhase.phase == "reveal") {
+      return newPhase;
+    } else if (phase.phase == "reveal") {
+      return newPhase;
+    }
+    return phase;
+  }
+}
+
+/*
+isRunning: false -> true === Running
+mode: grimoire -> reveal === Reveal
+mode: reveal -> grimoire === Inactive
+*/

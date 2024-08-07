@@ -7,7 +7,7 @@ import useLocalStore from "../stores/local";
 import { broadcastBulkStateChange, synchronizeExtensionState } from "../twitch/sync";
 
 import { throttle } from "underscore";
-import { GameState, Seat } from "../types/event";
+import { GamePhase, Seat } from "../types/event";
 import { Offsets } from "../../core/util/bounds";
 
 const pinia = createPinia();
@@ -31,7 +31,7 @@ export default defineStore("extension", () => {
   const seats = ref<Seat[] | undefined>(undefined);
   const grim = ref<Grimoire | undefined>(undefined);
   const overlay = ref<{ pos: Offsets } | undefined>(undefined);
-  const game = ref<GameState | undefined>(undefined);
+  const game = ref<GamePhase | undefined>(undefined);
 
   const state = computed(() => ({
     script: script.value,

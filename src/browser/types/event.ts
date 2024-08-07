@@ -21,6 +21,8 @@ export type Seat = Partial<{
   revealed: boolean;
 };
 
+export type GamePhase = { phase: "inactive" } | { phase: "running"; count: number } | { phase: "reveal" };
+
 export interface GameState {
   phase: number;
   isRunning: boolean;
