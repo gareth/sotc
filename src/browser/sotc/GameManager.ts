@@ -79,7 +79,7 @@ export class GameManager {
           break;
         case "sotc-playersChanged":
           this.state.seats = message.payload as Seat[];
-          extensionStore.seats = this.state.seats;
+          extensionStore.knownSeats = this.state.seats;
           logger.debug("Seats are now", this.state.seats);
           break;
         case "sotc-size":

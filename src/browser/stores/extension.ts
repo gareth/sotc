@@ -28,7 +28,11 @@ const synchroniseState = async (newState: object) => {
 export default defineStore("extension", () => {
   const script = ref<Script | undefined>(undefined);
   const page = ref<string | undefined>(undefined);
-  const seats = ref<Seat[] | undefined>(undefined);
+  const knownSeats = ref<Seat[] | undefined>(undefined);
+  const seats = computed(() => {
+    const seatsVisible = game.value?.phase != "inactive";
+    return seatsVisible ? knownSeats.value : [];
+  });
   const grim = ref<Grimoire | undefined>(undefined);
   const overlay = ref<{ pos: Offsets } | undefined>(undefined);
   const game = ref<GamePhase | undefined>(undefined);
@@ -47,7 +51,7 @@ export default defineStore("extension", () => {
   const setState = (newState: Partial<ExtensionState>) => {
     script.value = newState.script;
     page.value = newState.page;
-    seats.value = newState.seats;
+    knownSeats.value = newState.seats;
     grim.value = newState.grim;
     overlay.value = newState.overlay;
     game.value = newState.game;
@@ -63,7 +67,7 @@ export default defineStore("extension", () => {
   watch(overlay, synchroniser.updater("overlay"), { deep: true });
   watch(game, synchroniser.updater("game"), { deep: true });
 
-  return { script, page, seats, grim, state, overlay, game, setState };
+  return { script, page, knownSeats, seats, grim, state, overlay, game, setState };
 });
 
 class BatchSynchroniser {
