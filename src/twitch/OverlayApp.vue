@@ -3,7 +3,7 @@ import { computed, onMounted, ref } from "vue";
 import { TaggedLogger } from "../core/util/TaggedLogger";
 import { decode } from "../browser/twitch/sync";
 import { ExtensionState, Grimoire, Script } from "../browser/types/sotc";
-import { GameState, Seat } from "../browser/types/event";
+import { GamePhase, GameState, Seat } from "../browser/types/event";
 import ScriptPanel from "./ScriptPanel.vue";
 import GrimoirePanel from "./GrimoirePanel.vue";
 import CalibrationPanel from "./CalibrationPanel.vue";
@@ -12,12 +12,6 @@ import { Bounds, Offsets } from "../core/util/bounds";
 
 interface SOTCPubSubMessage {
   type: string;
-}
-
-interface SOTCPubSubUpdateStateMessage<T extends keyof ExtensionState> {
-  type: "updateState";
-  key: T;
-  payload: ExtensionState[T];
 }
 
 interface SOTCPubSubBulkUpdateStateMessage {
@@ -66,52 +60,6 @@ const broadcastHandler = (
   logger.debug("Decoded, this is", message);
 
   switch (message.type) {
-    // TODO: Remove this (unused?) message handler
-    case "updateState":
-      {
-        const stateMessage = message as SOTCPubSubUpdateStateMessage<any>;
-        switch (stateMessage.key) {
-          case "script":
-            script.value = (
-              stateMessage as SOTCPubSubUpdateStateMessage<"script">
-            ).payload;
-            break;
-
-          case "seats":
-            seats.value = (
-              stateMessage as SOTCPubSubUpdateStateMessage<"seats">
-            ).payload;
-            break;
-
-          case "page":
-            page.value = (
-              stateMessage as SOTCPubSubUpdateStateMessage<"page">
-            ).payload;
-            break;
-
-          case "grim":
-            grim.value = (
-              stateMessage as SOTCPubSubUpdateStateMessage<"grim">
-            ).payload;
-            break;
-
-          case "overlay":
-            overlay.value = (
-              stateMessage as SOTCPubSubUpdateStateMessage<"overlay">
-            ).payload;
-            break;
-
-          case "game":
-            game.value = (
-              stateMessage as SOTCPubSubUpdateStateMessage<"game">
-            ).payload;
-            break;
-
-          default:
-            break;
-        }
-      }
-      break;
     case "bulkUpdateState":
       const stateMessage = message as SOTCPubSubBulkUpdateStateMessage;
       const data = stateMessage.payload;
@@ -182,7 +130,7 @@ const page = ref<string | undefined>(undefined);
 const seats = ref<Seat[] | undefined>(undefined);
 const grim = ref<Grimoire | undefined>(undefined);
 const overlay = ref<{ pos: Offsets }>({ pos: defaultOffsets });
-const game = ref<GameState | undefined>(undefined);
+const game = ref<GamePhase | undefined>(undefined);
 
 Twitch.ext.configuration.onChanged(() => {
   if (Twitch.ext.configuration.broadcaster) {
