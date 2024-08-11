@@ -29,27 +29,33 @@ export interface GameState {
   isNight: boolean;
 }
 
-export interface SOTCEvent {
-  "sotc-navigate": NavigateEventDetail;
-  "sotc-scriptChanged": Script;
-  "sotc-playersChanged": Seat[];
-  "sotc-size": Grimoire;
-  "sotc-overlayOffsets": { offsets: Offsets };
-  "sotc-startCalibration": void;
-  "sotc-endCalibration": void;
-  "sotc-gameState": GameState;
+export interface SOTCMessagePayloadType {
+  navigate: NavigateEventDetail;
+  scriptChanged: Script;
+  playersChanged: Seat[];
+  size: Grimoire;
+  overlayOffsets: { offsets: Offsets };
+  startCalibration: void;
+  endCalibration: void;
+  gameState: GameState;
 }
+
+export type SOTCEvent = {
+  [K in keyof SOTCMessagePayloadType as `sotc-${K}`]: SOTCMessagePayloadType[K];
+};
 
 export type SOTCEventMap = {
   [K in keyof SOTCEvent]: CustomEvent<{ detail: SOTCEvent[K] }>;
 };
 
-export interface SOTCEventMessage<T extends keyof SOTCEvent> {
+export interface SOTCEventMessage<T extends keyof SOTCMessagePayloadType> {
   type: T;
-  payload: SOTCEvent[T];
+  payload: SOTCMessagePayloadType[T];
 }
 
-export function isSOTCEventMessage<T extends keyof SOTCEvent>(message: object): message is SOTCEventMessage<T> {
+export function isSOTCEventMessage<T extends keyof SOTCMessagePayloadType>(
+  message: object
+): message is SOTCEventMessage<T> {
   return typeof message == "object" && "type" in message && typeof message.type == "string" && "payload" in message;
 }
 

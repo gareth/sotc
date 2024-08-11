@@ -38,7 +38,7 @@ chrome.runtime
       container.addEventListener("cancelCalibration", () => {
         void chrome.runtime.sendMessage("endCalibration");
       });
-      container.addEventListener("sotc-overlayOffsets", (event: Event) => {
+      container.addEventListener("sotc-overlayOffsets", (event) => {
         if (event instanceof CustomEvent) {
           handleOverlayOffsets(event);
           void chrome.runtime.sendMessage("endCalibration");
