@@ -72,7 +72,7 @@ function inject(container: HTMLVueAppElement) {
       logger.info("Detected VueX script change", script);
       if (!script) return;
 
-      document.dispatchEvent(sotcEvent("sotc-scriptChanged", { detail: clone(script) }));
+      document.dispatchEvent(sotcEvent("sotc-scriptChange", { detail: clone(script) }));
     }
   );
 
@@ -123,7 +123,7 @@ function inject(container: HTMLVueAppElement) {
 
         logger.info("Players changed", [...activePlayers]);
 
-        document.dispatchEvent(sotcEvent("sotc-playersChanged", { detail: clone(activePlayers) }));
+        document.dispatchEvent(sotcEvent("sotc-playersChange", { detail: clone(activePlayers) }));
         updateGrim(container, mode);
       }).catch((e) => {
         sentry.captureException(e);
@@ -168,12 +168,12 @@ function inject(container: HTMLVueAppElement) {
     const detail = { page: to.name?.toString() };
 
     logger.debug("Dispatching navigated route", detail);
-    document.dispatchEvent(sotcEvent("sotc-navigate", { detail }));
+    document.dispatchEvent(sotcEvent("sotc-pageChange", { detail }));
   });
 
   const detail = { page: globals.$route.name?.toString() };
   logger.debug("Dispatching initial route", detail);
-  const event = sotcEvent("sotc-navigate", { detail });
+  const event = sotcEvent("sotc-pageChange", { detail });
   document.dispatchEvent(event);
 
   logger.info("Adding mutation watcher");
@@ -194,9 +194,7 @@ const updateGrim = (container: HTMLElement, mode: string | undefined) => {
     width: window.innerWidth,
     height: window.innerHeight,
   };
-  if (grimBounds) {
-    document.dispatchEvent(sotcEvent("sotc-size", { detail: { pos: grimBounds, container: windowBounds, mode } }));
-  }
+  document.dispatchEvent(sotcEvent("sotc-grimChange", { detail: { pos: grimBounds, container: windowBounds, mode } }));
 };
 
 const calibratorClass = "sotc-overlay";

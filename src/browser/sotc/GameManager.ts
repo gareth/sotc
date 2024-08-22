@@ -66,23 +66,23 @@ export class GameManager {
       logger.debug("Received port message", message);
 
       switch (message.type) {
-        case "navigate":
+        case "pageChange":
           this.state.page = (message.payload as NavigateEventDetail).page;
           extensionStore.page = this.state.page;
           logger.debug("Page is now", this.state.page);
           break;
-        case "scriptChanged":
+        case "scriptChange":
           this.state.script = message.payload as Script;
           extensionStore.script = this.state.script;
           this.step({ phase: "inactive" });
           logger.debug("Script is now", this.state.script);
           break;
-        case "playersChanged":
+        case "playersChange":
           this.state.seats = message.payload as Seat[];
           extensionStore.knownSeats = this.state.seats;
           logger.debug("Seats are now", this.state.seats);
           break;
-        case "size":
+        case "grimChange":
           this.state.grim = message.payload as Grimoire;
           extensionStore.grim = this.state.grim;
           if (this.state.grim.mode == "reveal") {

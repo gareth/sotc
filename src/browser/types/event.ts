@@ -30,10 +30,10 @@ export interface GameState {
 }
 
 export interface SOTCMessagePayloadType {
-  navigate: NavigateEventDetail;
-  scriptChanged: Script;
-  playersChanged: Seat[];
-  size: Grimoire;
+  pageChange: NavigateEventDetail;
+  scriptChange: Script;
+  playersChange: Seat[];
+  grimChange: Grimoire;
   overlayOffsets: { offsets: Offsets };
   startCalibration: void;
   endCalibration: void;

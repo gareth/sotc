@@ -116,10 +116,10 @@ function injectScript() {
   logger.debug("Injecting Vue monitor script", runtimeUrl);
   script.src = runtimeUrl;
 
-  relay("sotc-navigate");
-  relay("sotc-scriptChanged");
-  relay("sotc-playersChanged");
-  relay("sotc-size");
+  relay("sotc-pageChange");
+  relay("sotc-scriptChange");
+  relay("sotc-playersChange");
+  relay("sotc-grimChange");
   relay("sotc-overlayOffsets");
   relay("sotc-gameState");
 
