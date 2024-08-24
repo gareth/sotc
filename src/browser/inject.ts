@@ -179,11 +179,32 @@ function inject(container: HTMLVueAppElement) {
   logger.info("Adding mutation watcher");
   globals.$store.subscribe((mutation, state) => {
     if (IGNORED_MUTATIONS.includes(mutation.type)) return;
-
     logger.debug("VueX mutation", mutation, state);
   });
 
-  logger.info("Adding game watcher");
+  // There may be other ways for the grim position to move, but for now we're
+  // just worrying about the side panel opening/closing.
+  logger.info("Adding grim position observer");
+  globals.$store.watch(
+    (state) => ({ rightSideTabState: state.grimoire.rightSideTabState }),
+    (rightSideTabState) => {
+      // TODO: Avoid one-off hardcoded ID lookup here.
+      // Is the difference between #center and .circle important?
+      const grimContainer = document.querySelector("#center");
+      if (!(grimContainer instanceof HTMLElement)) return;
+      logger.info("Tab state now", rightSideTabState);
+
+      // The tab state changing might have caused the grim to animate, so we
+      // wait for the animations to finish before detecting the new position. If
+      // there are no animations, this resolves instantly
+      Promise.allSettled(grimContainer.getAnimations().map((a) => a.finished))
+        .then(() => {
+          const bounds = getGrimoireBounds(grimContainer);
+          logger.info("Bounds", bounds);
+        })
+        .catch((e) => logger.error(e));
+    }
+  );
 }
 
 const updateGrim = (container: HTMLElement, mode: string | undefined) => {

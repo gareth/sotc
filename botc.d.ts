@@ -52,6 +52,7 @@ declare namespace botc {
     };
     grimoire: {
       mode: string | undefined;
+      rightSideTabState: string;
     };
     players: {
       players: Player[];
