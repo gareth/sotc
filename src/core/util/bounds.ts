@@ -51,8 +51,9 @@ export const invertInsetBoundsBy = (bounds: Bounds, inset: number): Bounds => {
   };
 };
 
-export const mapToPixels = (object: Record<string, number>) =>
-  Object.fromEntries([...Object.entries(object)].map(([k, v]) => [k, `${v}px`]));
+const mapObjectValues = (mapper: (value: number) => string, object: Record<string, number>) =>
+  Object.fromEntries([...Object.entries(object)].map(([k, v]) => [k, mapper(v)]));
 
-export const mapToPercent = (object: Record<string, number>) =>
-  Object.fromEntries([...Object.entries(object)].map(([k, v]) => [k, `${v * 100}%`]));
+export const mapToPixels = mapObjectValues.bind(this, (v: number) => `${v}px`);
+
+export const mapToPercent = mapObjectValues.bind(this, (v: number) => `${v * 100}%`);
