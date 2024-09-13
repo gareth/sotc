@@ -63,26 +63,26 @@ export class GameManager {
         return;
       }
 
-      logger.debug("Received port message", message);
+      logger.info("Received port message", message);
 
       switch (message.type) {
-        case "pageChange":
+        case "sotc-pageChange":
           this.state.page = (message.payload as NavigateEventDetail).page;
           extensionStore.page = this.state.page;
           logger.debug("Page is now", this.state.page);
           break;
-        case "scriptChange":
+        case "sotc-scriptChange":
           this.state.script = message.payload as Script;
           extensionStore.script = this.state.script;
           this.step({ phase: "inactive" });
           logger.debug("Script is now", this.state.script);
           break;
-        case "playersChange":
+        case "sotc-playersChange":
           this.state.seats = message.payload as Seat[];
           extensionStore.knownSeats = this.state.seats;
           logger.debug("Seats are now", this.state.seats);
           break;
-        case "grimChange":
+        case "sotc-grimChange":
           this.state.grim = message.payload as Grimoire;
           extensionStore.grim = this.state.grim;
           if (this.state.grim.mode == "reveal") {
@@ -92,7 +92,7 @@ export class GameManager {
           }
           logger.debug("Grim is now", this.state.grim);
           break;
-        case "gameState":
+        case "sotc-gameState":
           {
             const gameState = message.payload as GameState;
             if (gameState.isRunning) {

@@ -48,14 +48,12 @@ export type SOTCEventMap = {
   [K in keyof SOTCEvent]: CustomEvent<{ detail: SOTCEvent[K] }>;
 };
 
-export interface SOTCEventMessage<T extends keyof SOTCMessagePayloadType> {
+export interface SOTCEventMessage<T extends keyof SOTCEvent> {
   type: T;
-  payload: SOTCMessagePayloadType[T];
+  payload: SOTCEvent[T];
 }
 
-export function isSOTCEventMessage<T extends keyof SOTCMessagePayloadType>(
-  message: object
-): message is SOTCEventMessage<T> {
+export function isSOTCEventMessage<T extends keyof SOTCEvent>(message: object): message is SOTCEventMessage<T> {
   return typeof message == "object" && "type" in message && typeof message.type == "string" && "payload" in message;
 }
 

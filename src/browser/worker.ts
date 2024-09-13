@@ -53,7 +53,7 @@ chrome.runtime.onConnect.addListener(
 chrome.runtime.onMessage.addListener(
   capture(
     (
-      message: string | SOTCEventMessage<"overlayOffsets">,
+      message: string | SOTCEventMessage<"sotc-overlayOffsets">,
       sender: unknown,
       sendResponse: (response: unknown) => void
     ) => {
@@ -108,7 +108,7 @@ chrome.runtime.onMessage.addListener(
         }
       } else {
         switch (message.type) {
-          case "overlayOffsets":
+          case "sotc-overlayOffsets":
             {
               logger.info("Calibration saving", message.payload);
               localStore.overlay.pos = message.payload.offsets;
