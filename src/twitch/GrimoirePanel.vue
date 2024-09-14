@@ -208,11 +208,13 @@ svg {
 }
 
 g.seat {
+  transition: all 0.2s linear;
+
   circle {
     stroke: black;
     stroke-width: 0.5;
 
-    transition: all linear 0.3s;
+    transition: all 0.2s linear;
   }
 
   .shroud {
@@ -220,7 +222,7 @@ g.seat {
     stroke-width: 0.5;
     fill: #303030;
     stroke: #222;
-    transition: opacity 0.3s linear;
+    transition: opacity 0.2s linear;
     opacity: 0;
   }
 

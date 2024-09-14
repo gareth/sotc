@@ -64,6 +64,7 @@ declare namespace botc {
 
   export interface StoreGetters {
     "game/isNight": boolean;
+    "chat/hasVideo": Record<number, boolean>;
   }
 }
 

@@ -1,9 +1,8 @@
-import { Seat, sotcEvent } from "./types/event";
+import { PlayerCharacter, Seat, sotcEvent } from "./types/event";
 import { TaggedLogger } from "../core/util/TaggedLogger";
 import type { BOTCVueApp } from "botc";
 import { clone } from "../core/util/clone";
 import { Character, CharacterAlignments, Script, characterType } from "./types/sotc";
-import { nextTick } from "vue";
 import { round } from "../core/util/round";
 
 import sentry, { promiseHandler } from "../core/util/sentry";
@@ -96,40 +95,20 @@ function inject(container: HTMLVueAppElement) {
     };
   }
 
-  logger.info("Adding players watcher");
+  logger.info("Adding players/camera visibility watcher");
   globals.$store.watch(
-    (state) => ({ players: state.players.players, users: state.session.users, mode: state.grimoire.mode }),
-    ({ players, users, mode }) => {
-      // addCalibrationOverlay(container);
-
-      // `nextTick` because we need Vue to render the result of this change
-      // otherwise the bounds won't be calculated correctly.
-      nextTick(async () => {
-        const locations = await getTokensBounds(container);
-        if (locations?.length != players.length) return;
-
-        const activePlayers = players.map((player, idx): Seat => {
-          const pos = locations?.[idx];
-          const user = users.get(player.id);
-          return {
-            user: user?.username,
-            role: roleDetail(player),
-            pos,
-            isDead: player.isDead,
-            isVoteless: player.isVoteless,
-            revealed: player.revealed,
-          };
-        });
-
-        logger.info("Players changed", [...activePlayers]);
-
-        document.dispatchEvent(sotcEvent("sotc-playersChange", { detail: clone(activePlayers) }));
-        updateGrim(container, mode);
-      }).catch((e) => {
+    (state, getters: botc.StoreGetters) => ({
+      players: state.players.players,
+      users: state.session.users,
+      mode: state.grimoire.mode,
+      hasVideo: getters["chat/hasVideo"],
+    }),
+    ({ players, users, mode, hasVideo: _hasVideo }) => {
+      updateGrimoireTokenPositions(container, players, users, roleDetail, mode).catch((e) => {
         sentry.captureException(e);
       });
     },
-    { deep: true }
+    { deep: true, flush: "post" }
   );
 
   globals.$store.watch(
@@ -220,6 +199,36 @@ const updateGrim = (container: HTMLElement, mode: string | undefined) => {
 
 const calibratorClass = "sotc-overlay";
 
+async function updateGrimoireTokenPositions(
+  container: HTMLVueAppElement,
+  players: botc.Player[],
+  users: Map<string, botc.User>,
+  roleDetail: (player: botc.Player) => PlayerCharacter | undefined,
+  mode: string | undefined
+) {
+  const locations = await getTokensBounds(container);
+  logger.info("Animations finished!");
+  if (locations?.length != players.length) return;
+
+  const activePlayers = players.map((player, idx): Seat => {
+    const pos = locations?.[idx];
+    const user = users.get(player.id);
+    return {
+      user: user?.username,
+      role: roleDetail(player),
+      pos,
+      isDead: player.isDead,
+      isVoteless: player.isVoteless,
+      revealed: player.revealed,
+    };
+  });
+
+  logger.info("Players changed", [...activePlayers]);
+
+  document.dispatchEvent(sotcEvent("sotc-playersChange", { detail: clone(activePlayers) }));
+  updateGrim(container, mode);
+}
+
 function addCalibrationOverlay(container: HTMLElement) {
   logger.info("Adding calibration overlay to", container);
   let calibrator: HTMLElement | null = container.querySelector(`.${calibratorClass}`);
@@ -305,16 +314,25 @@ const getTokensBounds = async (container: HTMLElement) => {
   logger.debug("Getting token bounds");
   const base = getGrimoireBounds(container);
   logger.debug("Base bounds", base);
-  const tokens = container.querySelectorAll(".circle .player");
-  const promises = [...tokens].map(async (el) => {
-    const animations = el.getAnimations();
-    // If there are no animations, this resolves instantly
-    await Promise.allSettled(animations.map((a) => a.finished));
-    return getElementBounds(el, base);
+  const playerContainers = container.querySelectorAll(".circle > li");
+  const promises = [...playerContainers].map(async (el) => {
+    const player = el.querySelector(":scope .player");
+    if (!player) throw new Error("Player not found in circle scope");
+    const animationTargets = el.querySelectorAll(":scope .player, :scope .chat-video");
+    await animationsResolved([...animationTargets]);
+    return getElementBounds(player, base);
   });
 
   return Promise.all(promises);
 };
+
+async function animationsResolved(elements: Element[]) {
+  let animations;
+  do {
+    animations = elements.flatMap((el) => el.getAnimations());
+    await Promise.allSettled(animations.map((a) => a.finished));
+  } while (animations.length);
+}
 
 try {
   const main = document.getElementById("main");
