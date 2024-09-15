@@ -117,8 +117,8 @@ function deselect() {
               <template #default v-if="selectedCharacter">
                 {{ selectedCharacter.ability }}
               </template>
-              <template #default v-else-if="showInfoPanel">
-                <PlayerCounts :seats="seats"></PlayerCounts>
+              <template #default v-else-if="showInfoPanel && seats?.length">
+                <PlayerCounts :seats="seats" v-if="seats"></PlayerCounts>
               </template>
             </InfoBox>
           </div>
