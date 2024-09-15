@@ -306,11 +306,12 @@ g.seat {
 }
 
 .infoBox {
+  border-radius: 50%;
   position: absolute;
-  top: 30%;
-  left: 30%;
-  bottom: 35%;
-  right: 30%;
+  top: 32%;
+  left: 32%;
+  bottom: 32%;
+  right: 32%;
   display: grid;
   place-items: center;
   z-index: 1000;
