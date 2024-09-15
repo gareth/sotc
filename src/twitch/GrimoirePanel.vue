@@ -97,7 +97,9 @@ function deselect() {
               <use
                 class="shroud"
                 href="#shroud"
-                :transform="`translate(0, ${-position.r * 100})`"
+                :transform="`translate(0, ${-position.r * 100}) scale(${
+                  position.r * 15
+                })`"
               ></use>
             </g>
           </Transition>
