@@ -129,13 +129,24 @@ function disconnect() {
       <div class="description">Connect your Twitch account</div>
       <div class="status">
         <template v-if="connectedAccount">
-          <span class="twitchAccount">{{
-            connectedAccount.connection.id.preferred_username
-          }}</span>
-          <button @click="disconnect()">X</button>
+          <span class="promise-success">
+            <span class="twitchAccount">{{
+              connectedAccount.connection.id.preferred_username
+            }}</span>
+          </span>
+          <button
+            class="btn"
+            title="Disconnect your account"
+            @click="disconnect()"
+          >
+            X
+          </button>
         </template>
         <template v-else>
-          <button @click="connect(false)">Connect your account</button>
+          <span class="promise-failure">Account not connected</span>
+          <button class="btn btn__external btn--twitch" @click="connect(false)">
+            Connect your account
+          </button>
         </template>
       </div>
     </div>
@@ -146,18 +157,33 @@ function disconnect() {
         <template v-if="connectedAccount">
           <Async :promise="installCheckPromise">
             <template #pending>Checking…</template>
-            <template #failure="{ value: error }">
-              {{ error }}
-              <a
+            <template #failure="{ value: error }"
+              >{{ error
+              }}<a
                 :href="`https://dashboard.twitch.tv/extensions/${clientId}`"
                 target="_blank"
-                >Install</a
+                class="btn btn--twitch btn__external"
               >
-              <button @click="checkExtensionStatus">Check again</button>
+                Install
+              </a>
+              <button
+                class="btn"
+                title="Refresh this data"
+                @click="checkExtensionStatus"
+              >
+                ↻
+              </button>
             </template>
             <template #success="{ value: [installed] }"
-              >Version {{ installed.version }} installed</template
-            >
+              >Version {{ installed.version }} installed
+              <button
+                class="btn"
+                title="Refresh this data"
+                @click="checkExtensionStatus"
+              >
+                ↻
+              </button>
+            </template>
           </Async>
         </template>
       </div>
@@ -173,6 +199,28 @@ function disconnect() {
 </template>
 
 <style scoped lang="scss">
+.btn {
+  appearance: none;
+  border: 1px solid black;
+  padding: 0.2em 0.5em;
+  text-decoration: none;
+  display: inline-block;
+  box-sizing: border-box;
+  margin-left: 0.3em;
+  line-height: initial;
+  font-family: Arial;
+}
+
+.btn--twitch {
+  border-color: purple;
+  background: purple;
+  color: white;
+}
+
+.btn__external::after {
+  content: "⤴";
+}
+
 .extensionStatus {
   display: grid;
   grid-template-columns: auto auto 1fr;
@@ -185,16 +233,23 @@ function disconnect() {
   grid-column: 1 / -1;
   grid-template-columns: subgrid;
   align-items: baseline;
-  line-height: 1.5;
+  line-height: 2;
+  counter-increment: extensionStep;
 }
 
 .description {
+  min-height: 2em;
   color: inherit;
+
+  &::before {
+    content: counter(extensionStep) ". ";
+  }
 }
 
 .status {
   color: inherit;
 }
+
 .promise-pending {
   color: #666;
 }
