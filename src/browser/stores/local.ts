@@ -75,7 +75,7 @@ chrome.storage.onChanged.addListener((changes) => {
 
 export default defineStore("sotc", {
   state: () => ({
-    auth: useStorageAsync<Partial<Auth>>("auth", {}, new ChromeStorageWrapper(chrome.storage.local), {
+    auth: useStorageAsync<Partial<{ data: Auth }>>("auth", {}, new ChromeStorageWrapper(chrome.storage.local), {
       window: self,
     }),
     // There were problems using `OIDCIdentity | undefined` because Pinia
@@ -89,7 +89,9 @@ export default defineStore("sotc", {
     }),
   }),
   getters: {
-    accessToken: (state) => state.auth.access_token,
+    accessToken: (state) => state.auth.data?.access_token,
     broadcasterId: (state) => state.id.data?.sub,
+    connection: (state) =>
+      state.id.data && state.auth.data ? { auth: state.auth.data, id: state.id.data } : undefined,
   },
 });

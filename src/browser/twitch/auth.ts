@@ -11,7 +11,7 @@ export const twitchAuth = async (force_verify = false) => {
   const redirect_uri = chrome.identity.getRedirectURL();
   const state = crypto.randomUUID();
   const nonce = crypto.randomUUID();
-  const scopes = ["openid"];
+  const scopes = ["openid", "user:edit:broadcast"];
 
   const url = new URL("https://id.twitch.tv/oauth2/authorize");
   Object.entries({
