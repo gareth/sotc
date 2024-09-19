@@ -36,9 +36,9 @@ const installCheckPromise = ref<
   Promise<[HelixUserExtension, HelixExtension]> | undefined
 >(undefined);
 
-watch(installCheckPromise, (newV, oldV) => {
-  logger.info("Changing installCheckPromise", oldV, newV);
-});
+const activeCheckPromise = ref<Promise<HelixUserExtension> | undefined>(
+  undefined
+);
 
 watch(connectedAccount, (value, oldValue) => {
   if (value != oldValue) installedExtension.value = undefined;
@@ -47,8 +47,30 @@ watch(connectedAccount, (value, oldValue) => {
   }
 });
 
+async function connect(verify = false) {
+  const data = await twitchAuth(verify).catch((e) => {
+    logger.error("Authentication failed:", e);
+    return undefined;
+  });
+
+  if (data) {
+    const { auth, id } = data;
+
+    if (auth) {
+      store.auth = { data: auth };
+      store.id = { data: id };
+    }
+  }
+}
+
+function disconnect() {
+  store.auth = {};
+  store.id = {};
+}
+
 async function checkExtensionStatus() {
   installCheckPromise.value = undefined;
+  activeCheckPromise.value = undefined;
   const expectPromise = getExpectedExtension();
   expectedSOTCPromise.value = expectPromise;
   expectedSOTCPromise.value.then((extension) => {
@@ -63,18 +85,43 @@ async function checkExtensionStatus() {
     .then((extensions) => {
       installedExtension.value = extensions;
     })
-    .catch(() => {});
+    .catch(() => {
+      // Extension not installed, that's ok
+    });
   installCheckPromise.value = Promise.all([installPromise, expectPromise]).then(
     ([installed, expected]) => {
       const target = expected.version;
-      // const target = "0.0.4";
       if (lt(installed.version, target))
         throw new Error(
           `Installed Twitch extension (${installed.version}) is outdated. Install the newest version (${target})`
         );
+
+      checkExtensionActiveStatus(installPromise);
       return [installed, expected];
     }
   );
+}
+
+async function recheckExtensionActiveStatus(extension: HelixUserExtension) {
+  return checkExtensionActiveStatus(Promise.resolve(extension));
+}
+
+async function checkExtensionActiveStatus(
+  installPromise: Promise<HelixUserExtension>
+) {
+  activeCheckPromise.value = installPromise.then((extension) => {
+    return getActiveOverlayExtension().then((overlayExtension) => {
+      if (
+        extension.id == overlayExtension?.id &&
+        extension.version == overlayExtension?.version
+      ) {
+        return extension;
+      } else {
+        throw new Error("Extension has not been set as your stream overlay");
+      }
+    });
+  });
+  return activeCheckPromise.value;
 }
 
 async function getExpectedExtension() {
@@ -93,33 +140,47 @@ async function getInstalledExtensions() {
       connectedAccount.value.connection.id.sub
     )
   ).filter((ext) => ext.id == props.clientId);
-  logger.debug("Found extensions", extensions);
   return extensions;
 }
 
-async function connect(verify = false) {
-  const data = await twitchAuth(verify).catch((e) => {
-    logger.error("Authentication failed:", e);
-    return undefined;
-  });
+async function getActiveOverlayExtension() {
+  if (!connectedAccount.value)
+    throw new Error("Can't load extensions: account not linked");
 
-  if (data) {
-    const { auth, id } = data;
-
-    // // TODO: Maybe use remote call the verify connection
-    // const token_info = await getTokenInfo(auth.access_token);
-    // console.log("Got token info", token_info);
-
-    if (auth) {
-      store.auth = { data: auth };
-      store.id = { data: id };
-    }
-  }
+  return await connectedAccount.value.api.users
+    .getActiveExtensions(connectedAccount.value.connection.id.sub, true)
+    .then((installedExtensions) =>
+      installedExtensions.getExtensionAtSlot("overlay", "1")
+    );
 }
 
-function disconnect() {
-  store.auth = {};
-  store.id = {};
+async function activateExtension(extension: HelixUserExtension) {
+  if (!connectedAccount.value)
+    throw new Error("Can't load extensions: account not linked");
+
+  const p1 =
+    connectedAccount.value.api.users.updateActiveExtensionsForAuthenticatedUser(
+      connectedAccount.value.connection.id.sub,
+      {
+        overlay: {
+          "1": {
+            id: extension.id,
+            version: extension.version,
+            active: true,
+          },
+        },
+      }
+    );
+
+  const p2 = p1.then(() =>
+    checkExtensionActiveStatus(Promise.resolve(extension))
+  );
+
+  activeCheckPromise.value = p2;
+
+  const result = await p1;
+
+  return result;
 }
 </script>
 
@@ -130,7 +191,7 @@ function disconnect() {
       <div class="status">
         <template v-if="connectedAccount">
           <span class="promise-success">
-            <span class="twitchAccount">{{
+            <span class="twitch-account twitch-account--name">{{
               connectedAccount.connection.id.preferred_username
             }}</span>
           </span>
@@ -192,7 +253,40 @@ function disconnect() {
     <div class="extensionStep">
       <div class="description">Activate the stream overlay</div>
       <div class="status">
-        <template v-if="connectedAccount">…</template>
+        <template v-if="connectedAccount">
+          <Async :promise="activeCheckPromise">
+            <template #pending>Checking…</template>
+            <template #failure="{ value: error }"
+              >{{ error }}
+              <button
+                v-if="installedExtension"
+                class="btn btn--twitch"
+                @click="activateExtension(installedExtension)"
+              >
+                Activate overlay
+              </button>
+              <button
+                v-if="installedExtension"
+                class="btn"
+                title="Refresh this data"
+                @click="recheckExtensionActiveStatus(installedExtension)"
+              >
+                ↻
+              </button>
+            </template>
+            <template #success="{ value: active }"
+              >Extension active in overlay slot
+              <button
+                v-if="installedExtension"
+                class="btn"
+                title="Refresh this data"
+                @click="recheckExtensionActiveStatus(installedExtension)"
+              >
+                ↻
+              </button>
+            </template>
+          </Async>
+        </template>
       </div>
     </div>
   </div>
